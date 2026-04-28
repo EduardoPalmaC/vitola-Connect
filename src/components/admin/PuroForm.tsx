@@ -48,6 +48,7 @@ export default function PuroForm({ mode, id, initialData }: Props) {
   const [costMode, setCostMode] = useState<'pieza' | 'mazo'>('pieza');
   const [costoMazo, setCostoMazo] = useState(0);
   const [purosPorMazo, setPurosPorMazo] = useState(25);
+  const [transporteMazo, setTransporteMazo] = useState(0);
 
   // Live cost calculations
   const costoTotal = values.precioBruto + values.costoTransporte + values.costoAlmacenamiento;
@@ -63,28 +64,39 @@ export default function PuroForm({ mode, id, initialData }: Props) {
       set(key, Number(e.target.value) as FormValues[typeof key]);
   }
 
+  function calcMazoPrecioBruto(mazo: number, transporte: number, qty: number) {
+    return qty > 0 ? (mazo + transporte) / qty : 0;
+  }
+
   function handleCostoMazoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const mazo = Number(e.target.value);
     setCostoMazo(mazo);
-    set('precioBruto', purosPorMazo > 0 ? mazo / purosPorMazo : 0);
+    set('precioBruto', calcMazoPrecioBruto(mazo, transporteMazo, purosPorMazo));
   }
 
   function handlePurosPorMazoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const qty = Number(e.target.value);
     setPurosPorMazo(qty);
-    set('precioBruto', qty > 0 ? costoMazo / qty : 0);
+    set('precioBruto', calcMazoPrecioBruto(costoMazo, transporteMazo, qty));
+  }
+
+  function handleTransporteMazoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const transporte = Number(e.target.value);
+    setTransporteMazo(transporte);
+    set('precioBruto', calcMazoPrecioBruto(costoMazo, transporte, purosPorMazo));
   }
 
   function handleCostModeChange(mode: 'pieza' | 'mazo') {
     setCostMode(mode);
     if (mode === 'pieza') {
-      // Reset mazo fields, keep precioBruto as-is
       setCostoMazo(0);
+      setTransporteMazo(0);
       setPurosPorMazo(25);
     } else {
-      // Switching to mazo: reset precioBruto
       set('precioBruto', 0);
+      set('costoTransporte', 0);
       setCostoMazo(0);
+      setTransporteMazo(0);
     }
   }
 
@@ -125,10 +137,19 @@ export default function PuroForm({ mode, id, initialData }: Props) {
       const url = mode === 'create' ? '/api/puros' : `/api/puros/${id}`;
       const method = mode === 'create' ? 'POST' : 'PUT';
 
+      const payload =
+        costMode === 'mazo'
+          ? {
+              ...values,
+              precioBruto: calcMazoPrecioBruto(costoMazo, transporteMazo, purosPorMazo),
+              costoTransporte: 0,
+            }
+          : values;
+
       const res = await fetch(url, {
         method,
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values),
+        body: JSON.stringify(payload),
       });
 
       if (!res.ok) {
@@ -278,19 +299,19 @@ export default function PuroForm({ mode, id, initialData }: Props) {
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-medium text-text-muted">Costo unitario calculado</label>
                 <div className="px-3 py-2 rounded-lg border border-border bg-surface-alt text-sm text-text font-medium">
-                  ${purosPorMazo > 0 ? (costoMazo / purosPorMazo).toFixed(2) : '0.00'}
+                  ${purosPorMazo > 0 ? calcMazoPrecioBruto(costoMazo, transporteMazo, purosPorMazo).toFixed(2) : '0.00'}
                 </div>
               </div>
             </>
           )}
 
           <Input
-            label="Costo transporte ($)"
+            label={costMode === 'mazo' ? 'Transporte del mazo ($)' : 'Costo transporte ($)'}
             type="number"
             min={0}
             step="0.01"
-            value={values.costoTransporte}
-            onChange={numericSet('costoTransporte')}
+            value={costMode === 'mazo' ? transporteMazo : values.costoTransporte}
+            onChange={costMode === 'mazo' ? handleTransporteMazoChange : numericSet('costoTransporte')}
             required
           />
           <Input
