@@ -49,6 +49,7 @@ export default function PuroForm({ mode, id, initialData }: Props) {
   const [costoMazo, setCostoMazo] = useState(0);
   const [purosPorMazo, setPurosPorMazo] = useState(25);
   const [transporteMazo, setTransporteMazo] = useState(0);
+  const [almacenamientoMazo, setAlmacenamientoMazo] = useState(0);
 
   // Live cost calculations
   const costoTotal = values.precioBruto + values.costoTransporte + values.costoAlmacenamiento;
@@ -64,26 +65,32 @@ export default function PuroForm({ mode, id, initialData }: Props) {
       set(key, Number(e.target.value) as FormValues[typeof key]);
   }
 
-  function calcMazoPrecioBruto(mazo: number, transporte: number, qty: number) {
-    return qty > 0 ? (mazo + transporte) / qty : 0;
+  function calcMazoPrecioBruto(mazo: number, transporte: number, almacenamiento: number, qty: number) {
+    return qty > 0 ? (mazo + transporte + almacenamiento) / qty : 0;
   }
 
   function handleCostoMazoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const mazo = Number(e.target.value);
     setCostoMazo(mazo);
-    set('precioBruto', calcMazoPrecioBruto(mazo, transporteMazo, purosPorMazo));
+    set('precioBruto', calcMazoPrecioBruto(mazo, transporteMazo, almacenamientoMazo, purosPorMazo));
   }
 
   function handlePurosPorMazoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const qty = Number(e.target.value);
     setPurosPorMazo(qty);
-    set('precioBruto', calcMazoPrecioBruto(costoMazo, transporteMazo, qty));
+    set('precioBruto', calcMazoPrecioBruto(costoMazo, transporteMazo, almacenamientoMazo, qty));
   }
 
   function handleTransporteMazoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const transporte = Number(e.target.value);
     setTransporteMazo(transporte);
-    set('precioBruto', calcMazoPrecioBruto(costoMazo, transporte, purosPorMazo));
+    set('precioBruto', calcMazoPrecioBruto(costoMazo, transporte, almacenamientoMazo, purosPorMazo));
+  }
+
+  function handleAlmacenamientoMazoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const almacenamiento = Number(e.target.value);
+    setAlmacenamientoMazo(almacenamiento);
+    set('precioBruto', calcMazoPrecioBruto(costoMazo, transporteMazo, almacenamiento, purosPorMazo));
   }
 
   function handleCostModeChange(mode: 'pieza' | 'mazo') {
@@ -91,12 +98,15 @@ export default function PuroForm({ mode, id, initialData }: Props) {
     if (mode === 'pieza') {
       setCostoMazo(0);
       setTransporteMazo(0);
+      setAlmacenamientoMazo(0);
       setPurosPorMazo(25);
     } else {
       set('precioBruto', 0);
       set('costoTransporte', 0);
+      set('costoAlmacenamiento', 0);
       setCostoMazo(0);
       setTransporteMazo(0);
+      setAlmacenamientoMazo(0);
     }
   }
 
@@ -141,8 +151,9 @@ export default function PuroForm({ mode, id, initialData }: Props) {
         costMode === 'mazo'
           ? {
               ...values,
-              precioBruto: calcMazoPrecioBruto(costoMazo, transporteMazo, purosPorMazo),
+              precioBruto: calcMazoPrecioBruto(costoMazo, transporteMazo, almacenamientoMazo, purosPorMazo),
               costoTransporte: 0,
+              costoAlmacenamiento: 0,
             }
           : values;
 
@@ -299,7 +310,7 @@ export default function PuroForm({ mode, id, initialData }: Props) {
               <div className="flex flex-col gap-1.5">
                 <label className="text-sm font-medium text-text-muted">Costo unitario calculado</label>
                 <div className="px-3 py-2 rounded-lg border border-border bg-surface-alt text-sm text-text font-medium">
-                  ${purosPorMazo > 0 ? calcMazoPrecioBruto(costoMazo, transporteMazo, purosPorMazo).toFixed(2) : '0.00'}
+                  ${purosPorMazo > 0 ? calcMazoPrecioBruto(costoMazo, transporteMazo, almacenamientoMazo, purosPorMazo).toFixed(2) : '0.00'}
                 </div>
               </div>
             </>
@@ -315,12 +326,12 @@ export default function PuroForm({ mode, id, initialData }: Props) {
             required
           />
           <Input
-            label="Costo almacenamiento ($)"
+            label={costMode === 'mazo' ? 'Almacenamiento del mazo ($)' : 'Costo almacenamiento ($)'}
             type="number"
             min={0}
             step="0.01"
-            value={values.costoAlmacenamiento}
-            onChange={numericSet('costoAlmacenamiento')}
+            value={costMode === 'mazo' ? almacenamientoMazo : values.costoAlmacenamiento}
+            onChange={costMode === 'mazo' ? handleAlmacenamientoMazoChange : numericSet('costoAlmacenamiento')}
             required
           />
           <Input
