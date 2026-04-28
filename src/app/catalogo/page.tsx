@@ -34,7 +34,7 @@ export default async function CatalogoPage({ searchParams }: PageProps) {
   };
 
   const allPuros = await getPuros();
-  const publicPuros = allPuros.filter((p) => p.estado === 'negocio');
+  const publicPuros = allPuros.filter((p) => p.estado === 'negocio' && p.stock > 0);
 
   const filtered = filtrarPuros(publicPuros, filterParams);
   const { items, total, pages } = paginar(filtered, filterParams.page);
@@ -46,6 +46,7 @@ export default async function CatalogoPage({ searchParams }: PageProps) {
     vitola: p.vitola,
     precioVenta: p.precioVenta,
     fotoUrl: p.fotoUrl,
+    stock: p.stock,
   }));
 
   const marcas = getUniqueValues(publicPuros, 'marca') as string[];

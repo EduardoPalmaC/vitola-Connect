@@ -28,6 +28,7 @@ const EMPTY: FormValues = {
   fechaRevisionHumedad: '',
   fotoUrl: '',
   notasCata: '',
+  stock: 1,
 };
 
 interface Props {
@@ -79,6 +80,7 @@ export default function PuroForm({ mode, id, initialData }: Props) {
     const qty = Number(e.target.value);
     setPurosPorMazo(qty);
     set('precioBruto', calcMazoPrecioBruto(costoMazo, transporteMazo, almacenamientoMazo, qty));
+    set('stock', qty);
   }
 
   function handleTransporteMazoChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -100,6 +102,7 @@ export default function PuroForm({ mode, id, initialData }: Props) {
       setTransporteMazo(0);
       setAlmacenamientoMazo(0);
       setPurosPorMazo(25);
+      set('stock', 1);
     } else {
       set('precioBruto', 0);
       set('costoTransporte', 0);
@@ -107,6 +110,7 @@ export default function PuroForm({ mode, id, initialData }: Props) {
       setCostoMazo(0);
       setTransporteMazo(0);
       setAlmacenamientoMazo(0);
+      set('stock', purosPorMazo);
     }
   }
 
@@ -399,6 +403,28 @@ export default function PuroForm({ mode, id, initialData }: Props) {
             required
           />
         </div>
+      </section>
+
+      {/* Stock */}
+      <section className="flex flex-col gap-4">
+        <h2 className="text-xs font-semibold text-text-muted uppercase tracking-wider">
+          Inventario
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <Input
+            label="Stock disponible"
+            type="number"
+            min={0}
+            value={values.stock}
+            onChange={numericSet('stock')}
+            required
+          />
+        </div>
+        {costMode === 'mazo' && (
+          <p className="text-xs text-text-muted -mt-2">
+            Sugerido automáticamente según los puros por mazo.
+          </p>
+        )}
       </section>
 
       {/* Humedad */}

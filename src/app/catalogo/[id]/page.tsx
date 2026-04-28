@@ -12,7 +12,7 @@ interface PageProps {
 export default async function PuroDetailPage({ params }: PageProps) {
   const { id } = await params;
   const allPuros = await getPuros();
-  const puro = allPuros.find((p) => p.id === id && p.estado === 'negocio');
+  const puro = allPuros.find((p) => p.id === id && p.estado === 'negocio' && p.stock > 0);
 
   if (!puro) notFound();
 
@@ -52,8 +52,19 @@ export default async function PuroDetailPage({ params }: PageProps) {
               <h1 className="text-2xl font-heading font-bold text-text">{puro.nombre}</h1>
             </div>
 
-            <div className="text-3xl font-bold text-secondary">
-              ${puro.precioVenta.toLocaleString('es-MX')}
+            <div className="flex items-end gap-3">
+              <div className="text-3xl font-bold text-secondary">
+                ${puro.precioVenta.toLocaleString('es-MX')}
+              </div>
+              <span
+                className={`mb-1 text-xs font-medium px-2.5 py-1 rounded-full ${
+                  puro.stock <= 3
+                    ? 'bg-amber-400/15 text-amber-400'
+                    : 'bg-secondary/10 text-secondary'
+                }`}
+              >
+                {puro.stock} disponible{puro.stock !== 1 ? 's' : ''}
+              </span>
             </div>
 
             <div className="grid grid-cols-2 gap-3">

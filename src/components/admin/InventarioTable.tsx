@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import {
   useReactTable,
   getCoreRowModel,
@@ -18,64 +18,133 @@ import Input from '@/components/ui/Input';
 
 const col = createColumnHelper<Puro>();
 
-const columns = [
-  col.accessor('nombre', {
-    header: 'Nombre',
-    cell: (info) => (
-      <Link
-        href={`/admin/inventario/${info.row.original.id}`}
-        className="font-medium text-text hover:text-secondary transition-colors"
-      >
-        {info.getValue()}
-      </Link>
-    ),
-  }),
-  col.accessor('marca', { header: 'Marca' }),
-  col.accessor('vitola', { header: 'Vitola' }),
-  col.accessor('paisOrigen', { header: 'País' }),
-  col.accessor('estado', {
-    header: 'Estado',
-    cell: (info) => {
-      const v = info.getValue();
-      return (
-        <Badge variant={v === 'negocio' ? 'success' : 'info'}>
-          {v.replace('_', ' ')}
-        </Badge>
-      );
-    },
-  }),
-  col.accessor('precioVenta', {
-    header: 'Precio venta',
-    cell: (info) => `$${info.getValue().toLocaleString('es-MX')}`,
-  }),
-  col.display({
-    id: 'costoTotal',
-    header: 'Costo total',
-    cell: (info) => `$${calcularCostoTotal(info.row.original).toLocaleString('es-MX')}`,
-  }),
-  col.display({
-    id: 'margen',
-    header: 'Margen',
-    cell: (info) => `${calcularMargen(info.row.original).toFixed(1)}%`,
-  }),
-  col.accessor('fechaLlegada', { header: 'Llegada' }),
-  col.display({
-    id: 'acciones',
-    header: '',
-    cell: (info) => (
-      <Link
-        href={`/admin/inventario/${info.row.original.id}`}
-        className="text-xs text-text-muted hover:text-secondary transition-colors"
-      >
-        Editar →
-      </Link>
-    ),
-  }),
-];
-
-export default function InventarioTable({ puros }: { puros: Puro[] }) {
+export default function InventarioTable({ puros: initialPuros }: { puros: Puro[] }) {
+  const [puros, setPuros] = useState<Puro[]>(initialPuros);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState('');
+  const [selling, setSelling] = useState<string | null>(null);
+
+  const handleVentaRapida = useCallback(async (puro: Puro) => {
+    if (puro.stock <= 0 || selling === puro.id) return;
+    const newStock = puro.stock - 1;
+
+    setSelling(puro.id);
+    setPuros((prev) => prev.map((p) => (p.id === puro.id ? { ...p, stock: newStock } : p)));
+
+    try {
+      const res = await fetch(`/api/puros/${puro.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ stock: newStock }),
+      });
+      if (!res.ok) throw new Error();
+    } catch {
+      setPuros((prev) => prev.map((p) => (p.id === puro.id ? { ...p, stock: puro.stock } : p)));
+    } finally {
+      setSelling(null);
+    }
+  }, [selling]);
+
+  const columns = useMemo(
+    () => [
+      col.accessor('nombre', {
+        header: 'Nombre',
+        cell: (info) => (
+          <Link
+            href={`/admin/inventario/${info.row.original.id}`}
+            className="font-medium text-text hover:text-secondary transition-colors"
+          >
+            {info.getValue()}
+          </Link>
+        ),
+      }),
+      col.accessor('marca', { header: 'Marca' }),
+      col.accessor('vitola', { header: 'Vitola' }),
+      col.accessor('paisOrigen', { header: 'País' }),
+      col.accessor('estado', {
+        header: 'Estado',
+        cell: (info) => {
+          const v = info.getValue();
+          return (
+            <Badge variant={v === 'negocio' ? 'success' : 'info'}>
+              {v.replace('_', ' ')}
+            </Badge>
+          );
+        },
+      }),
+      col.accessor('precioVenta', {
+        header: 'Precio venta',
+        cell: (info) => `$${info.getValue().toLocaleString('es-MX')}`,
+      }),
+      col.display({
+        id: 'costoTotal',
+        header: 'Costo total',
+        cell: (info) => `$${calcularCostoTotal(info.row.original).toLocaleString('es-MX')}`,
+      }),
+      col.display({
+        id: 'margen',
+        header: 'Margen',
+        cell: (info) => `${calcularMargen(info.row.original).toFixed(1)}%`,
+      }),
+      col.accessor('stock', {
+        header: 'Stock',
+        cell: (info) => {
+          const stock = info.getValue();
+          return (
+            <span
+              className={`font-semibold tabular-nums ${
+                stock === 0 ? 'text-red-400' : stock <= 3 ? 'text-amber-400' : 'text-secondary'
+              }`}
+            >
+              {stock}
+            </span>
+          );
+        },
+      }),
+      col.accessor('fechaLlegada', { header: 'Llegada' }),
+      col.display({
+        id: 'acciones',
+        header: 'Acciones',
+        cell: (info) => {
+          const puro = info.row.original;
+          const agotado = puro.stock <= 0;
+          const isSelling = selling === puro.id;
+
+          return (
+            <div className="flex items-center gap-2">
+              {agotado ? (
+                <span className="text-xs text-red-400 font-medium px-2 py-1 rounded-md border border-red-400/30 bg-red-400/10 whitespace-nowrap">
+                  Agotado
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  disabled={isSelling}
+                  onClick={() => handleVentaRapida(puro)}
+                  title="Registrar venta (-1 stock)"
+                  className="flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-md border border-border bg-surface hover:border-secondary/60 hover:text-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+                >
+                  {isSelling ? (
+                    <span className="w-3 h-3 rounded-full border-2 border-current border-t-transparent animate-spin" />
+                  ) : (
+                    <span className="text-base leading-none">−</span>
+                  )}
+                  Vender
+                </button>
+              )}
+              <Link
+                href={`/admin/inventario/${puro.id}`}
+                className="text-xs text-text-muted hover:text-secondary transition-colors"
+              >
+                Editar →
+              </Link>
+            </div>
+          );
+        },
+      }),
+    ],
+    [selling, handleVentaRapida],
+  );
 
   const data = useMemo(() => puros, [puros]);
 

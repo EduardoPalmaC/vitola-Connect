@@ -17,6 +17,7 @@ export interface Puro {
   fechaRevisionHumedad: string;
   fotoUrl?: string;
   notasCata?: string;
+  stock: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -52,6 +53,7 @@ export interface PuroPublico {
   vitola: string;
   precioVenta: number;
   fotoUrl?: string;
+  stock: number;
 }
 
 export interface DashboardKPIs {

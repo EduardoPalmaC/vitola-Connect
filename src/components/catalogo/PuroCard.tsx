@@ -32,9 +32,18 @@ export default function PuroCard({ puro }: PuroCardProps) {
         <p className="text-xs text-text-muted uppercase tracking-wide">{puro.marca}</p>
         <h3 className="font-semibold text-text leading-tight line-clamp-2">{puro.nombre}</h3>
         <p className="text-xs text-text-muted">{puro.vitola}</p>
-        <div className="mt-3">
+        <div className="mt-3 flex items-end justify-between gap-2">
           <span className="text-lg font-bold text-secondary">
             ${puro.precioVenta.toLocaleString('es-MX')}
+          </span>
+          <span
+            className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+              puro.stock <= 3
+                ? 'bg-amber-400/15 text-amber-400'
+                : 'bg-secondary/10 text-secondary'
+            }`}
+          >
+            {puro.stock} disponible{puro.stock !== 1 ? 's' : ''}
           </span>
         </div>
       </div>
