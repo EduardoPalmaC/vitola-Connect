@@ -45,6 +45,15 @@ export interface FilterParams {
   page?: number;
 }
 
+export interface PuroPublico {
+  id: string;
+  nombre: string;
+  marca: string;
+  vitola: string;
+  precioVenta: number;
+  fotoUrl?: string;
+}
+
 export interface DashboardKPIs {
   valorColeccionPersonal: number;
   gananciasProyectadas: number;

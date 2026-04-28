@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 import { Suspense } from 'react';
 import { getPuros } from '@/lib/sheets';
 import { filtrarPuros, paginar, getUniqueValues } from '@/lib/filters';
-import type { FilterParams, Puro } from '@/types';
+import type { FilterParams, Puro, PuroPublico } from '@/types';
 import PuroCard from '@/components/catalogo/PuroCard';
 import FilterSidebar from '@/components/catalogo/FilterSidebar';
 import PaginationBar from '@/components/catalogo/PaginationBar';
@@ -39,6 +39,15 @@ export default async function CatalogoPage({ searchParams }: PageProps) {
   const filtered = filtrarPuros(publicPuros, filterParams);
   const { items, total, pages } = paginar(filtered, filterParams.page);
 
+  const publicItems: PuroPublico[] = items.map((p) => ({
+    id: p.id,
+    nombre: p.nombre,
+    marca: p.marca,
+    vitola: p.vitola,
+    precioVenta: p.precioVenta,
+    fotoUrl: p.fotoUrl,
+  }));
+
   const marcas = getUniqueValues(publicPuros, 'marca') as string[];
   const vitolas = getUniqueValues(publicPuros, 'vitola') as string[];
   const paises = getUniqueValues(publicPuros, 'paisOrigen') as string[];
@@ -73,7 +82,7 @@ export default async function CatalogoPage({ searchParams }: PageProps) {
             ) : (
               <>
                 <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4">
-                  {items.map((puro) => (
+                  {publicItems.map((puro) => (
                     <PuroCard key={puro.id} puro={puro} />
                   ))}
                 </div>

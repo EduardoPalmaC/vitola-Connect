@@ -44,6 +44,16 @@ export default function PuroForm({ mode, id, initialData }: Props) {
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState('');
 
+  // Mazo/Pieza state
+  const [costMode, setCostMode] = useState<'pieza' | 'mazo'>('pieza');
+  const [costoMazo, setCostoMazo] = useState(0);
+  const [purosPorMazo, setPurosPorMazo] = useState(25);
+
+  // Live cost calculations
+  const costoTotal = values.precioBruto + values.costoTransporte + values.costoAlmacenamiento;
+  const gananciaCalc = values.precioVenta - costoTotal;
+  const margenCalc = costoTotal > 0 ? (gananciaCalc / costoTotal) * 100 : 0;
+
   function set<K extends keyof FormValues>(key: K, value: FormValues[K]) {
     setValues((prev) => ({ ...prev, [key]: value }));
   }
@@ -51,6 +61,31 @@ export default function PuroForm({ mode, id, initialData }: Props) {
   function numericSet(key: keyof FormValues) {
     return (e: React.ChangeEvent<HTMLInputElement>) =>
       set(key, Number(e.target.value) as FormValues[typeof key]);
+  }
+
+  function handleCostoMazoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const mazo = Number(e.target.value);
+    setCostoMazo(mazo);
+    set('precioBruto', purosPorMazo > 0 ? mazo / purosPorMazo : 0);
+  }
+
+  function handlePurosPorMazoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const qty = Number(e.target.value);
+    setPurosPorMazo(qty);
+    set('precioBruto', qty > 0 ? costoMazo / qty : 0);
+  }
+
+  function handleCostModeChange(mode: 'pieza' | 'mazo') {
+    setCostMode(mode);
+    if (mode === 'pieza') {
+      // Reset mazo fields, keep precioBruto as-is
+      setCostoMazo(0);
+      setPurosPorMazo(25);
+    } else {
+      // Switching to mazo: reset precioBruto
+      set('precioBruto', 0);
+      setCostoMazo(0);
+    }
   }
 
   async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -180,16 +215,75 @@ export default function PuroForm({ mode, id, initialData }: Props) {
         <h2 className="text-xs font-semibold text-text-muted uppercase tracking-wider">
           Costos y precio
         </h2>
+
+        {/* Toggle mazo/pieza */}
+        <div className="flex items-center gap-3">
+          <span className="text-sm text-text-muted">Ingresar costo por:</span>
+          <div className="flex rounded-lg border border-border overflow-hidden text-sm">
+            <button
+              type="button"
+              onClick={() => handleCostModeChange('pieza')}
+              className={`px-4 py-1.5 transition-colors ${
+                costMode === 'pieza'
+                  ? 'bg-secondary text-white font-medium'
+                  : 'bg-surface text-text hover:bg-surface-alt'
+              }`}
+            >
+              Pieza
+            </button>
+            <button
+              type="button"
+              onClick={() => handleCostModeChange('mazo')}
+              className={`px-4 py-1.5 transition-colors border-l border-border ${
+                costMode === 'mazo'
+                  ? 'bg-secondary text-white font-medium'
+                  : 'bg-surface text-text hover:bg-surface-alt'
+              }`}
+            >
+              Mazo
+            </button>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Input
-            label="Precio bruto ($)"
-            type="number"
-            min={0}
-            step="0.01"
-            value={values.precioBruto}
-            onChange={numericSet('precioBruto')}
-            required
-          />
+          {costMode === 'pieza' ? (
+            <Input
+              label="Costo unitario ($)"
+              type="number"
+              min={0}
+              step="0.01"
+              value={values.precioBruto}
+              onChange={numericSet('precioBruto')}
+              required
+            />
+          ) : (
+            <>
+              <Input
+                label="Costo total del mazo ($)"
+                type="number"
+                min={0}
+                step="0.01"
+                value={costoMazo}
+                onChange={handleCostoMazoChange}
+                required
+              />
+              <Input
+                label="Puros por mazo"
+                type="number"
+                min={1}
+                value={purosPorMazo}
+                onChange={handlePurosPorMazoChange}
+                required
+              />
+              <div className="flex flex-col gap-1.5">
+                <label className="text-sm font-medium text-text-muted">Costo unitario calculado</label>
+                <div className="px-3 py-2 rounded-lg border border-border bg-surface-alt text-sm text-text font-medium">
+                  ${purosPorMazo > 0 ? (costoMazo / purosPorMazo).toFixed(2) : '0.00'}
+                </div>
+              </div>
+            </>
+          )}
+
           <Input
             label="Costo transporte ($)"
             type="number"
@@ -218,6 +312,28 @@ export default function PuroForm({ mode, id, initialData }: Props) {
             required
           />
         </div>
+
+        {/* Ganancia y margen calculados */}
+        {costoTotal > 0 && (
+          <div className="grid grid-cols-3 gap-3 rounded-lg border border-border bg-surface-alt p-4">
+            <div className="flex flex-col gap-0.5">
+              <p className="text-xs text-text-muted">Costo total unitario</p>
+              <p className="text-sm font-bold text-text">${costoTotal.toFixed(2)}</p>
+            </div>
+            <div className="flex flex-col gap-0.5">
+              <p className="text-xs text-text-muted">Ganancia</p>
+              <p className={`text-sm font-bold ${gananciaCalc >= 0 ? 'text-secondary' : 'text-red-400'}`}>
+                ${gananciaCalc.toFixed(2)}
+              </p>
+            </div>
+            <div className="flex flex-col gap-0.5">
+              <p className="text-xs text-text-muted">Margen</p>
+              <p className={`text-sm font-bold ${margenCalc >= 0 ? 'text-secondary' : 'text-red-400'}`}>
+                {margenCalc.toFixed(1)}%
+              </p>
+            </div>
+          </div>
+        )}
       </section>
 
       {/* Estado y añejamiento */}
@@ -286,8 +402,8 @@ export default function PuroForm({ mode, id, initialData }: Props) {
         </h2>
         <div className="flex flex-col gap-3">
           {values.fotoUrl && (
-            <div className="relative h-48 w-48 rounded-lg overflow-hidden border border-border">
-              <Image src={values.fotoUrl} alt="Foto del puro" fill className="object-cover" />
+            <div className="relative h-48 w-48 rounded-lg overflow-hidden border border-border bg-white">
+              <Image src={values.fotoUrl} alt="Foto del puro" fill className="object-contain" />
             </div>
           )}
           <div className="flex flex-col gap-1.5">
