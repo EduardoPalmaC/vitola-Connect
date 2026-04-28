@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { Suspense } from 'react';
 import { getPuros } from '@/lib/sheets';
 import { filtrarPuros, paginar, getUniqueValues } from '@/lib/filters';
