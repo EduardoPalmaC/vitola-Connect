@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Input from '@/components/ui/Input';
@@ -52,6 +52,20 @@ export default function PuroForm({ mode, id, initialData }: Props) {
   const [transporteMazo, setTransporteMazo] = useState(0);
   const [almacenamientoMazo, setAlmacenamientoMazo] = useState(0);
 
+  const isColeccion = values.estado === 'coleccion_personal';
+
+  // Auto-calculate añejamiento from fechaLlegada
+  useEffect(() => {
+    if (!values.fechaLlegada) return;
+    const llegada = new Date(values.fechaLlegada);
+    if (isNaN(llegada.getTime())) return;
+    const hoy = new Date();
+    const meses =
+      (hoy.getFullYear() - llegada.getFullYear()) * 12 +
+      (hoy.getMonth() - llegada.getMonth());
+    set('tiempoAnejamiento', Math.max(0, meses));
+  }, [values.fechaLlegada]);
+
   // Live cost calculations
   const costoTotal = values.precioBruto + values.costoTransporte + values.costoAlmacenamiento;
   const gananciaCalc = values.precioVenta - costoTotal;
@@ -97,10 +111,6 @@ export default function PuroForm({ mode, id, initialData }: Props) {
 
   function handleCostModeChange(mode: 'pieza' | 'mazo') {
     setCostMode(mode);
-    if (mode === 'mazo') {
-      set('precioBruto', calcMazoPrecioBruto(costoMazo, transporteMazo, almacenamientoMazo, purosPorMazo));
-      set('stock', purosPorMazo);
-    }
   }
 
   async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
@@ -327,36 +337,42 @@ export default function PuroForm({ mode, id, initialData }: Props) {
             onChange={costMode === 'mazo' ? handleAlmacenamientoMazoChange : numericSet('costoAlmacenamiento')}
             required
           />
-          <Input
-            label="Precio de venta ($)"
-            type="number"
-            min={0}
-            step="0.01"
-            value={values.precioVenta}
-            onChange={numericSet('precioVenta')}
-            required
-          />
+          {!isColeccion && (
+            <Input
+              label="Precio de venta ($)"
+              type="number"
+              min={0}
+              step="0.01"
+              value={values.precioVenta}
+              onChange={numericSet('precioVenta')}
+              required
+            />
+          )}
         </div>
 
-        {/* Ganancia y margen calculados */}
+        {/* Costo total visible siempre; ganancia/margen solo para negocio */}
         {costoTotal > 0 && (
-          <div className="grid grid-cols-3 gap-3 rounded-lg border border-border bg-surface-alt p-4">
+          <div className={`grid gap-3 rounded-lg border border-border bg-surface-alt p-4 ${isColeccion ? 'grid-cols-1' : 'grid-cols-3'}`}>
             <div className="flex flex-col gap-0.5">
               <p className="text-xs text-text-muted">Costo total unitario</p>
               <p className="text-sm font-bold text-text">${costoTotal.toFixed(2)}</p>
             </div>
-            <div className="flex flex-col gap-0.5">
-              <p className="text-xs text-text-muted">Ganancia</p>
-              <p className={`text-sm font-bold ${gananciaCalc >= 0 ? 'text-secondary' : 'text-red-400'}`}>
-                ${gananciaCalc.toFixed(2)}
-              </p>
-            </div>
-            <div className="flex flex-col gap-0.5">
-              <p className="text-xs text-text-muted">Margen</p>
-              <p className={`text-sm font-bold ${margenCalc >= 0 ? 'text-secondary' : 'text-red-400'}`}>
-                {margenCalc.toFixed(1)}%
-              </p>
-            </div>
+            {!isColeccion && (
+              <>
+                <div className="flex flex-col gap-0.5">
+                  <p className="text-xs text-text-muted">Ganancia</p>
+                  <p className={`text-sm font-bold ${gananciaCalc >= 0 ? 'text-secondary' : 'text-red-400'}`}>
+                    ${gananciaCalc.toFixed(2)}
+                  </p>
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  <p className="text-xs text-text-muted">Margen</p>
+                  <p className={`text-sm font-bold ${margenCalc >= 0 ? 'text-secondary' : 'text-red-400'}`}>
+                    {margenCalc.toFixed(1)}%
+                  </p>
+                </div>
+              </>
+            )}
           </div>
         )}
       </section>
@@ -384,11 +400,12 @@ export default function PuroForm({ mode, id, initialData }: Props) {
             required
           />
           <Input
-            label="Tiempo añejamiento (meses)"
+            label={`Añejamiento (meses)${values.fechaLlegada ? ' — calculado' : ''}`}
             type="number"
             min={0}
             value={values.tiempoAnejamiento}
             onChange={numericSet('tiempoAnejamiento')}
+            readOnly={!!values.fechaLlegada}
             required
           />
         </div>

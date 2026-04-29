@@ -23,6 +23,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             'h-10 w-full rounded-lg border bg-surface px-3 text-sm text-text placeholder:text-text-muted transition-colors',
             'focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent',
             'disabled:opacity-50 disabled:cursor-not-allowed',
+            'read-only:bg-surface-alt read-only:cursor-default',
             error ? 'border-red-500' : 'border-border',
             className,
           )}
