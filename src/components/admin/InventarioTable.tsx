@@ -9,119 +9,149 @@ import {
   flexRender,
   createColumnHelper,
   type SortingState,
+  type ColumnDef,
 } from '@tanstack/react-table';
 import Link from 'next/link';
 import type { Puro } from '@/types';
 import { calcularCostoTotal, calcularMargen } from '@/lib/calculations';
-import Badge from '@/components/ui/Badge';
 import Input from '@/components/ui/Input';
 
 const col = createColumnHelper<Puro>();
 
-export default function InventarioTable({ puros: initialPuros }: { puros: Puro[] }) {
-  const [puros] = useState<Puro[]>(initialPuros);
+const baseColumns = [
+  col.accessor('nombre', {
+    header: 'Nombre',
+    cell: (info) => (
+      <Link
+        href={`/admin/inventario/${info.row.original.id}`}
+        className="font-medium text-text hover:text-secondary transition-colors"
+      >
+        {info.getValue()}
+      </Link>
+    ),
+  }),
+  col.accessor('marca', { header: 'Marca' }),
+  col.accessor('vitola', { header: 'Vitola' }),
+  col.accessor('paisOrigen', { header: 'País' }),
+  col.display({
+    id: 'costoTotal',
+    header: 'Costo total',
+    cell: (info) => `$${calcularCostoTotal(info.row.original).toLocaleString('es-MX')}`,
+  }),
+  col.accessor('stock', {
+    header: 'Stock',
+    cell: (info) => {
+      const stock = info.getValue();
+      return (
+        <span
+          className={`font-semibold tabular-nums ${
+            stock === 0 ? 'text-red-400' : stock <= 3 ? 'text-amber-400' : 'text-secondary'
+          }`}
+        >
+          {stock}
+        </span>
+      );
+    },
+  }),
+  col.accessor('fechaLlegada', { header: 'Llegada' }),
+  col.display({
+    id: 'acciones',
+    header: 'Acciones',
+    cell: (info) => (
+      <Link
+        href={`/admin/inventario/${info.row.original.id}`}
+        className="text-xs text-text-muted hover:text-secondary transition-colors"
+      >
+        Editar →
+      </Link>
+    ),
+  }),
+];
+
+const negocioColumns = [
+  col.accessor('nombre', {
+    header: 'Nombre',
+    cell: (info) => (
+      <Link
+        href={`/admin/inventario/${info.row.original.id}`}
+        className="font-medium text-text hover:text-secondary transition-colors"
+      >
+        {info.getValue()}
+      </Link>
+    ),
+  }),
+  col.accessor('marca', { header: 'Marca' }),
+  col.accessor('vitola', { header: 'Vitola' }),
+  col.accessor('paisOrigen', { header: 'País' }),
+  col.accessor('precioVenta', {
+    header: 'Precio venta',
+    cell: (info) => `$${info.getValue().toLocaleString('es-MX')}`,
+  }),
+  col.display({
+    id: 'costoTotal',
+    header: 'Costo total',
+    cell: (info) => `$${calcularCostoTotal(info.row.original).toLocaleString('es-MX')}`,
+  }),
+  col.display({
+    id: 'margen',
+    header: 'Margen',
+    cell: (info) => `${calcularMargen(info.row.original).toFixed(1)}%`,
+  }),
+  col.accessor('stock', {
+    header: 'Stock',
+    cell: (info) => {
+      const stock = info.getValue();
+      return (
+        <span
+          className={`font-semibold tabular-nums ${
+            stock === 0 ? 'text-red-400' : stock <= 3 ? 'text-amber-400' : 'text-secondary'
+          }`}
+        >
+          {stock}
+        </span>
+      );
+    },
+  }),
+  col.accessor('fechaLlegada', { header: 'Llegada' }),
+  col.display({
+    id: 'acciones',
+    header: 'Acciones',
+    cell: (info) => (
+      <Link
+        href={`/admin/inventario/${info.row.original.id}`}
+        className="text-xs text-text-muted hover:text-secondary transition-colors"
+      >
+        Editar →
+      </Link>
+    ),
+  }),
+];
+
+function PurosTable({
+  data,
+  columns,
+  globalFilter,
+  emptyText,
+}: {
+  data: Puro[];
+  columns: ColumnDef<Puro, unknown>[];
+  globalFilter: string;
+  emptyText: string;
+}) {
   const [sorting, setSorting] = useState<SortingState>([]);
-  const [globalFilter, setGlobalFilter] = useState('');
-
-  const columns = useMemo(
-    () => [
-      col.accessor('nombre', {
-        header: 'Nombre',
-        cell: (info) => (
-          <Link
-            href={`/admin/inventario/${info.row.original.id}`}
-            className="font-medium text-text hover:text-secondary transition-colors"
-          >
-            {info.getValue()}
-          </Link>
-        ),
-      }),
-      col.accessor('marca', { header: 'Marca' }),
-      col.accessor('vitola', { header: 'Vitola' }),
-      col.accessor('paisOrigen', { header: 'País' }),
-      col.accessor('estado', {
-        header: 'Estado',
-        cell: (info) => {
-          const v = info.getValue();
-          return (
-            <Badge variant={v === 'negocio' ? 'success' : 'info'}>
-              {v.replace('_', ' ')}
-            </Badge>
-          );
-        },
-      }),
-      col.accessor('precioVenta', {
-        header: 'Precio venta',
-        cell: (info) => `$${info.getValue().toLocaleString('es-MX')}`,
-      }),
-      col.display({
-        id: 'costoTotal',
-        header: 'Costo total',
-        cell: (info) => `$${calcularCostoTotal(info.row.original).toLocaleString('es-MX')}`,
-      }),
-      col.display({
-        id: 'margen',
-        header: 'Margen',
-        cell: (info) => `${calcularMargen(info.row.original).toFixed(1)}%`,
-      }),
-      col.accessor('stock', {
-        header: 'Stock',
-        cell: (info) => {
-          const stock = info.getValue();
-          return (
-            <span
-              className={`font-semibold tabular-nums ${
-                stock === 0 ? 'text-red-400' : stock <= 3 ? 'text-amber-400' : 'text-secondary'
-              }`}
-            >
-              {stock}
-            </span>
-          );
-        },
-      }),
-      col.accessor('fechaLlegada', { header: 'Llegada' }),
-      col.display({
-        id: 'acciones',
-        header: 'Acciones',
-        cell: (info) => {
-          const puro = info.row.original;
-          return (
-            <Link
-              href={`/admin/inventario/${puro.id}`}
-              className="text-xs text-text-muted hover:text-secondary transition-colors"
-            >
-              Editar →
-            </Link>
-          );
-        },
-      }),
-    ],
-    [],
-  );
-
-  const data = useMemo(() => puros, [puros]);
 
   const table = useReactTable({
     data,
     columns,
     state: { sorting, globalFilter },
     onSortingChange: setSorting,
-    onGlobalFilterChange: setGlobalFilter,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
   });
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="max-w-xs">
-        <Input
-          placeholder="Buscar..."
-          value={globalFilter}
-          onChange={(e) => setGlobalFilter(e.target.value)}
-        />
-      </div>
-
+    <div className="flex flex-col gap-2">
       <div className="rounded-xl border border-border overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
@@ -145,11 +175,8 @@ export default function InventarioTable({ puros: initialPuros }: { puros: Puro[]
           <tbody>
             {table.getRowModel().rows.length === 0 ? (
               <tr>
-                <td
-                  colSpan={columns.length}
-                  className="px-4 py-12 text-center text-text-muted"
-                >
-                  No se encontraron puros
+                <td colSpan={columns.length} className="px-4 py-12 text-center text-text-muted">
+                  {emptyText}
                 </td>
               </tr>
             ) : (
@@ -169,10 +196,55 @@ export default function InventarioTable({ puros: initialPuros }: { puros: Puro[]
           </tbody>
         </table>
       </div>
-
       <p className="text-xs text-text-muted">
-        {table.getFilteredRowModel().rows.length} de {puros.length} puros
+        {table.getFilteredRowModel().rows.length} de {data.length} puros
       </p>
+    </div>
+  );
+}
+
+export default function InventarioTable({ puros: initialPuros }: { puros: Puro[] }) {
+  const [puros] = useState<Puro[]>(initialPuros);
+  const [globalFilter, setGlobalFilter] = useState('');
+
+  const negocio = useMemo(() => puros.filter((p) => p.estado === 'negocio'), [puros]);
+  const coleccion = useMemo(() => puros.filter((p) => p.estado === 'coleccion_personal'), [puros]);
+
+  return (
+    <div className="flex flex-col gap-8">
+      <div className="max-w-xs">
+        <Input
+          placeholder="Buscar..."
+          value={globalFilter}
+          onChange={(e) => setGlobalFilter(e.target.value)}
+        />
+      </div>
+
+      <section className="flex flex-col gap-3">
+        <h2 className="text-lg font-semibold text-text" style={{ fontFamily: 'Syne, sans-serif' }}>
+          Inventario de Negocio
+          <span className="ml-2 text-sm font-normal text-text-muted">({negocio.length})</span>
+        </h2>
+        <PurosTable
+          data={negocio}
+          columns={negocioColumns as ColumnDef<Puro, unknown>[]}
+          globalFilter={globalFilter}
+          emptyText="No hay puros de negocio"
+        />
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <h2 className="text-lg font-semibold text-text" style={{ fontFamily: 'Syne, sans-serif' }}>
+          Colección Personal
+          <span className="ml-2 text-sm font-normal text-text-muted">({coleccion.length})</span>
+        </h2>
+        <PurosTable
+          data={coleccion}
+          columns={baseColumns as ColumnDef<Puro, unknown>[]}
+          globalFilter={globalFilter}
+          emptyText="No hay puros en colección personal"
+        />
+      </section>
     </div>
   );
 }
