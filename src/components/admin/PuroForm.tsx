@@ -97,10 +97,6 @@ export default function PuroForm({ mode, id, initialData }: Props) {
 
   function handleCostModeChange(mode: 'pieza' | 'mazo') {
     setCostMode(mode);
-    if (mode === 'mazo') {
-      set('precioBruto', calcMazoPrecioBruto(costoMazo, transporteMazo, almacenamientoMazo, purosPorMazo));
-      set('stock', purosPorMazo);
-    }
   }
 
   async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
