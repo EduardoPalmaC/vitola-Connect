@@ -238,6 +238,23 @@ export async function createCata(cata: Omit<Cata, 'id' | 'createdAt'>): Promise<
   return full;
 }
 
+export async function updateCata(id: string, data: Partial<Omit<Cata, 'id' | 'createdAt'>>): Promise<Cata> {
+  const catas = await getCatas();
+  const index = catas.findIndex((c) => c.id === id);
+  if (index === -1) throw new Error('Cata no encontrada');
+
+  const updated: Cata = { ...catas[index]!, ...data };
+
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: SPREADSHEET_ID,
+    range: `Catas!A${index + 2}:N${index + 2}`,
+    valueInputOption: 'USER_ENTERED',
+    requestBody: { values: [cataToRow(updated)] },
+  });
+
+  return updated;
+}
+
 export async function deleteCata(id: string): Promise<void> {
   const catas = await getCatas();
   const index = catas.findIndex((c) => c.id === id);

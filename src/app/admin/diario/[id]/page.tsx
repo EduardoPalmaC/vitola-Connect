@@ -79,6 +79,12 @@ export default async function CataDetailPage({
           >
             ← Mi Diario
           </Link>
+          <Link
+            href={`/admin/diario/${cata.id}/editar`}
+            className="rounded-lg border border-border bg-surface px-4 py-1.5 text-sm text-text hover:border-secondary/60 transition-colors"
+          >
+            Editar
+          </Link>
           <DeleteCataButton id={cata.id} />
         </div>
       </header>
