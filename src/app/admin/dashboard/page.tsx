@@ -27,6 +27,12 @@ export default async function DashboardPage() {
             Inventario
           </Link>
           <Link
+            href="/admin/coleccion"
+            className="text-sm text-text-muted hover:text-secondary transition-colors"
+          >
+            Mi Colección
+          </Link>
+          <Link
             href="/admin/settings"
             className="text-sm text-text-muted hover:text-secondary transition-colors"
           >
