@@ -22,29 +22,36 @@ export default function PaginationBar({ page, pages, total }: PaginationBarProps
   if (pages <= 1) return null;
 
   return (
-    <div className="flex items-center justify-between pt-8 mt-4 border-t border-border/40">
-      <p className="text-xs text-text-muted">{total} puros encontrados</p>
-      <div className="flex items-center gap-3">
+    <div
+      className="flex items-center justify-between pt-8 mt-8"
+      style={{ borderTop: '1px solid rgba(237,224,196,0.07)' }}
+    >
+      <p
+        className="text-[10px] uppercase tracking-widest"
+        style={{ fontFamily: 'var(--font-body)', color: 'rgba(237,224,196,0.2)' }}
+      >
+        {total} puros
+      </p>
+      <div className="flex items-center gap-4">
         <button
           disabled={page <= 1}
           onClick={() => goTo(page - 1)}
-          className="text-xs px-4 py-2 rounded-lg border border-border text-text-muted
-            hover:border-[#B8924A]/50 hover:text-[#D4AA6A]
-            disabled:opacity-30 disabled:cursor-not-allowed
-            transition-all duration-200 cursor-pointer"
+          className="text-[10px] uppercase tracking-widest cursor-pointer transition-colors duration-200 disabled:opacity-20 disabled:cursor-not-allowed"
+          style={{ fontFamily: 'var(--font-body)', color: 'rgba(237,224,196,0.4)' }}
         >
           ← Anterior
         </button>
-        <span className="text-xs text-text-muted tabular-nums min-w-[3rem] text-center">
+        <span
+          className="text-[10px] tabular-nums"
+          style={{ fontFamily: 'var(--font-body)', color: 'rgba(237,224,196,0.2)' }}
+        >
           {page} / {pages}
         </span>
         <button
           disabled={page >= pages}
           onClick={() => goTo(page + 1)}
-          className="text-xs px-4 py-2 rounded-lg border border-border text-text-muted
-            hover:border-[#B8924A]/50 hover:text-[#D4AA6A]
-            disabled:opacity-30 disabled:cursor-not-allowed
-            transition-all duration-200 cursor-pointer"
+          className="text-[10px] uppercase tracking-widest cursor-pointer transition-colors duration-200 disabled:opacity-20 disabled:cursor-not-allowed"
+          style={{ fontFamily: 'var(--font-body)', color: 'rgba(237,224,196,0.4)' }}
         >
           Siguiente →
         </button>

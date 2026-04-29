@@ -57,34 +57,45 @@ export default async function CatalogoPage({ searchParams }: PageProps) {
   const cepos = getUniqueValues(publicPuros, 'ringGauge') as number[];
 
   return (
-    <div className="min-h-screen bg-background relative">
-      <header className="border-b border-border/50 px-6 py-8 text-center">
-        <p className="text-[10px] font-medium uppercase tracking-[0.25em] text-[#B8924A] mb-3">
-          Colección Premium
-        </p>
-        <h1
-          className="text-4xl sm:text-5xl text-text"
-          style={{ fontFamily: 'var(--font-serif)', fontWeight: 600 }}
+    <div className="min-h-screen relative" style={{ background: '#0A0806' }}>
+      {/* Editorial header */}
+      <header className="px-6 pt-14 pb-10 text-center" style={{ borderBottom: '1px solid rgba(237,224,196,0.06)' }}>
+        <p
+          className="text-[9px] uppercase tracking-[0.4em] mb-4"
+          style={{ fontFamily: 'var(--font-body)', fontWeight: 600, color: '#C9A84C', letterSpacing: '0.4em' }}
         >
-          Catálogo Vitola
-        </h1>
-        <p className="text-sm text-text-muted mt-2 font-light tracking-wide">
-          Puros de colección, seleccionados con criterio
+          Boutique · Colección Premium
         </p>
-        <div className="mt-5 flex items-center justify-center gap-3">
-          <span className="h-px w-12 bg-[#B8924A]/40" />
-          <span className="text-[#B8924A]/60">
-            <svg viewBox="0 0 16 16" className="w-3 h-3" fill="currentColor">
-              <circle cx="8" cy="8" r="3" />
-            </svg>
-          </span>
-          <span className="h-px w-12 bg-[#B8924A]/40" />
+
+        <h1
+          className="leading-none"
+          style={{
+            fontFamily: 'var(--font-serif)',
+            fontWeight: 600,
+            fontSize: 'clamp(3rem, 8vw, 6rem)',
+            color: '#EDE0C4',
+            letterSpacing: '-0.01em',
+          }}
+        >
+          Vitola
+        </h1>
+
+        <div className="flex items-center justify-center gap-4 mt-6">
+          <span className="h-px w-16" style={{ background: 'rgba(201,168,76,0.3)' }} />
+          <p
+            className="text-[10px] uppercase tracking-[0.3em]"
+            style={{ fontFamily: 'var(--font-body)', fontWeight: 300, color: 'rgba(237,224,196,0.35)' }}
+          >
+            {publicPuros.length} referencias
+          </p>
+          <span className="h-px w-16" style={{ background: 'rgba(201,168,76,0.3)' }} />
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
-        <div className="flex gap-10">
-          <div className="hidden lg:block w-52 shrink-0 pt-1">
+      <div className="max-w-7xl mx-auto px-5 sm:px-8 py-10">
+        <div className="flex gap-12">
+          {/* Filter sidebar */}
+          <div className="hidden lg:block w-44 shrink-0 pt-0.5">
             <Suspense>
               <FilterSidebar
                 marcas={marcas}
@@ -95,27 +106,35 @@ export default async function CatalogoPage({ searchParams }: PageProps) {
             </Suspense>
           </div>
 
+          {/* Grid */}
           <div className="flex-1 min-w-0">
             {total > 0 && (
-              <p className="text-xs text-text-muted mb-5">
-                {total} {total === 1 ? 'puro encontrado' : 'puros encontrados'}
+              <p
+                className="text-[10px] uppercase tracking-widest mb-6"
+                style={{ fontFamily: 'var(--font-body)', color: 'rgba(237,224,196,0.25)' }}
+              >
+                {total} {total === 1 ? 'puro' : 'puros'}
               </p>
             )}
 
             {items.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-32 text-text-muted">
-                <svg viewBox="0 0 48 48" className="w-10 h-10 mb-4 opacity-30" fill="none" stroke="currentColor" strokeWidth="1.5">
-                  <circle cx="24" cy="24" r="20" />
-                  <path d="M16 24h16M24 16v16" strokeLinecap="round" />
-                </svg>
-                <p className="text-base" style={{ fontFamily: 'var(--font-serif)' }}>
+              <div className="flex flex-col items-center justify-center py-40">
+                <p
+                  className="text-2xl mb-2"
+                  style={{ fontFamily: 'var(--font-serif)', color: 'rgba(237,224,196,0.3)', fontStyle: 'italic' }}
+                >
                   Sin resultados
                 </p>
-                <p className="text-sm mt-1 font-light">Ajusta los filtros para continuar</p>
+                <p
+                  className="text-xs uppercase tracking-widest"
+                  style={{ fontFamily: 'var(--font-body)', color: 'rgba(237,224,196,0.15)' }}
+                >
+                  Ajusta los filtros
+                </p>
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-5">
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
                   {publicItems.map((puro) => (
                     <PuroCard key={puro.id} puro={puro} />
                   ))}
@@ -131,10 +150,11 @@ export default async function CatalogoPage({ searchParams }: PageProps) {
 
       <Link
         href="/admin/login"
-        className="fixed bottom-4 right-4 p-2 rounded-md text-text opacity-10 hover:opacity-60 transition-opacity duration-300"
+        className="fixed bottom-5 right-5 p-2 transition-opacity duration-300"
+        style={{ color: 'rgba(237,224,196,0.1)' }}
         aria-label="Admin"
       >
-        <Lock size={14} />
+        <Lock size={13} />
       </Link>
     </div>
   );

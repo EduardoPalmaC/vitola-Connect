@@ -10,73 +10,99 @@ export default function PuroCard({ puro }: PuroCardProps) {
   return (
     <Link
       href={`/catalogo/${puro.id}`}
-      className="group flex flex-col rounded-2xl border border-border bg-surface overflow-hidden cursor-pointer
+      className="group relative block overflow-hidden rounded-xl cursor-pointer
         shadow-[var(--shadow-card)]
         hover:shadow-[var(--shadow-card-hover)]
-        hover:-translate-y-1
-        hover:border-[#B8924A]/40
-        transition-all duration-300 ease-out"
+        transition-all duration-500 ease-out"
     >
-      <div className="relative aspect-[3/4] bg-[#111111] overflow-hidden">
+      {/* Image layer — landscape-first, object-cover fills any photo ratio */}
+      <div className="relative aspect-[4/3] bg-[#0C0906]">
         {puro.fotoUrl ? (
           <Image
             src={puro.fotoUrl}
             alt={puro.nombre}
             fill
-            sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className="object-contain group-hover:scale-[1.04] transition-transform duration-500 ease-out"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
           />
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <svg
-              viewBox="0 0 48 48"
-              className="w-12 h-12 text-text-muted/30"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.5"
-            >
-              <rect x="4" y="20" width="40" height="8" rx="4" />
-              <path d="M38 20c0-7-6-12-14-12" strokeLinecap="round" />
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+            <svg viewBox="0 0 64 20" className="w-20 opacity-20" fill="none" stroke="#C9A84C" strokeWidth="1">
+              <rect x="1" y="1" width="62" height="18" rx="9" />
+              <line x1="12" y1="1" x2="12" y2="19" />
+              <line x1="52" y1="1" x2="52" y2="19" />
             </svg>
           </div>
         )}
 
+        {/* Gradient — always on, heavier at bottom for legibility */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#080604]/96 via-[#080604]/25 to-transparent" />
+
+        {/* Low stock badge */}
         {puro.stock <= 3 && (
-          <div className="absolute top-3 left-3">
-            <span className="text-[10px] font-medium tracking-wider uppercase bg-[#1A1A1A]/90 text-amber-400 border border-amber-400/30 px-2 py-0.5 rounded-full">
-              Últimas unidades
+          <div className="absolute top-3 right-3">
+            <span
+              className="text-[9px] uppercase tracking-[0.18em] px-2 py-0.5 rounded-full"
+              style={{
+                background: 'rgba(201,168,76,0.12)',
+                color: '#C9A84C',
+                border: '1px solid rgba(201,168,76,0.3)',
+                fontFamily: 'var(--font-body)',
+              }}
+            >
+              Últimas
             </span>
           </div>
         )}
-      </div>
 
-      <div className="flex flex-col gap-1.5 p-4">
-        <p className="text-[10px] text-[#B8924A] uppercase tracking-[0.15em] font-medium">
-          {puro.marca}
-        </p>
-
-        <h3
-          className="text-base leading-snug line-clamp-2 text-text"
-          style={{ fontFamily: 'var(--font-serif)', fontWeight: 600 }}
-        >
-          {puro.nombre}
-        </h3>
-
-        <p className="text-[11px] text-text-muted font-light tracking-wide">
-          {puro.vitola}
-        </p>
-
-        <div className="mt-3 pt-3 border-t border-border/60 flex items-end justify-between gap-2">
-          <span
-            className="text-xl font-semibold text-[#D4AA6A]"
-            style={{ fontFamily: 'var(--font-serif)' }}
+        {/* Text overlay */}
+        <div className="absolute bottom-0 left-0 right-0 p-4 flex flex-col gap-1">
+          <p
+            className="text-[9px] uppercase tracking-[0.22em]"
+            style={{ color: '#C9A84C', fontFamily: 'var(--font-body)', fontWeight: 500 }}
           >
-            ${puro.precioVenta.toLocaleString('es-MX')}
-          </span>
-          <span className="text-[10px] text-text-muted tabular-nums">
-            {puro.stock} uds.
-          </span>
+            {puro.marca}
+          </p>
+
+          <h3
+            className="leading-tight line-clamp-2"
+            style={{
+              fontFamily: 'var(--font-serif)',
+              fontWeight: 600,
+              fontSize: '1.05rem',
+              color: '#EDE0C4',
+              letterSpacing: '0.01em',
+            }}
+          >
+            {puro.nombre}
+          </h3>
+
+          <div className="flex items-end justify-between gap-2 mt-1.5">
+            <span
+              className="text-xs"
+              style={{ color: 'rgba(237,224,196,0.45)', fontFamily: 'var(--font-body)', fontWeight: 300 }}
+            >
+              {puro.vitola}
+            </span>
+            <span
+              style={{
+                fontFamily: 'var(--font-serif)',
+                fontWeight: 600,
+                fontSize: '1.1rem',
+                color: '#E2C47A',
+                letterSpacing: '0.02em',
+              }}
+            >
+              ${puro.precioVenta.toLocaleString('es-MX')}
+            </span>
+          </div>
         </div>
+
+        {/* Hover: inset gold ring */}
+        <div
+          className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+          style={{ boxShadow: 'inset 0 0 0 1px rgba(201,168,76,0.4)' }}
+        />
       </div>
     </Link>
   );
