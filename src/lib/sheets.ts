@@ -1,5 +1,5 @@
 import { google } from 'googleapis';
-import type { Puro, Venta } from '@/types';
+import type { Puro, Venta, Cata } from '@/types';
 
 const auth = new google.auth.GoogleAuth({
   credentials: {
@@ -173,6 +173,91 @@ export async function registrarVentaItems(
     range: 'Ventas!A:F',
     valueInputOption: 'USER_ENTERED',
     requestBody: { values: rows },
+  });
+}
+
+function rowToCata(row: string[]): Cata {
+  return {
+    id: row[0]!,
+    fecha: row[1]!,
+    lugar: row[2]!,
+    fotoUrl: row[3] || undefined,
+    notas: row[4]!,
+    calificacion: parseInt(row[5]!) || 0,
+    marca: row[6]!,
+    vitola: row[7]!,
+    cepo: parseInt(row[8]!) || 0,
+    paisOrigen: row[9]!,
+    capa: row[10]!,
+    puroId: row[11] || undefined,
+    usuarioId: row[12] || 'admin',
+    createdAt: row[13]!,
+  };
+}
+
+function cataToRow(cata: Cata): (string | number)[] {
+  return [
+    cata.id,
+    cata.fecha,
+    cata.lugar,
+    cata.fotoUrl ?? '',
+    cata.notas,
+    cata.calificacion,
+    cata.marca,
+    cata.vitola,
+    cata.cepo,
+    cata.paisOrigen,
+    cata.capa,
+    cata.puroId ?? '',
+    cata.usuarioId,
+    cata.createdAt,
+  ];
+}
+
+export async function getCatas(): Promise<Cata[]> {
+  const response = await sheets.spreadsheets.values.get({
+    spreadsheetId: SPREADSHEET_ID,
+    range: 'Catas!A2:N',
+  });
+  const rows = (response.data.values ?? []) as string[][];
+  return rows.filter((r) => r.length >= 5).map(rowToCata);
+}
+
+export async function createCata(cata: Omit<Cata, 'id' | 'createdAt'>): Promise<Cata> {
+  const id = crypto.randomUUID();
+  const now = new Date().toISOString();
+  const full: Cata = { ...cata, id, createdAt: now };
+
+  await sheets.spreadsheets.values.append({
+    spreadsheetId: SPREADSHEET_ID,
+    range: 'Catas!A:N',
+    valueInputOption: 'USER_ENTERED',
+    requestBody: { values: [cataToRow(full)] },
+  });
+
+  return full;
+}
+
+export async function deleteCata(id: string): Promise<void> {
+  const catas = await getCatas();
+  const index = catas.findIndex((c) => c.id === id);
+  if (index === -1) throw new Error('Cata no encontrada');
+
+  const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId: SPREADSHEET_ID });
+  const sheet = spreadsheet.data.sheets?.find((s) => s.properties?.title === 'Catas');
+  const sheetId = sheet?.properties?.sheetId ?? 2;
+
+  await sheets.spreadsheets.batchUpdate({
+    spreadsheetId: SPREADSHEET_ID,
+    requestBody: {
+      requests: [
+        {
+          deleteDimension: {
+            range: { sheetId, dimension: 'ROWS', startIndex: index + 1, endIndex: index + 2 },
+          },
+        },
+      ],
+    },
   });
 }
 

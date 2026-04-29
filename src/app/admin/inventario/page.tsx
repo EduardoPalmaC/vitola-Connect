@@ -22,6 +22,12 @@ export default async function InventarioPage() {
             Dashboard
           </Link>
           <Link
+            href="/admin/diario"
+            className="text-sm text-text-muted hover:text-secondary transition-colors"
+          >
+            Mi Diario
+          </Link>
+          <Link
             href="/admin/inventario/nuevo"
             className="inline-flex items-center px-4 py-2 rounded-lg bg-secondary text-background text-sm font-medium hover:opacity-90 transition-opacity"
           >

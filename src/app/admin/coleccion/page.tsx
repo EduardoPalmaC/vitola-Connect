@@ -64,6 +64,12 @@ export default async function ColeccionPage({ searchParams }: PageProps) {
             Inventario
           </Link>
           <Link
+            href="/admin/diario"
+            className="text-sm text-text-muted hover:text-secondary transition-colors"
+          >
+            Mi Diario
+          </Link>
+          <Link
             href="/admin/settings"
             className="text-sm text-text-muted hover:text-secondary transition-colors"
           >

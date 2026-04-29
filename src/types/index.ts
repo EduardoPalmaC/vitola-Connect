@@ -54,6 +54,23 @@ export interface PuroPublico {
   stock: number;
 }
 
+export interface Cata {
+  id: string;
+  fecha: string;
+  lugar: string;
+  fotoUrl?: string;
+  notas: string;
+  calificacion: number;
+  marca: string;
+  vitola: string;
+  cepo: number;
+  paisOrigen: string;
+  capa: string;
+  puroId?: string;
+  usuarioId: string;
+  createdAt: string;
+}
+
 export interface DashboardKPIs {
   valorColeccionPersonal: number;
   gananciasProyectadas: number;

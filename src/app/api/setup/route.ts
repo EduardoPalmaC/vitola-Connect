@@ -28,6 +28,12 @@ const VENTAS_HEADERS = [
   'ganancia', 'notas', 'createdAt',
 ];
 
+const CATAS_HEADERS = [
+  'id', 'fecha', 'lugar', 'fotoUrl', 'notas', 'calificacion',
+  'marca', 'vitola', 'cepo', 'paisOrigen', 'capa', 'puroId',
+  'usuarioId', 'createdAt',
+];
+
 export async function GET() {
   const meta = await sheets.spreadsheets.get({ spreadsheetId: SPREADSHEET_ID });
   const existingSheets = meta.data.sheets ?? [];
@@ -54,6 +60,13 @@ export async function GET() {
     });
   }
 
+  // Add "Catas" tab if missing
+  if (!sheetTitles.includes('Catas')) {
+    requests.push({
+      addSheet: { properties: { title: 'Catas' } },
+    });
+  }
+
   if (requests.length > 0) {
     await sheets.spreadsheets.batchUpdate({
       spreadsheetId: SPREADSHEET_ID,
@@ -75,6 +88,14 @@ export async function GET() {
     range: 'Ventas!A1',
     valueInputOption: 'RAW',
     requestBody: { values: [VENTAS_HEADERS] },
+  });
+
+  // Write headers to Catas!A1
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: SPREADSHEET_ID,
+    range: 'Catas!A1',
+    valueInputOption: 'RAW',
+    requestBody: { values: [CATAS_HEADERS] },
   });
 
   return NextResponse.json({ ok: true, message: 'Sheet configurado correctamente' });
