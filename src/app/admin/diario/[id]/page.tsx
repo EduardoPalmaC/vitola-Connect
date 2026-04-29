@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { getCatas } from '@/lib/sheets';
 import DeleteCataButton from '@/components/admin/DeleteCataButton';
+import CataGallery from '@/components/admin/CataGallery';
 
 function Stars({ value }: { value: number }) {
   const stars = value / 20;
@@ -143,6 +144,14 @@ export default async function CataDetailPage({
                 </p>
                 <p className="text-sm text-text leading-relaxed whitespace-pre-wrap">{cata.notas}</p>
               </div>
+            )}
+
+            {/* Galería de fotos adicionales */}
+            {cata.fotosAdicionales && cata.fotosAdicionales.length > 0 && (
+              <CataGallery
+                fotos={cata.fotosAdicionales}
+                alt={`${cata.marca} ${cata.vitola}`}
+              />
             )}
           </div>
         </div>

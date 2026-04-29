@@ -21,7 +21,21 @@ interface FormValues {
   lugar: string;
   notas: string;
   fotoUrl: string;
+  fotosAdicionales: string[];
   calificacion: number;
+}
+
+async function uploadToCloudinary(file: File): Promise<string> {
+  const fd = new FormData();
+  fd.append('file', file);
+  fd.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!);
+  const res = await fetch(
+    `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+    { method: 'POST', body: fd },
+  );
+  const data = (await res.json()) as { secure_url?: string; error?: { message: string } };
+  if (!res.ok || !data.secure_url) throw new Error(data.error?.message ?? 'Error al subir imagen');
+  return data.secure_url;
 }
 
 export default function CataEditForm({ cata }: Props) {
@@ -36,6 +50,7 @@ export default function CataEditForm({ cata }: Props) {
     lugar: cata.lugar,
     notas: cata.notas,
     fotoUrl: cata.fotoUrl ?? '',
+    fotosAdicionales: cata.fotosAdicionales ?? [],
     calificacion: cata.calificacion,
   });
   const [uploading, setUploading] = useState(false);
@@ -47,28 +62,38 @@ export default function CataEditForm({ cata }: Props) {
   }
 
   async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
+    const files = Array.from(e.target.files ?? []);
+    if (!files.length) return;
     setUploading(true);
+    setError('');
     try {
-      const fd = new FormData();
-      fd.append('file', file);
-      fd.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!);
-      const res = await fetch(
-        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
-        { method: 'POST', body: fd },
-      );
-      const data = (await res.json()) as { secure_url?: string; error?: { message: string } };
-      if (!res.ok || !data.secure_url) {
-        setError(data.error?.message ?? 'Error al subir imagen');
-        return;
-      }
-      set('fotoUrl', data.secure_url);
-    } catch {
-      setError('Error de red al subir imagen');
+      const urls = await Promise.all(files.map(uploadToCloudinary));
+      setValues((prev) => {
+        if (!prev.fotoUrl) {
+          const [portada, ...rest] = urls;
+          return { ...prev, fotoUrl: portada ?? '', fotosAdicionales: [...prev.fotosAdicionales, ...rest] };
+        }
+        return { ...prev, fotosAdicionales: [...prev.fotosAdicionales, ...urls] };
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Error al subir imágenes');
     } finally {
       setUploading(false);
     }
+  }
+
+  function removePortada() {
+    setValues((prev) => {
+      const [next, ...rest] = prev.fotosAdicionales;
+      return { ...prev, fotoUrl: next ?? '', fotosAdicionales: rest };
+    });
+  }
+
+  function removeAdicional(index: number) {
+    setValues((prev) => ({
+      ...prev,
+      fotosAdicionales: prev.fotosAdicionales.filter((_, i) => i !== index),
+    }));
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -87,6 +112,7 @@ export default function CataEditForm({ cata }: Props) {
           fecha: values.fecha,
           lugar: values.lugar,
           fotoUrl: values.fotoUrl || undefined,
+          fotosAdicionales: values.fotosAdicionales.length ? values.fotosAdicionales : undefined,
           notas: values.notas,
           calificacion: values.calificacion,
           marca: values.marca,
@@ -225,22 +251,60 @@ export default function CataEditForm({ cata }: Props) {
           />
         </div>
 
-        {/* Foto */}
-        <div className="flex flex-col gap-1.5">
-          <label className="text-sm font-medium text-text-muted">Foto</label>
+        {/* Fotos */}
+        <div className="flex flex-col gap-3">
+          <label className="text-sm font-medium text-text-muted">Fotos</label>
+
+          {/* Portada */}
           {values.fotoUrl && (
-            <div className="relative h-48 w-48 rounded-lg overflow-hidden border border-border bg-white">
-              <Image src={values.fotoUrl} alt="Foto de la cata" fill className="object-contain" />
+            <div className="flex flex-col gap-1.5">
+              <span className="text-xs text-text-muted uppercase tracking-wider">Portada</span>
+              <div className="relative w-48 h-48 rounded-lg overflow-hidden border border-border bg-white group">
+                <Image src={values.fotoUrl} alt="Portada" fill className="object-contain" />
+                <button
+                  type="button"
+                  onClick={removePortada}
+                  className="absolute top-1.5 right-1.5 rounded-full bg-black/60 text-white text-xs w-6 h-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  ×
+                </button>
+              </div>
             </div>
           )}
+
+          {/* Adicionales */}
+          {values.fotosAdicionales.length > 0 && (
+            <div className="flex flex-col gap-1.5">
+              <span className="text-xs text-text-muted uppercase tracking-wider">Adicionales</span>
+              <div className="flex flex-wrap gap-3">
+                {values.fotosAdicionales.map((url, i) => (
+                  <div key={url} className="relative w-24 h-24 rounded-lg overflow-hidden border border-border bg-white group">
+                    <Image src={url} alt={`Foto ${i + 2}`} fill className="object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => removeAdicional(i)}
+                      className="absolute top-1 right-1 rounded-full bg-black/60 text-white text-xs w-5 h-5 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           <input
             type="file"
             accept="image/*"
+            multiple
             onChange={handleImageUpload}
             disabled={uploading}
             className="text-sm text-text-muted file:mr-3 file:rounded-lg file:border file:border-border file:bg-surface file:px-3 file:py-1 file:text-sm file:text-text file:cursor-pointer hover:file:border-secondary/60 disabled:opacity-50"
           />
-          {uploading && <p className="text-xs text-text-muted">Subiendo imagen...</p>}
+          <p className="text-xs text-text-muted">
+            {values.fotoUrl ? 'Selecciona más para agregar fotos adicionales.' : 'La primera imagen será la portada.'}
+          </p>
+          {uploading && <p className="text-xs text-text-muted">Subiendo imágenes...</p>}
         </div>
       </section>
 

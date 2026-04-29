@@ -177,6 +177,7 @@ export async function registrarVentaItems(
 }
 
 function rowToCata(row: string[]): Cata {
+  const fotosRaw = row[14] ?? '';
   return {
     id: row[0]!,
     fecha: row[1]!,
@@ -192,6 +193,7 @@ function rowToCata(row: string[]): Cata {
     puroId: row[11] || undefined,
     usuarioId: row[12] || 'admin',
     createdAt: row[13]!,
+    fotosAdicionales: fotosRaw ? fotosRaw.split(',').map((u) => u.trim()).filter(Boolean) : undefined,
   };
 }
 
@@ -211,13 +213,14 @@ function cataToRow(cata: Cata): (string | number)[] {
     cata.puroId ?? '',
     cata.usuarioId,
     cata.createdAt,
+    (cata.fotosAdicionales ?? []).join(','),
   ];
 }
 
 export async function getCatas(): Promise<Cata[]> {
   const response = await sheets.spreadsheets.values.get({
     spreadsheetId: SPREADSHEET_ID,
-    range: 'Catas!A2:N',
+    range: 'Catas!A2:O',
   });
   const rows = (response.data.values ?? []) as string[][];
   return rows.filter((r) => r.length >= 5).map(rowToCata);
@@ -230,7 +233,7 @@ export async function createCata(cata: Omit<Cata, 'id' | 'createdAt'>): Promise<
 
   await sheets.spreadsheets.values.append({
     spreadsheetId: SPREADSHEET_ID,
-    range: 'Catas!A:N',
+    range: 'Catas!A:O',
     valueInputOption: 'USER_ENTERED',
     requestBody: { values: [cataToRow(full)] },
   });
@@ -247,7 +250,7 @@ export async function updateCata(id: string, data: Partial<Omit<Cata, 'id' | 'cr
 
   await sheets.spreadsheets.values.update({
     spreadsheetId: SPREADSHEET_ID,
-    range: `Catas!A${index + 2}:N${index + 2}`,
+    range: `Catas!A${index + 2}:O${index + 2}`,
     valueInputOption: 'USER_ENTERED',
     requestBody: { values: [cataToRow(updated)] },
   });

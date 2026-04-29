@@ -59,6 +59,7 @@ export interface Cata {
   fecha: string;
   lugar: string;
   fotoUrl?: string;
+  fotosAdicionales?: string[];
   notas: string;
   calificacion: number;
   marca: string;
