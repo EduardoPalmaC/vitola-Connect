@@ -10,9 +10,10 @@ interface FilterSidebarProps {
   marcas: string[];
   vitolas: string[];
   paises: string[];
+  cepos: number[];
 }
 
-export default function FilterSidebar({ marcas, vitolas, paises }: FilterSidebarProps) {
+export default function FilterSidebar({ marcas, vitolas, paises, cepos }: FilterSidebarProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -82,6 +83,17 @@ export default function FilterSidebar({ marcas, vitolas, paises }: FilterSidebar
       >
         {paises.map((p) => (
           <option key={p} value={p}>{p}</option>
+        ))}
+      </Select>
+
+      <Select
+        label="Cepo"
+        value={searchParams.get('ringGauge') ?? ''}
+        onChange={(e) => setParam('ringGauge', e.target.value)}
+        placeholder="Todos"
+      >
+        {cepos.map((c) => (
+          <option key={c} value={c}>{c}</option>
         ))}
       </Select>
 

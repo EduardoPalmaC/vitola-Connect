@@ -28,6 +28,7 @@ export default async function CatalogoPage({ searchParams }: PageProps) {
     search: sp(params['search']),
     precioMin: params['precioMin'] ? Number(params['precioMin']) : undefined,
     precioMax: params['precioMax'] ? Number(params['precioMax']) : undefined,
+    ringGauge: params['ringGauge'] ? Number(params['ringGauge']) : undefined,
     tiempoAnejamientoMin: params['tiempoAnejamientoMin']
       ? Number(params['tiempoAnejamientoMin'])
       : undefined,
@@ -53,6 +54,7 @@ export default async function CatalogoPage({ searchParams }: PageProps) {
   const marcas = getUniqueValues(publicPuros, 'marca') as string[];
   const vitolas = getUniqueValues(publicPuros, 'vitola') as string[];
   const paises = getUniqueValues(publicPuros, 'paisOrigen') as string[];
+  const cepos = getUniqueValues(publicPuros, 'ringGauge') as number[];
 
   return (
     <div className="min-h-screen bg-background relative">
@@ -69,6 +71,7 @@ export default async function CatalogoPage({ searchParams }: PageProps) {
                 marcas={marcas}
                 vitolas={vitolas}
                 paises={paises}
+                cepos={cepos}
               />
             </Suspense>
           </div>
