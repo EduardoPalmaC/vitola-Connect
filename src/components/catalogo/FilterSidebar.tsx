@@ -5,16 +5,14 @@ import { useCallback } from 'react';
 import Input from '@/components/ui/Input';
 import Select from '@/components/ui/Select';
 import Button from '@/components/ui/Button';
-import type { Puro } from '@/types';
 
 interface FilterSidebarProps {
   marcas: string[];
   vitolas: string[];
   paises: string[];
-  estados: Puro['estado'][];
 }
 
-export default function FilterSidebar({ marcas, vitolas, paises, estados }: FilterSidebarProps) {
+export default function FilterSidebar({ marcas, vitolas, paises }: FilterSidebarProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -84,17 +82,6 @@ export default function FilterSidebar({ marcas, vitolas, paises, estados }: Filt
       >
         {paises.map((p) => (
           <option key={p} value={p}>{p}</option>
-        ))}
-      </Select>
-
-      <Select
-        label="Estado"
-        value={searchParams.get('estado') ?? ''}
-        onChange={(e) => setParam('estado', e.target.value)}
-        placeholder="Todos"
-      >
-        {estados.map((e) => (
-          <option key={e} value={e}>{e.replace('_', ' ')}</option>
         ))}
       </Select>
 

@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic';
 import { Suspense } from 'react';
 import { getPuros } from '@/lib/sheets';
 import { filtrarPuros, paginar, getUniqueValues } from '@/lib/filters';
-import type { FilterParams, Puro, PuroPublico } from '@/types';
+import type { FilterParams, PuroPublico } from '@/types';
 import PuroCard from '@/components/catalogo/PuroCard';
 import FilterSidebar from '@/components/catalogo/FilterSidebar';
 import PaginationBar from '@/components/catalogo/PaginationBar';
@@ -24,7 +24,6 @@ export default async function CatalogoPage({ searchParams }: PageProps) {
     vitola: sp(params['vitola']),
     paisOrigen: sp(params['paisOrigen']),
     search: sp(params['search']),
-    estado: sp(params['estado']) as FilterParams['estado'],
     precioMin: params['precioMin'] ? Number(params['precioMin']) : undefined,
     precioMax: params['precioMax'] ? Number(params['precioMax']) : undefined,
     tiempoAnejamientoMin: params['tiempoAnejamientoMin']
@@ -52,7 +51,6 @@ export default async function CatalogoPage({ searchParams }: PageProps) {
   const marcas = getUniqueValues(publicPuros, 'marca') as string[];
   const vitolas = getUniqueValues(publicPuros, 'vitola') as string[];
   const paises = getUniqueValues(publicPuros, 'paisOrigen') as string[];
-  const estados = getUniqueValues(publicPuros, 'estado') as Puro['estado'][];
 
   return (
     <div className="min-h-screen bg-background">
@@ -69,7 +67,6 @@ export default async function CatalogoPage({ searchParams }: PageProps) {
                 marcas={marcas}
                 vitolas={vitolas}
                 paises={paises}
-                estados={estados}
               />
             </Suspense>
           </div>
