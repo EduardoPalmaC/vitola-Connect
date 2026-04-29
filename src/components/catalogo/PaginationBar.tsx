@@ -1,7 +1,6 @@
 'use client';
 
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
-import Button from '@/components/ui/Button';
 
 interface PaginationBarProps {
   page: number;
@@ -23,18 +22,32 @@ export default function PaginationBar({ page, pages, total }: PaginationBarProps
   if (pages <= 1) return null;
 
   return (
-    <div className="flex items-center justify-between py-4">
-      <p className="text-sm text-text-muted">{total} puros encontrados</p>
-      <div className="flex items-center gap-2">
-        <Button variant="secondary" size="sm" disabled={page <= 1} onClick={() => goTo(page - 1)}>
+    <div className="flex items-center justify-between pt-8 mt-4 border-t border-border/40">
+      <p className="text-xs text-text-muted">{total} puros encontrados</p>
+      <div className="flex items-center gap-3">
+        <button
+          disabled={page <= 1}
+          onClick={() => goTo(page - 1)}
+          className="text-xs px-4 py-2 rounded-lg border border-border text-text-muted
+            hover:border-[#B8924A]/50 hover:text-[#D4AA6A]
+            disabled:opacity-30 disabled:cursor-not-allowed
+            transition-all duration-200 cursor-pointer"
+        >
           ← Anterior
-        </Button>
-        <span className="text-sm text-text-muted px-2">
+        </button>
+        <span className="text-xs text-text-muted tabular-nums min-w-[3rem] text-center">
           {page} / {pages}
         </span>
-        <Button variant="secondary" size="sm" disabled={page >= pages} onClick={() => goTo(page + 1)}>
+        <button
+          disabled={page >= pages}
+          onClick={() => goTo(page + 1)}
+          className="text-xs px-4 py-2 rounded-lg border border-border text-text-muted
+            hover:border-[#B8924A]/50 hover:text-[#D4AA6A]
+            disabled:opacity-30 disabled:cursor-not-allowed
+            transition-all duration-200 cursor-pointer"
+        >
           Siguiente →
-        </Button>
+        </button>
       </div>
     </div>
   );

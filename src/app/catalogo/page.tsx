@@ -58,14 +58,33 @@ export default async function CatalogoPage({ searchParams }: PageProps) {
 
   return (
     <div className="min-h-screen bg-background relative">
-      <header className="border-b border-border px-6 py-5">
-        <h1 className="text-2xl font-heading font-bold text-text">Catálogo Vitola</h1>
-        <p className="text-sm text-text-muted mt-0.5">Puros premium seleccionados</p>
+      <header className="border-b border-border/50 px-6 py-8 text-center">
+        <p className="text-[10px] font-medium uppercase tracking-[0.25em] text-[#B8924A] mb-3">
+          Colección Premium
+        </p>
+        <h1
+          className="text-4xl sm:text-5xl text-text"
+          style={{ fontFamily: 'var(--font-serif)', fontWeight: 600 }}
+        >
+          Catálogo Vitola
+        </h1>
+        <p className="text-sm text-text-muted mt-2 font-light tracking-wide">
+          Puros de colección, seleccionados con criterio
+        </p>
+        <div className="mt-5 flex items-center justify-center gap-3">
+          <span className="h-px w-12 bg-[#B8924A]/40" />
+          <span className="text-[#B8924A]/60">
+            <svg viewBox="0 0 16 16" className="w-3 h-3" fill="currentColor">
+              <circle cx="8" cy="8" r="3" />
+            </svg>
+          </span>
+          <span className="h-px w-12 bg-[#B8924A]/40" />
+        </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-        <div className="flex gap-8">
-          <div className="hidden lg:block w-56 shrink-0">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
+        <div className="flex gap-10">
+          <div className="hidden lg:block w-52 shrink-0 pt-1">
             <Suspense>
               <FilterSidebar
                 marcas={marcas}
@@ -77,14 +96,26 @@ export default async function CatalogoPage({ searchParams }: PageProps) {
           </div>
 
           <div className="flex-1 min-w-0">
+            {total > 0 && (
+              <p className="text-xs text-text-muted mb-5">
+                {total} {total === 1 ? 'puro encontrado' : 'puros encontrados'}
+              </p>
+            )}
+
             {items.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-24 text-text-muted">
-                <p className="text-lg">No se encontraron puros</p>
-                <p className="text-sm mt-1">Intenta ajustar los filtros</p>
+              <div className="flex flex-col items-center justify-center py-32 text-text-muted">
+                <svg viewBox="0 0 48 48" className="w-10 h-10 mb-4 opacity-30" fill="none" stroke="currentColor" strokeWidth="1.5">
+                  <circle cx="24" cy="24" r="20" />
+                  <path d="M16 24h16M24 16v16" strokeLinecap="round" />
+                </svg>
+                <p className="text-base" style={{ fontFamily: 'var(--font-serif)' }}>
+                  Sin resultados
+                </p>
+                <p className="text-sm mt-1 font-light">Ajusta los filtros para continuar</p>
               </div>
             ) : (
               <>
-                <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4">
+                <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-5">
                   {publicItems.map((puro) => (
                     <PuroCard key={puro.id} puro={puro} />
                   ))}
@@ -100,10 +131,10 @@ export default async function CatalogoPage({ searchParams }: PageProps) {
 
       <Link
         href="/admin/login"
-        className="fixed bottom-4 right-4 p-2 rounded-md text-text opacity-20 hover:opacity-100 transition-opacity duration-200"
+        className="fixed bottom-4 right-4 p-2 rounded-md text-text opacity-10 hover:opacity-60 transition-opacity duration-300"
         aria-label="Admin"
       >
-        <Lock size={16} />
+        <Lock size={14} />
       </Link>
     </div>
   );

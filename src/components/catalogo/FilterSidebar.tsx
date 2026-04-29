@@ -2,9 +2,6 @@
 
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import { useCallback } from 'react';
-import Input from '@/components/ui/Input';
-import Select from '@/components/ui/Select';
-import Button from '@/components/ui/Button';
 
 interface FilterSidebarProps {
   marcas: string[];
@@ -13,18 +10,72 @@ interface FilterSidebarProps {
   cepos: number[];
 }
 
-export default function FilterSidebar({ marcas, vitolas, paises, cepos }: FilterSidebarProps) {
+function FilterGroup({
+  label,
+  paramKey,
+  options,
+  format,
+}: {
+  label: string;
+  paramKey: string;
+  options: string[];
+  format?: (v: string) => string;
+}) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const current = searchParams.get(paramKey) ?? '';
+
+  const toggle = useCallback(
+    (value: string) => {
+      const params = new URLSearchParams(searchParams.toString());
+      if (current === value) {
+        params.delete(paramKey);
+      } else {
+        params.set(paramKey, value);
+      }
+      params.delete('page');
+      router.push(`${pathname}?${params.toString()}`);
+    },
+    [router, pathname, searchParams, current, paramKey],
+  );
+
+  return (
+    <div className="flex flex-col gap-2">
+      <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#B8924A]">
+        {label}
+      </p>
+      <div className="flex flex-col gap-1">
+        {options.map((opt) => (
+          <button
+            key={opt}
+            onClick={() => toggle(opt)}
+            className={`text-left text-xs px-2 py-1.5 rounded-md transition-all duration-200 cursor-pointer ${
+              current === opt
+                ? 'bg-[#B8924A]/15 text-[#D4AA6A] font-medium'
+                : 'text-text-muted hover:text-text hover:bg-surface-alt'
+            }`}
+          >
+            {format ? format(opt) : opt}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function SearchInput() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const setParam = useCallback(
-    (key: string, value: string) => {
+  const onChange = useCallback(
+    (value: string) => {
       const params = new URLSearchParams(searchParams.toString());
       if (value) {
-        params.set(key, value);
+        params.set('search', value);
       } else {
-        params.delete(key);
+        params.delete('search');
       }
       params.delete('page');
       router.push(`${pathname}?${params.toString()}`);
@@ -32,94 +83,65 @@ export default function FilterSidebar({ marcas, vitolas, paises, cepos }: Filter
     [router, pathname, searchParams],
   );
 
-  const clearAll = () => router.push(pathname);
+  return (
+    <input
+      type="search"
+      placeholder="Buscar puro..."
+      defaultValue={searchParams.get('search') ?? ''}
+      onChange={(e) => onChange(e.target.value)}
+      className="w-full bg-transparent border border-border rounded-lg px-3 py-2 text-xs text-text placeholder:text-text-muted/50 focus:outline-none focus:border-[#B8924A]/50 transition-colors duration-200"
+    />
+  );
+}
 
+export default function FilterSidebar({ marcas, vitolas, paises, cepos }: FilterSidebarProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const clearAll = () => router.push(pathname);
   const hasFilters = searchParams.toString().length > 0;
 
   return (
-    <aside className="flex flex-col gap-5 w-full">
+    <aside className="flex flex-col gap-6 w-full">
       <div className="flex items-center justify-between">
-        <h2 className="text-sm font-semibold text-text uppercase tracking-wider">Filtros</h2>
+        <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-text-muted">
+          Filtros
+        </p>
         {hasFilters && (
-          <button onClick={clearAll} className="text-xs text-text-muted hover:text-secondary transition-colors">
-            Limpiar
+          <button
+            onClick={clearAll}
+            className="text-[10px] text-text-muted/60 hover:text-[#B8924A] transition-colors duration-200 cursor-pointer"
+          >
+            Limpiar todo
           </button>
         )}
       </div>
 
-      <Input
-        placeholder="Buscar..."
-        defaultValue={searchParams.get('search') ?? ''}
-        onChange={(e) => setParam('search', e.target.value)}
-      />
+      <SearchInput />
 
-      <Select
-        label="Marca"
-        value={searchParams.get('marca') ?? ''}
-        onChange={(e) => setParam('marca', e.target.value)}
-        placeholder="Todas"
-      >
-        {marcas.map((m) => (
-          <option key={m} value={m}>{m}</option>
-        ))}
-      </Select>
+      <div className="w-full h-px bg-border/40" />
 
-      <Select
-        label="Vitola"
-        value={searchParams.get('vitola') ?? ''}
-        onChange={(e) => setParam('vitola', e.target.value)}
-        placeholder="Todas"
-      >
-        {vitolas.map((v) => (
-          <option key={v} value={v}>{v}</option>
-        ))}
-      </Select>
+      {marcas.length > 0 && (
+        <FilterGroup label="Marca" paramKey="marca" options={marcas} />
+      )}
 
-      <Select
-        label="Cepo"
-        value={searchParams.get('ringGauge') ?? ''}
-        onChange={(e) => setParam('ringGauge', e.target.value)}
-        placeholder="Todos"
-      >
-        {cepos.map((c) => (
-          <option key={c} value={c}>{c}</option>
-        ))}
-      </Select>
+      {cepos.length > 0 && (
+        <FilterGroup
+          label="Cepo"
+          paramKey="ringGauge"
+          options={cepos.map(String)}
+          format={(v) => `Cepo ${v}`}
+        />
+      )}
 
-      <Select
-        label="País de origen"
-        value={searchParams.get('paisOrigen') ?? ''}
-        onChange={(e) => setParam('paisOrigen', e.target.value)}
-        placeholder="Todos"
-      >
-        {paises.map((p) => (
-          <option key={p} value={p}>{p}</option>
-        ))}
-      </Select>
+      {paises.length > 0 && (
+        <FilterGroup label="País de origen" paramKey="paisOrigen" options={paises} />
+      )}
 
-      <div className="flex flex-col gap-2">
-        <p className="text-sm font-medium text-text-muted">Precio</p>
-        <div className="flex gap-2">
-          <Input
-            placeholder="Mín"
-            type="number"
-            min={0}
-            defaultValue={searchParams.get('precioMin') ?? ''}
-            onBlur={(e) => setParam('precioMin', e.target.value)}
-          />
-          <Input
-            placeholder="Máx"
-            type="number"
-            min={0}
-            defaultValue={searchParams.get('precioMax') ?? ''}
-            onBlur={(e) => setParam('precioMax', e.target.value)}
-          />
-        </div>
-      </div>
-
-      <Button variant="secondary" size="sm" onClick={clearAll} className="w-full mt-1">
-        Resetear filtros
-      </Button>
+      {vitolas.length > 0 && (
+        <FilterGroup label="Vitola" paramKey="vitola" options={vitolas} />
+      )}
     </aside>
   );
 }
