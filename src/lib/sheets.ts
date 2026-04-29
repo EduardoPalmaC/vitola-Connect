@@ -141,46 +141,63 @@ export async function deletePuro(id: string): Promise<void> {
 export async function getVentas(): Promise<Venta[]> {
   const response = await sheets.spreadsheets.values.get({
     spreadsheetId: SPREADSHEET_ID,
-    range: 'Ventas!A2:H',
+    range: 'Ventas!A2:F',
   });
 
   const rows = (response.data.values ?? []) as string[][];
-  return rows.map((row) => ({
-    id: row[0]!,
-    puroId: row[1]!,
-    cantidad: parseInt(row[2]!),
-    fechaVenta: row[3]!,
-    precioVentaReal: parseFloat(row[4]!),
-    ganancia: parseFloat(row[5]!),
-    notas: row[6] || undefined,
-    createdAt: row[7]!,
-  }));
+  return rows
+    .filter((row) => row.length >= 6)
+    .map((row) => ({
+      fecha: row[0]!,
+      producto: row[1]!,
+      cantidad: parseInt(row[2]!),
+      precioUnitario: parseFloat(row[3]!),
+      totalVenta: parseFloat(row[4]!),
+      gananciaEstimada: parseFloat(row[5]!),
+    }));
 }
 
-export async function createVenta(
-  venta: Omit<Venta, 'id' | 'createdAt'>
-): Promise<Venta> {
-  const id = crypto.randomUUID();
-  const now = new Date().toISOString();
-  const full: Venta = { ...venta, id, createdAt: now };
+export async function registrarVentaItems(
+  items: { puro: Puro; cantidad: number }[]
+): Promise<void> {
+  const fecha = new Date().toLocaleDateString('es-MX');
+  const rows = items.map(({ puro, cantidad }) => {
+    const costoUnitario = puro.precioBruto + puro.costoTransporte + puro.costoAlmacenamiento;
+    const totalVenta = puro.precioVenta * cantidad;
+    const gananciaEstimada = (puro.precioVenta - costoUnitario) * cantidad;
+    return [fecha, `${puro.marca} ${puro.vitola}`, cantidad, puro.precioVenta, totalVenta, gananciaEstimada];
+  });
 
   await sheets.spreadsheets.values.append({
     spreadsheetId: SPREADSHEET_ID,
-    range: 'Ventas!A:H',
+    range: 'Ventas!A:F',
     valueInputOption: 'USER_ENTERED',
-    requestBody: {
-      values: [[
-        full.id,
-        full.puroId,
-        full.cantidad,
-        full.fechaVenta,
-        full.precioVentaReal,
-        full.ganancia,
-        full.notas ?? '',
-        full.createdAt,
-      ]],
-    },
+    requestBody: { values: rows },
   });
+}
 
-  return full;
+export async function actualizarStockMultiple(
+  updates: { id: string; cantidad: number }[]
+): Promise<void> {
+  const puros = await getPuros();
+
+  await Promise.all(
+    updates.map(({ id, cantidad }) => {
+      const index = puros.findIndex((p) => p.id === id);
+      if (index === -1) return Promise.resolve();
+
+      const updated: Puro = {
+        ...puros[index]!,
+        stock: Math.max(0, puros[index]!.stock - cantidad),
+        updatedAt: new Date().toISOString(),
+      };
+
+      return sheets.spreadsheets.values.update({
+        spreadsheetId: SPREADSHEET_ID,
+        range: `Inventario!A${index + 2}:U${index + 2}`,
+        valueInputOption: 'USER_ENTERED',
+        requestBody: { values: [puroToRow(updated)] },
+      });
+    })
+  );
 }

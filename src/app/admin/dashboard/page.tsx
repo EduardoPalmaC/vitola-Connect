@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import Link from 'next/link';
 import { getPuros, getVentas } from '@/lib/sheets';
 import { calcularKPIs } from '@/lib/calculations';
+import DashboardActions from '@/components/admin/DashboardActions';
 
 export default async function DashboardPage() {
   const [puros, ventas] = await Promise.all([getPuros(), getVentas()]);
@@ -97,20 +98,7 @@ export default async function DashboardPage() {
         )}
 
         {/* Quick actions */}
-        <div className="flex gap-3">
-          <Link
-            href="/admin/inventario/nuevo"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-secondary text-background text-sm font-medium hover:opacity-90 transition-opacity"
-          >
-            + Nuevo puro
-          </Link>
-          <Link
-            href="/admin/inventario"
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border text-text text-sm font-medium hover:border-secondary/60 transition-colors"
-          >
-            Ver inventario
-          </Link>
-        </div>
+        <DashboardActions puros={puros} />
       </div>
     </div>
   );

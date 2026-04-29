@@ -23,14 +23,12 @@ export interface Puro {
 }
 
 export interface Venta {
-  id: string;
-  puroId: string;
+  fecha: string;
+  producto: string;
   cantidad: number;
-  fechaVenta: string;
-  precioVentaReal: number;
-  ganancia: number;
-  notas?: string;
-  createdAt: string;
+  precioUnitario: number;
+  totalVenta: number;
+  gananciaEstimada: number;
 }
 
 export interface FilterParams {

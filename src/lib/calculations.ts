@@ -28,7 +28,7 @@ export function calcularKPIs(puros: Puro[], ventas: Venta[]): DashboardKPIs {
     0
   );
 
-  const gananciasReales = ventas.reduce((sum, v) => sum + v.ganancia, 0);
+  const gananciasReales = ventas.reduce((sum, v) => sum + v.gananciaEstimada, 0);
 
   const stockTotal = puros.length;
 

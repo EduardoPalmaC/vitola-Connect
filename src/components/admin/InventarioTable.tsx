@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo } from 'react';
 import {
   useReactTable,
   getCoreRowModel,
@@ -19,31 +19,9 @@ import Input from '@/components/ui/Input';
 const col = createColumnHelper<Puro>();
 
 export default function InventarioTable({ puros: initialPuros }: { puros: Puro[] }) {
-  const [puros, setPuros] = useState<Puro[]>(initialPuros);
+  const [puros] = useState<Puro[]>(initialPuros);
   const [sorting, setSorting] = useState<SortingState>([]);
   const [globalFilter, setGlobalFilter] = useState('');
-  const [selling, setSelling] = useState<string | null>(null);
-
-  const handleVentaRapida = useCallback(async (puro: Puro) => {
-    if (puro.stock <= 0 || selling === puro.id) return;
-    const newStock = puro.stock - 1;
-
-    setSelling(puro.id);
-    setPuros((prev) => prev.map((p) => (p.id === puro.id ? { ...p, stock: newStock } : p)));
-
-    try {
-      const res = await fetch(`/api/puros/${puro.id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ stock: newStock }),
-      });
-      if (!res.ok) throw new Error();
-    } catch {
-      setPuros((prev) => prev.map((p) => (p.id === puro.id ? { ...p, stock: puro.stock } : p)));
-    } finally {
-      setSelling(null);
-    }
-  }, [selling]);
 
   const columns = useMemo(
     () => [
@@ -107,43 +85,18 @@ export default function InventarioTable({ puros: initialPuros }: { puros: Puro[]
         header: 'Acciones',
         cell: (info) => {
           const puro = info.row.original;
-          const agotado = puro.stock <= 0;
-          const isSelling = selling === puro.id;
-
           return (
-            <div className="flex items-center gap-2">
-              {agotado ? (
-                <span className="text-xs text-red-400 font-medium px-2 py-1 rounded-md border border-red-400/30 bg-red-400/10 whitespace-nowrap">
-                  Agotado
-                </span>
-              ) : (
-                <button
-                  type="button"
-                  disabled={isSelling}
-                  onClick={() => handleVentaRapida(puro)}
-                  title="Registrar venta (-1 stock)"
-                  className="flex items-center gap-1 text-xs font-medium px-2 py-1 rounded-md border border-border bg-surface hover:border-secondary/60 hover:text-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
-                >
-                  {isSelling ? (
-                    <span className="w-3 h-3 rounded-full border-2 border-current border-t-transparent animate-spin" />
-                  ) : (
-                    <span className="text-base leading-none">−</span>
-                  )}
-                  Vender
-                </button>
-              )}
-              <Link
-                href={`/admin/inventario/${puro.id}`}
-                className="text-xs text-text-muted hover:text-secondary transition-colors"
-              >
-                Editar →
-              </Link>
-            </div>
+            <Link
+              href={`/admin/inventario/${puro.id}`}
+              className="text-xs text-text-muted hover:text-secondary transition-colors"
+            >
+              Editar →
+            </Link>
           );
         },
       }),
     ],
-    [selling, handleVentaRapida],
+    [],
   );
 
   const data = useMemo(() => puros, [puros]);
