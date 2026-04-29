@@ -97,19 +97,8 @@ export default function PuroForm({ mode, id, initialData }: Props) {
 
   function handleCostModeChange(mode: 'pieza' | 'mazo') {
     setCostMode(mode);
-    if (mode === 'pieza') {
-      setCostoMazo(0);
-      setTransporteMazo(0);
-      setAlmacenamientoMazo(0);
-      setPurosPorMazo(25);
-      set('stock', 1);
-    } else {
-      set('precioBruto', 0);
-      set('costoTransporte', 0);
-      set('costoAlmacenamiento', 0);
-      setCostoMazo(0);
-      setTransporteMazo(0);
-      setAlmacenamientoMazo(0);
+    if (mode === 'mazo') {
+      set('precioBruto', calcMazoPrecioBruto(costoMazo, transporteMazo, almacenamientoMazo, purosPorMazo));
       set('stock', purosPorMazo);
     }
   }
