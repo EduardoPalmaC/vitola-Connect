@@ -1,6 +1,8 @@
 export const dynamic = 'force-dynamic';
 
 import { Suspense } from 'react';
+import Link from 'next/link';
+import { Lock } from 'lucide-react';
 import { getPuros } from '@/lib/sheets';
 import { filtrarPuros, paginar, getUniqueValues } from '@/lib/filters';
 import type { FilterParams, PuroPublico } from '@/types';
@@ -53,7 +55,7 @@ export default async function CatalogoPage({ searchParams }: PageProps) {
   const paises = getUniqueValues(publicPuros, 'paisOrigen') as string[];
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background relative">
       <header className="border-b border-border px-6 py-5">
         <h1 className="text-2xl font-heading font-bold text-text">Catálogo Vitola</h1>
         <p className="text-sm text-text-muted mt-0.5">Puros premium seleccionados</p>
@@ -92,6 +94,14 @@ export default async function CatalogoPage({ searchParams }: PageProps) {
           </div>
         </div>
       </div>
+
+      <Link
+        href="/admin/login"
+        className="fixed bottom-4 right-4 p-2 rounded-md text-text opacity-20 hover:opacity-100 transition-opacity duration-200"
+        aria-label="Admin"
+      >
+        <Lock size={16} />
+      </Link>
     </div>
   );
 }
