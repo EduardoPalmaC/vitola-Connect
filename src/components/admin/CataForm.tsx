@@ -96,8 +96,8 @@ export default function CataForm({ puros }: Props) {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (values.calificacion === 0) {
-      setError('Selecciona una calificación');
+    if (values.calificacion < 1 || values.calificacion > 100) {
+      setError('La puntuación debe estar entre 1 y 100');
       return;
     }
     setError('');
@@ -250,24 +250,41 @@ export default function CataForm({ puros }: Props) {
 
         {/* Calificación */}
         <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium text-text-muted">Calificación</label>
-          <div className="flex items-center gap-1">
-            {[1, 2, 3, 4, 5].map((star) => (
-              <button
-                key={star}
-                type="button"
-                onClick={() => set('calificacion', star)}
-                className="text-2xl transition-transform hover:scale-110 focus:outline-none"
-              >
-                <span className={star <= values.calificacion ? 'text-secondary' : 'text-border'}>
-                  ★
-                </span>
-              </button>
-            ))}
-            {values.calificacion > 0 && (
-              <span className="ml-2 text-sm text-text-muted">{values.calificacion}/5</span>
-            )}
-          </div>
+          <label className="text-sm font-medium text-text-muted">Puntuación</label>
+          <Input
+            type="number"
+            min={1}
+            max={100}
+            value={values.calificacion || ''}
+            onChange={(e) => set('calificacion', Math.min(100, Math.max(0, Number(e.target.value))))}
+            placeholder="1 – 100"
+          />
+          {values.calificacion > 0 && (
+            <div className="flex items-center gap-1.5">
+              <span className="text-xs text-text-muted">{(values.calificacion / 20).toFixed(2)} / 5 estrellas</span>
+              <div className="flex items-center gap-0.5">
+                {[0, 1, 2, 3, 4].map((i) => {
+                  const fill = Math.min(1, Math.max(0, values.calificacion / 20 - i));
+                  return (
+                    <span key={i} style={{ position: 'relative', display: 'inline-block' }}>
+                      <span className="text-border text-lg">★</span>
+                      {fill > 0 && (
+                        <span
+                          style={{
+                            position: 'absolute', left: 0, top: 0,
+                            overflow: 'hidden', width: `${fill * 100}%`, whiteSpace: 'nowrap',
+                          }}
+                          className="text-secondary text-lg"
+                        >
+                          ★
+                        </span>
+                      )}
+                    </span>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Notas */}

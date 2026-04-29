@@ -5,14 +5,34 @@ import { getCatas } from '@/lib/sheets';
 import DeleteCataButton from '@/components/admin/DeleteCataButton';
 
 function Stars({ value }: { value: number }) {
+  const stars = value / 20;
   return (
-    <div className="flex items-center gap-0.5">
-      {[1, 2, 3, 4, 5].map((s) => (
-        <span key={s} className={`text-xl ${s <= value ? 'text-secondary' : 'text-border'}`}>
-          ★
-        </span>
-      ))}
-      <span className="ml-2 text-sm text-text-muted">{value}/5</span>
+    <div className="flex items-center gap-3">
+      <span className="text-4xl font-heading font-bold text-secondary leading-none">{value}</span>
+      <div className="flex flex-col gap-1">
+        <span className="text-xs text-text-muted uppercase tracking-wider">pts / 100</span>
+        <div className="flex items-center gap-0.5">
+          {[0, 1, 2, 3, 4].map((i) => {
+            const fill = Math.min(1, Math.max(0, stars - i));
+            return (
+              <span key={i} style={{ position: 'relative', display: 'inline-block' }}>
+                <span className="text-border text-xl">★</span>
+                {fill > 0 && (
+                  <span
+                    style={{
+                      position: 'absolute', left: 0, top: 0,
+                      overflow: 'hidden', width: `${fill * 100}%`, whiteSpace: 'nowrap',
+                    }}
+                    className="text-secondary text-xl"
+                  >
+                    ★
+                  </span>
+                )}
+              </span>
+            );
+          })}
+        </div>
+      </div>
     </div>
   );
 }

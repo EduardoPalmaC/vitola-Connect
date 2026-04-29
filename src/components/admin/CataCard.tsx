@@ -3,13 +3,31 @@ import Link from 'next/link';
 import type { Cata } from '@/types';
 
 function Stars({ value }: { value: number }) {
+  const stars = value / 20;
   return (
-    <div className="flex items-center gap-0.5">
-      {[1, 2, 3, 4, 5].map((s) => (
-        <span key={s} className={`text-base ${s <= value ? 'text-secondary' : 'text-border'}`}>
-          ★
-        </span>
-      ))}
+    <div className="flex items-center gap-1.5">
+      <span className="text-sm font-semibold text-secondary">{value} pts</span>
+      <div className="flex items-center gap-0.5">
+        {[0, 1, 2, 3, 4].map((i) => {
+          const fill = Math.min(1, Math.max(0, stars - i));
+          return (
+            <span key={i} style={{ position: 'relative', display: 'inline-block' }}>
+              <span className="text-border text-sm">★</span>
+              {fill > 0 && (
+                <span
+                  style={{
+                    position: 'absolute', left: 0, top: 0,
+                    overflow: 'hidden', width: `${fill * 100}%`, whiteSpace: 'nowrap',
+                  }}
+                  className="text-secondary text-sm"
+                >
+                  ★
+                </span>
+              )}
+            </span>
+          );
+        })}
+      </div>
     </div>
   );
 }
