@@ -76,17 +76,6 @@ export default function FilterSidebar({ marcas, vitolas, paises, cepos }: Filter
       </Select>
 
       <Select
-        label="País de origen"
-        value={searchParams.get('paisOrigen') ?? ''}
-        onChange={(e) => setParam('paisOrigen', e.target.value)}
-        placeholder="Todos"
-      >
-        {paises.map((p) => (
-          <option key={p} value={p}>{p}</option>
-        ))}
-      </Select>
-
-      <Select
         label="Cepo"
         value={searchParams.get('ringGauge') ?? ''}
         onChange={(e) => setParam('ringGauge', e.target.value)}
@@ -94,6 +83,17 @@ export default function FilterSidebar({ marcas, vitolas, paises, cepos }: Filter
       >
         {cepos.map((c) => (
           <option key={c} value={c}>{c}</option>
+        ))}
+      </Select>
+
+      <Select
+        label="País de origen"
+        value={searchParams.get('paisOrigen') ?? ''}
+        onChange={(e) => setParam('paisOrigen', e.target.value)}
+        placeholder="Todos"
+      >
+        {paises.map((p) => (
+          <option key={p} value={p}>{p}</option>
         ))}
       </Select>
 
