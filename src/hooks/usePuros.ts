@@ -25,6 +25,7 @@ export function usePuros({ puros, marcas, vitolas, paises, cepos }: Props) {
   const [openKey, setOpenKey] = useState<keyof Filters | null>(null);
   const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0, width: 0 });
   const btnRefs = useRef<Partial<Record<keyof Filters, HTMLButtonElement>>>({});
+  const dropdownRef = useRef<HTMLDivElement | null>(null);
 
   const handleToggle = (key: keyof Filters) => {
     if (openKey === key) {
@@ -42,8 +43,10 @@ export function usePuros({ puros, marcas, vitolas, paises, cepos }: Props) {
   useEffect(() => {
     if (!openKey) return;
     const close = (e: MouseEvent) => {
-      const el = btnRefs.current[openKey];
-      if (!el || !el.contains(e.target as Node)) setOpenKey(null);
+      const btn = btnRefs.current[openKey];
+      const dd = dropdownRef.current;
+      const target = e.target as Node;
+      if ((!btn || !btn.contains(target)) && (!dd || !dd.contains(target))) setOpenKey(null);
     };
     document.addEventListener('mousedown', close);
     return () => document.removeEventListener('mousedown', close);
@@ -78,5 +81,5 @@ export function usePuros({ puros, marcas, vitolas, paises, cepos }: Props) {
     { key: 'pais', opts: paises },
   ];
 
-  return { filters, openKey, dropdownPos, btnRefs, handleToggle, set, clear, visible, hasActive, filterDefs };
+  return { filters, openKey, dropdownPos, btnRefs, dropdownRef, handleToggle, set, clear, visible, hasActive, filterDefs };
 }

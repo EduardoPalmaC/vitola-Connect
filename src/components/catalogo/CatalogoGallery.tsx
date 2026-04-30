@@ -14,7 +14,7 @@ interface Props {
 }
 
 export default function CatalogoGallery({ puros, marcas, vitolas, paises, cepos }: Props) {
-  const { filters, openKey, dropdownPos, btnRefs, handleToggle, set, clear, visible, hasActive, filterDefs } =
+  const { filters, openKey, dropdownPos, btnRefs, dropdownRef, handleToggle, set, clear, visible, hasActive, filterDefs } =
     usePuros({ puros, marcas, vitolas, paises, cepos });
 
   return (
@@ -186,6 +186,7 @@ export default function CatalogoGallery({ puros, marcas, vitolas, paises, cepos 
       {openKey &&
         createPortal(
           <div
+            ref={dropdownRef}
             style={{
               position: 'fixed',
               top: dropdownPos.top,
