@@ -96,7 +96,7 @@ export default function PuroCard({ puro, idx }: PuroCardProps) {
       <div
         style={{
           height: '320px',
-          margin: '24px 0 32px',
+          margin: '24px 0 12px',
           position: 'relative',
           display: 'flex',
           alignItems: 'center',
