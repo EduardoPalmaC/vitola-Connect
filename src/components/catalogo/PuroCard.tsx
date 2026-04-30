@@ -161,7 +161,7 @@ export default function PuroCard({ puro, idx }: PuroCardProps) {
           lineHeight: 1.15,
           letterSpacing: '-0.01em',
           color: '#2C1E1A',
-          margin: '0 0 4px',
+          margin: '0',
           minHeight: '60px',
         }}
       >
@@ -173,7 +173,7 @@ export default function PuroCard({ puro, idx }: PuroCardProps) {
           display: 'grid',
           gridTemplateColumns: '1fr 1fr 1fr',
           gap: '10px',
-          paddingTop: '8px',
+          paddingTop: '4px',
           borderTop: '1px solid #EDE8DE',
           marginBottom: '10px',
         }}
