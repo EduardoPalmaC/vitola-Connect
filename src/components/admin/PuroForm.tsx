@@ -29,6 +29,7 @@ const EMPTY: FormValues = {
   fotoUrl: '',
   notasCata: '',
   stock: 1,
+  fortaleza: '',
 };
 
 interface Props {
@@ -242,6 +243,16 @@ export default function PuroForm({ mode, id, initialData }: Props) {
             onChange={numericSet('largo')}
             required
           />
+          <Select
+            label="Fortaleza"
+            value={values.fortaleza ?? ''}
+            onChange={(e) => set('fortaleza', e.target.value)}
+          >
+            <option value="">Sin especificar</option>
+            <option value="Suave">Suave</option>
+            <option value="Media">Media</option>
+            <option value="Fuerte">Fuerte</option>
+          </Select>
         </div>
       </section>
 
