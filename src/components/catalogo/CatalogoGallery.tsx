@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import PuroCard from '@/components/catalogo/PuroCard';
 import type { PuroPublico } from '@/types/index';
 
@@ -26,6 +27,31 @@ const LABEL: Record<keyof Filters, string> = {
 export default function CatalogoGallery({ puros, marcas, vitolas, paises, cepos }: Props) {
   const [filters, setFilters] = useState<Filters>(EMPTY);
   const [openKey, setOpenKey] = useState<keyof Filters | null>(null);
+  const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0, width: 0 });
+  const btnRefs = useRef<Partial<Record<keyof Filters, HTMLButtonElement>>>({});
+
+  const handleToggle = (key: keyof Filters) => {
+    if (openKey === key) {
+      setOpenKey(null);
+      return;
+    }
+    const el = btnRefs.current[key];
+    if (el) {
+      const rect = el.getBoundingClientRect();
+      setDropdownPos({ top: rect.bottom, left: rect.left, width: Math.max(rect.width, 180) });
+    }
+    setOpenKey(key);
+  };
+
+  useEffect(() => {
+    if (!openKey) return;
+    const close = (e: MouseEvent) => {
+      const el = btnRefs.current[openKey];
+      if (!el || !el.contains(e.target as Node)) setOpenKey(null);
+    };
+    document.addEventListener('mousedown', close);
+    return () => document.removeEventListener('mousedown', close);
+  }, [openKey]);
 
   const set = (key: keyof Filters, val: string) => {
     setFilters((prev) => ({ ...prev, [key]: prev[key] === val ? '' : val }));
@@ -59,12 +85,7 @@ export default function CatalogoGallery({ puros, marcas, vitolas, paises, cepos 
   return (
     <>
       {/* Filter bar */}
-      <div
-        style={{
-          background: '#F2EDE4',
-          borderBottom: '1px solid #E2D9C8',
-        }}
-      >
+      <div style={{ background: '#F2EDE4', borderBottom: '1px solid #E2D9C8' }}>
         <div
           style={{
             display: 'flex',
@@ -90,130 +111,67 @@ export default function CatalogoGallery({ puros, marcas, vitolas, paises, cepos 
             Filtrar
           </div>
 
-          {filterDefs.map(({ key, opts }) => {
+          {filterDefs.map(({ key }) => {
             const active = !!filters[key];
             const isOpen = openKey === key;
             return (
-              <div key={key} style={{ position: 'relative' }}>
-                <button
-                  type="button"
-                  onClick={() => setOpenKey((prev) => (prev === key ? null : key))}
+              <button
+                key={key}
+                ref={(el) => { btnRefs.current[key] = el ?? undefined; }}
+                type="button"
+                onClick={() => handleToggle(key)}
+                style={{
+                  padding: '16px 24px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '3px',
+                  cursor: 'pointer',
+                  background: active ? '#EDE5D5' : 'transparent',
+                  border: 'none',
+                  borderRight: '1px solid #DDD5C5',
+                  outline: 'none',
+                  minWidth: '130px',
+                  textAlign: 'left',
+                  transition: 'background 0.15s',
+                }}
+              >
+                <span
                   style={{
-                    padding: '16px 24px',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '3px',
-                    cursor: 'pointer',
-                    background: active ? '#EDE5D5' : 'transparent',
-                    border: 'none',
-                    borderRight: '1px solid #DDD5C5',
-                    outline: 'none',
-                    minWidth: '130px',
-                    textAlign: 'left',
-                    transition: 'background 0.15s',
+                    fontFamily: 'var(--font-code)',
+                    fontSize: '9px',
+                    letterSpacing: '0.32em',
+                    textTransform: 'uppercase',
+                    color: active ? '#7A6040' : '#9A8572',
                   }}
                 >
+                  {LABEL[key]}
+                </span>
+                <span
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    gap: '12px',
+                    fontFamily: 'var(--font-serif)',
+                    fontSize: '15px',
+                    color: active ? '#5C3D1E' : '#4A3728',
+                  }}
+                >
+                  <span>{filters[key] || 'Todas'}</span>
                   <span
                     style={{
                       fontFamily: 'var(--font-code)',
-                      fontSize: '9px',
-                      letterSpacing: '0.32em',
-                      textTransform: 'uppercase',
-                      color: active ? '#7A6040' : '#9A8572',
+                      fontSize: '10px',
+                      color: active ? '#9B7840' : '#B0A090',
+                      transform: isOpen ? 'scaleY(-1)' : 'none',
+                      display: 'inline-block',
+                      transition: 'transform 0.15s',
                     }}
                   >
-                    {LABEL[key]}
+                    ▾
                   </span>
-                  <span
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      gap: '12px',
-                      fontFamily: 'var(--font-serif)',
-                      fontSize: '15px',
-                      color: active ? '#5C3D1E' : '#4A3728',
-                    }}
-                  >
-                    <span>{filters[key] || 'Todas'}</span>
-                    <span
-                      style={{
-                        fontFamily: 'var(--font-code)',
-                        fontSize: '10px',
-                        color: active ? '#9B7840' : '#B0A090',
-                        transform: isOpen ? 'scaleY(-1)' : 'none',
-                        display: 'inline-block',
-                        transition: 'transform 0.15s',
-                      }}
-                    >
-                      ▾
-                    </span>
-                  </span>
-                </button>
-
-                {isOpen && (
-                  <div
-                    style={{
-                      position: 'absolute',
-                      top: '100%',
-                      left: 0,
-                      background: '#FFFDF8',
-                      border: '1px solid #E2D9C8',
-                      minWidth: '180px',
-                      zIndex: 100,
-                      maxHeight: '280px',
-                      overflowY: 'auto',
-                      boxShadow: '0 8px 24px rgba(44,30,20,0.12)',
-                    }}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => set(key, '')}
-                      style={{
-                        display: 'block',
-                        width: '100%',
-                        textAlign: 'left',
-                        padding: '10px 16px',
-                        fontFamily: 'var(--font-code)',
-                        fontSize: '10px',
-                        letterSpacing: '0.2em',
-                        textTransform: 'uppercase',
-                        color: !filters[key] ? '#9B7840' : '#9A8572',
-                        background: !filters[key] ? '#F5EDD8' : 'transparent',
-                        border: 'none',
-                        borderBottom: '1px solid #EDE8DE',
-                        cursor: 'pointer',
-                      }}
-                    >
-                      Todas
-                    </button>
-                    {opts.map((opt) => (
-                      <button
-                        key={opt}
-                        type="button"
-                        onClick={() => set(key, opt)}
-                        style={{
-                          display: 'block',
-                          width: '100%',
-                          textAlign: 'left',
-                          padding: '10px 16px',
-                          fontFamily: 'var(--font-code)',
-                          fontSize: '10px',
-                          letterSpacing: '0.2em',
-                          color: filters[key] === opt ? '#9B7840' : '#4A3728',
-                          background: filters[key] === opt ? '#F5EDD8' : 'transparent',
-                          border: 'none',
-                          borderBottom: '1px solid #EDE8DE',
-                          cursor: 'pointer',
-                          transition: 'background 0.1s',
-                        }}
-                      >
-                        {opt}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
+                </span>
+              </button>
             );
           })}
         </div>
@@ -288,6 +246,74 @@ export default function CatalogoGallery({ puros, marcas, vitolas, paises, cepos 
           </div>
         )}
       </div>
+
+      {/* Dropdown — portal to body so overflow-x:auto doesn't clip it */}
+      {openKey &&
+        createPortal(
+          <div
+            style={{
+              position: 'fixed',
+              top: dropdownPos.top,
+              left: dropdownPos.left,
+              minWidth: dropdownPos.width,
+              background: '#FFFDF8',
+              border: '1px solid #E2D9C8',
+              zIndex: 1000,
+              maxHeight: '280px',
+              overflowY: 'auto',
+              boxShadow: '0 8px 24px rgba(44,30,20,0.12)',
+            }}
+          >
+            <button
+              type="button"
+              onClick={() => set(openKey, '')}
+              style={{
+                display: 'block',
+                width: '100%',
+                textAlign: 'left',
+                padding: '10px 16px',
+                fontFamily: 'var(--font-code)',
+                fontSize: '10px',
+                letterSpacing: '0.2em',
+                textTransform: 'uppercase',
+                color: !filters[openKey] ? '#9B7840' : '#9A8572',
+                background: !filters[openKey] ? '#F5EDD8' : 'transparent',
+                border: 'none',
+                borderBottom: '1px solid #EDE8DE',
+                cursor: 'pointer',
+              }}
+            >
+              Todas
+            </button>
+            {filterDefs
+              .find((f) => f.key === openKey)
+              ?.opts.map((opt) => (
+                <button
+                  key={opt}
+                  type="button"
+                  onClick={() => set(openKey, opt)}
+                  style={{
+                    display: 'block',
+                    width: '100%',
+                    textAlign: 'left',
+                    padding: '10px 16px',
+                    fontFamily: 'var(--font-code)',
+                    fontSize: '10px',
+                    letterSpacing: '0.2em',
+                    color: filters[openKey] === opt ? '#9B7840' : '#4A3728',
+                    background: filters[openKey] === opt ? '#F5EDD8' : 'transparent',
+                    border: 'none',
+                    borderBottom: '1px solid #EDE8DE',
+                    cursor: 'pointer',
+                    transition: 'background 0.1s',
+                  }}
+                >
+                  {opt}
+                </button>
+              ))}
+          </div>,
+          document.body,
+        )}
 
       {/* Grid */}
       {visible.length === 0 ? (
