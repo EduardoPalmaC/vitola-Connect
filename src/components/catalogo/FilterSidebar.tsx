@@ -50,10 +50,10 @@ function FilterSection({
         className="flex items-center justify-between py-2.5 cursor-pointer"
       >
         <span
-          className="text-[9px] uppercase tracking-[0.25em] transition-colors duration-200"
+          className="text-[11px] uppercase tracking-[0.25em] transition-colors duration-200"
           style={{
             fontFamily: 'var(--font-body)',
-            fontWeight: 600,
+            fontWeight: 700,
             color: current ? '#C9A84C' : 'rgba(237,224,196,0.35)',
           }}
         >
@@ -92,10 +92,10 @@ function FilterSection({
                   }}
                 />
                 <span
-                  className="text-[11px] transition-colors duration-150"
+                  className="text-[13px] transition-colors duration-150"
                   style={{
                     fontFamily: 'var(--font-body)',
-                    fontWeight: active ? 500 : 300,
+                    fontWeight: active ? 600 : 400,
                     color: active ? '#C9A84C' : 'rgba(237,224,196,0.45)',
                     letterSpacing: '0.04em',
                   }}
