@@ -161,7 +161,7 @@ export default function PuroCard({ puro, idx }: PuroCardProps) {
           lineHeight: 1.15,
           letterSpacing: '-0.01em',
           color: '#2C1E1A',
-          margin: '0 0 24px',
+          margin: '0 0 12px',
           minHeight: '60px',
         }}
       >
@@ -172,26 +172,26 @@ export default function PuroCard({ puro, idx }: PuroCardProps) {
         style={{
           display: 'grid',
           gridTemplateColumns: '1fr 1fr 1fr',
-          gap: '16px',
-          paddingTop: '20px',
+          gap: '12px',
+          paddingTop: '12px',
           borderTop: '1px solid #EDE8DE',
-          marginBottom: '24px',
+          marginBottom: '14px',
         }}
       >
         <div>
           <div
             style={{
               fontFamily: 'var(--font-code)',
-              fontSize: '9px',
-              letterSpacing: '0.18em',
+              fontSize: '11px',
+              letterSpacing: '0.14em',
               textTransform: 'uppercase',
               color: '#B0A090',
-              marginBottom: '4px',
+              marginBottom: '3px',
             }}
           >
             Vitola
           </div>
-          <div style={{ fontFamily: 'var(--font-serif)', fontSize: '15px', color: '#2C1E1A' }}>
+          <div style={{ fontFamily: 'var(--font-serif)', fontSize: '17px', color: '#2C1E1A' }}>
             {puro.vitola}
           </div>
         </div>
@@ -199,16 +199,16 @@ export default function PuroCard({ puro, idx }: PuroCardProps) {
           <div
             style={{
               fontFamily: 'var(--font-code)',
-              fontSize: '9px',
-              letterSpacing: '0.18em',
+              fontSize: '11px',
+              letterSpacing: '0.14em',
               textTransform: 'uppercase',
               color: '#B0A090',
-              marginBottom: '4px',
+              marginBottom: '3px',
             }}
           >
             Cepo
           </div>
-          <div style={{ fontFamily: 'var(--font-serif)', fontSize: '15px', color: '#2C1E1A' }}>
+          <div style={{ fontFamily: 'var(--font-serif)', fontSize: '17px', color: '#2C1E1A' }}>
             {puro.ringGauge ?? '—'}
           </div>
         </div>
@@ -216,16 +216,16 @@ export default function PuroCard({ puro, idx }: PuroCardProps) {
           <div
             style={{
               fontFamily: 'var(--font-code)',
-              fontSize: '9px',
-              letterSpacing: '0.18em',
+              fontSize: '11px',
+              letterSpacing: '0.14em',
               textTransform: 'uppercase',
               color: '#B0A090',
-              marginBottom: '4px',
+              marginBottom: '3px',
             }}
           >
             Stock
           </div>
-          <div style={{ fontFamily: 'var(--font-serif)', fontSize: '15px', color: '#2C1E1A' }}>
+          <div style={{ fontFamily: 'var(--font-serif)', fontSize: '17px', color: '#2C1E1A' }}>
             {puro.stock || '—'}
           </div>
         </div>
