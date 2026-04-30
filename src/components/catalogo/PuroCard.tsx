@@ -91,23 +91,44 @@ export default function PuroCard({ puro, idx }: PuroCardProps) {
 
       <div
         style={{
-          height: '260px',
+          height: '320px',
           margin: '24px 0 32px',
           position: 'relative',
-          overflow: 'hidden',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
+          overflow: 'hidden',
         }}
       >
         {puro.fotoUrl ? (
-          <Image
-            src={puro.fotoUrl}
-            alt={puro.nombre}
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            style={{ objectFit: 'cover', objectPosition: 'center' }}
-          />
+          <div
+            style={{
+              width: '200px',
+              height: '300px',
+              position: 'relative',
+              overflow: 'hidden',
+              flexShrink: 0,
+            }}
+          >
+            <div
+              style={{
+                position: 'absolute',
+                width: '300px',
+                height: '200px',
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%) rotate(90deg)',
+              }}
+            >
+              <Image
+                src={puro.fotoUrl}
+                alt={puro.nombre}
+                fill
+                sizes="300px"
+                style={{ objectFit: 'contain', objectPosition: 'center' }}
+              />
+            </div>
+          </div>
         ) : (
           <CigarSVG shade={shade} id={`${idx}-${puro.id ?? idx}`} />
         )}
