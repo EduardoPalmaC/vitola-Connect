@@ -95,7 +95,7 @@ export default function PuroCard({ puro, idx }: PuroCardProps) {
 
       <div
         style={{
-          height: '240px',
+          height: '320px',
           margin: '8px 0 14px',
           position: 'relative',
           display: 'flex',
@@ -109,8 +109,8 @@ export default function PuroCard({ puro, idx }: PuroCardProps) {
         {puro.fotoUrl ? (
           <div
             style={{
-              width: '160px',
-              height: '220px',
+              width: '200px',
+              height: '300px',
               position: 'relative',
               overflow: 'hidden',
               flexShrink: 0,
@@ -119,8 +119,8 @@ export default function PuroCard({ puro, idx }: PuroCardProps) {
             <div
               style={{
                 position: 'absolute',
-                width: '220px',
-                height: '160px',
+                width: '300px',
+                height: '200px',
                 top: '50%',
                 left: '50%',
                 transform: 'translate(-50%, -50%) rotate(90deg)',
