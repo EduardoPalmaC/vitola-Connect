@@ -16,9 +16,9 @@ const BARS = [
 ];
 
 const SIZE_MAP: Record<Size, { barWidth: number; barMaxH: number; gap: number; fontSize: number }> = {
-  sm: { barWidth: 4, barMaxH: 20, gap: 3, fontSize: 18 },
-  md: { barWidth: 6, barMaxH: 30, gap: 4, fontSize: 26 },
-  lg: { barWidth: 8, barMaxH: 42, gap: 5, fontSize: 36 },
+  sm: { barWidth: 4, barMaxH: 20, gap: 3, fontSize: 24 },
+  md: { barWidth: 6, barMaxH: 30, gap: 4, fontSize: 36 },
+  lg: { barWidth: 8, barMaxH: 42, gap: 5, fontSize: 52 },
 };
 
 function Isotype({ size }: { size: Size }) {
