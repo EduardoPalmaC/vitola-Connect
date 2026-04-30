@@ -74,11 +74,11 @@ function FilterCellInner({ label, paramKey, options, isOpen, onToggle, onClose }
         <span
           style={{
             fontFamily: 'var(--font-code)',
-            fontSize: '11px',
-            fontWeight: 600,
-            letterSpacing: '0.24em',
+            fontSize: '13px',
+            fontWeight: 700,
+            letterSpacing: '0.15em',
             textTransform: 'uppercase',
-            color: '#8B6F47',
+            color: '#c9a961',
           }}
         >
           {label}
