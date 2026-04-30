@@ -172,7 +172,8 @@ export default function PuroCard({ puro, idx }: PuroCardProps) {
           display: 'grid',
           gridTemplateColumns: '1fr 1fr 1fr',
           gap: '10px',
-          paddingTop: '4px',
+          marginTop: '12px',
+          paddingTop: '12px',
           borderTop: '1px solid #EDE8DE',
           marginBottom: '10px',
         }}
