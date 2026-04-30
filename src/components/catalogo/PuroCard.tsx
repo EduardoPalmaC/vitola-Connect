@@ -175,7 +175,7 @@ export default function PuroCard({ puro, idx }: PuroCardProps) {
           marginTop: '12px',
           paddingTop: '12px',
           borderTop: '1px solid #EDE8DE',
-          marginBottom: '6px',
+          marginBottom: '2px',
         }}
       >
         <div>
