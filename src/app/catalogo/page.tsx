@@ -6,6 +6,7 @@ import { getPuros } from '@/lib/sheets';
 import { getUniqueValues } from '@/lib/filters';
 import type { PuroPublico } from '@/types';
 import CatalogoGallery from '@/components/catalogo/CatalogoGallery';
+import VitoraLogo from '@/components/VitoraLogo';
 
 function formatDate(d: Date): string {
   const dd = String(d.getDate()).padStart(2, '0');
@@ -67,19 +68,8 @@ export default async function CatalogoPage() {
           >
             Boutique · Colección Premium
           </p>
-          <h1
-            style={{
-              fontFamily: 'var(--font-serif)',
-              fontWeight: 300,
-              fontSize: 'clamp(3.5rem, 8vw, 5.25rem)',
-              lineHeight: 0.9,
-              letterSpacing: '-0.02em',
-              color: '#2C1E1A',
-              margin: 0,
-            }}
-          >
-            Vitola
-            <span style={{ fontStyle: 'italic', color: '#9B7840' }}>.</span>
+          <h1 style={{ margin: 0, lineHeight: 0.9 }}>
+            <VitoraLogo variant="wordmark" size="lg" />
           </h1>
         </div>
         <div
