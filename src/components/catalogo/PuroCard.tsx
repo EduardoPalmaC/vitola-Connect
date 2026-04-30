@@ -161,7 +161,7 @@ export default function PuroCard({ puro, idx }: PuroCardProps) {
           lineHeight: 1.15,
           letterSpacing: '-0.01em',
           color: '#2C1E1A',
-          margin: '0 0 8px',
+          margin: '0 0 4px',
           minHeight: '60px',
         }}
       >
