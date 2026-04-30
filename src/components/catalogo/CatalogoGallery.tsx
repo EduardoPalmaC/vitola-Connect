@@ -74,9 +74,10 @@ export default function CatalogoGallery({ puros, marcas, vitolas, paises, cepos 
                   style={{
                     fontFamily: 'var(--font-code)',
                     fontSize: '9px',
-                    letterSpacing: '0.32em',
+                    letterSpacing: '0.4em',
                     textTransform: 'uppercase',
-                    color: active ? '#7A6040' : '#9A8572',
+                    color: active ? '#2C1E1A' : '#2C1E1A',
+                    fontWeight: 700,
                   }}
                 >
                   {LABEL[key]}
