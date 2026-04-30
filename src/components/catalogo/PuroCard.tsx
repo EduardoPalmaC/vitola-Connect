@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import type { PuroPublico } from '@/types';
 
@@ -92,12 +93,24 @@ export default function PuroCard({ puro, idx }: PuroCardProps) {
         style={{
           height: '260px',
           margin: '24px 0 32px',
+          position: 'relative',
+          overflow: 'hidden',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
         }}
       >
-        <CigarSVG shade={shade} id={`${idx}-${puro.id ?? idx}`} />
+        {puro.fotoUrl ? (
+          <Image
+            src={puro.fotoUrl}
+            alt={puro.nombre}
+            fill
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+            style={{ objectFit: 'cover', objectPosition: 'center' }}
+          />
+        ) : (
+          <CigarSVG shade={shade} id={`${idx}-${puro.id ?? idx}`} />
+        )}
       </div>
 
       <div
