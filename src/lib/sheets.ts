@@ -37,6 +37,7 @@ function rowToPuro(row: string[]): Puro {
     fotoUrl: row[16] || undefined,
     notasCata: row[17] || undefined,
     stock: row[20] !== undefined && row[20] !== '' ? parseInt(row[20]) : 0,
+    fortaleza: row[21] || undefined,
     createdAt: row[18]!,
     updatedAt: row[19]!,
   };
@@ -65,13 +66,14 @@ function puroToRow(puro: Puro): (string | number)[] {
     puro.createdAt,
     puro.updatedAt,
     puro.stock ?? 0,
+    puro.fortaleza ?? '',
   ];
 }
 
 export async function getPuros(): Promise<Puro[]> {
   const response = await sheets.spreadsheets.values.get({
     spreadsheetId: SPREADSHEET_ID,
-    range: 'Inventario!A2:U',
+    range: 'Inventario!A2:V',
   });
 
   const rows = (response.data.values ?? []) as string[][];
@@ -87,7 +89,7 @@ export async function createPuro(
 
   await sheets.spreadsheets.values.append({
     spreadsheetId: SPREADSHEET_ID,
-    range: 'Inventario!A:U',
+    range: 'Inventario!A:V',
     valueInputOption: 'USER_ENTERED',
     requestBody: { values: [puroToRow(full)] },
   });
@@ -108,7 +110,7 @@ export async function updatePuro(id: string, updates: Partial<Puro>): Promise<vo
 
   await sheets.spreadsheets.values.update({
     spreadsheetId: SPREADSHEET_ID,
-    range: `Inventario!A${index + 2}:U${index + 2}`,
+    range: `Inventario!A${index + 2}:V${index + 2}`,
     valueInputOption: 'USER_ENTERED',
     requestBody: { values: [puroToRow(updated)] },
   });

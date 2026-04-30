@@ -1,15 +1,16 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import type { PuroPublico } from '@/types/index';
 
-export type Filters = { marca: string; vitola: string; pais: string; cepo: string };
+export type Filters = { marca: string; vitola: string; pais: string; cepo: string; fortaleza: string };
 
-const EMPTY: Filters = { marca: '', vitola: '', pais: '', cepo: '' };
+const EMPTY: Filters = { marca: '', vitola: '', pais: '', cepo: '', fortaleza: '' };
 
 export const LABEL: Record<keyof Filters, string> = {
   marca: 'Marca',
   cepo: 'Cepo',
   vitola: 'Vitola',
   pais: 'País',
+  fortaleza: 'Fortaleza',
 };
 
 interface Props {
@@ -18,9 +19,10 @@ interface Props {
   vitolas: string[];
   paises: string[];
   cepos: number[];
+  fortalezas: string[];
 }
 
-export function usePuros({ puros, marcas, vitolas, paises, cepos }: Props) {
+export function usePuros({ puros, marcas, vitolas, paises, cepos, fortalezas }: Props) {
   const [filters, setFilters] = useState<Filters>(EMPTY);
   const [openKey, setOpenKey] = useState<keyof Filters | null>(null);
   const [dropdownPos, setDropdownPos] = useState({ top: 0, left: 0, width: 0 });
@@ -68,6 +70,7 @@ export function usePuros({ puros, marcas, vitolas, paises, cepos }: Props) {
       if (filters.cepo && String(p.ringGauge) !== filters.cepo) return false;
       if (filters.vitola && p.vitola !== filters.vitola) return false;
       if (filters.pais && p.paisOrigen !== filters.pais) return false;
+      if (filters.fortaleza && p.fortaleza !== filters.fortaleza) return false;
       return true;
     });
   }, [puros, filters]);
@@ -79,6 +82,7 @@ export function usePuros({ puros, marcas, vitolas, paises, cepos }: Props) {
     { key: 'cepo', opts: cepos.map(String) },
     { key: 'vitola', opts: vitolas },
     { key: 'pais', opts: paises },
+    { key: 'fortaleza', opts: fortalezas },
   ];
 
   return { filters, openKey, dropdownPos, btnRefs, dropdownRef, handleToggle, set, clear, visible, hasActive, filterDefs };

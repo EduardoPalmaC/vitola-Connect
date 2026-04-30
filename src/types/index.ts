@@ -18,6 +18,7 @@ export interface Puro {
   fotoUrl?: string;
   notasCata?: string;
   stock: number;
+  fortaleza?: string;
   createdAt: string;
   updatedAt: string;
 }
@@ -42,6 +43,7 @@ export interface FilterParams {
   estado?: 'coleccion_personal' | 'negocio';
   search?: string;
   page?: number;
+  fortaleza?: string;
 }
 
 export interface PuroPublico {
@@ -54,6 +56,7 @@ export interface PuroPublico {
   stock: number;
   ringGauge?: number;
   paisOrigen?: string;
+  fortaleza?: string;
 }
 
 export interface Cata {

@@ -28,12 +28,14 @@ export default async function CatalogoPage() {
     stock: p.stock,
     ringGauge: p.ringGauge,
     paisOrigen: p.paisOrigen,
+    fortaleza: p.fortaleza,
   }));
 
   const marcas = getUniqueValues(publicPuros, 'marca') as string[];
   const vitolas = getUniqueValues(publicPuros, 'vitola') as string[];
   const paises = getUniqueValues(publicPuros, 'paisOrigen') as string[];
   const cepos = getUniqueValues(publicPuros, 'ringGauge') as number[];
+  const fortalezas = getUniqueValues(publicPuros, 'fortaleza') as string[];
 
   const today = formatDate(new Date());
 
@@ -103,6 +105,7 @@ export default async function CatalogoPage() {
         vitolas={vitolas}
         paises={paises}
         cepos={cepos}
+        fortalezas={fortalezas}
       />
 
       <Link

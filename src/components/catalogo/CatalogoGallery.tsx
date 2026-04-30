@@ -11,11 +11,12 @@ interface Props {
   vitolas: string[];
   paises: string[];
   cepos: number[];
+  fortalezas: string[];
 }
 
-export default function CatalogoGallery({ puros, marcas, vitolas, paises, cepos }: Props) {
+export default function CatalogoGallery({ puros, marcas, vitolas, paises, cepos, fortalezas }: Props) {
   const { filters, openKey, dropdownPos, btnRefs, dropdownRef, handleToggle, set, clear, visible, hasActive, filterDefs } =
-    usePuros({ puros, marcas, vitolas, paises, cepos });
+    usePuros({ puros, marcas, vitolas, paises, cepos, fortalezas });
 
   return (
     <>
