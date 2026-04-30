@@ -236,8 +236,8 @@ export default function PuroCard({ puro, idx }: PuroCardProps) {
           style={{
             fontFamily: 'Inter, sans-serif',
             fontSize: '24px',
-            fontWeight: 600,
-            color: '#B8956B',
+            fontWeight: 700,
+            color: '#9B7552',
             letterSpacing: '-0.02em',
           }}
         >
