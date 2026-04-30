@@ -162,7 +162,6 @@ export default function PuroCard({ puro, idx }: PuroCardProps) {
           letterSpacing: '-0.01em',
           color: '#2C1E1A',
           margin: '0',
-          minHeight: '60px',
         }}
       >
         {puro.nombre}
