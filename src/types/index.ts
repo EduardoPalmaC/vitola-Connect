@@ -52,6 +52,8 @@ export interface PuroPublico {
   precioVenta: number;
   fotoUrl?: string;
   stock: number;
+  ringGauge?: number;
+  paisOrigen?: string;
 }
 
 export interface Cata {

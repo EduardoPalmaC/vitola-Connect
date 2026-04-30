@@ -1,108 +1,220 @@
-import Image from 'next/image';
 import Link from 'next/link';
 import type { PuroPublico } from '@/types';
 
-interface PuroCardProps {
-  puro: PuroPublico;
+const SHADES: string[] = ['#a87a4a', '#946640', '#b88555', '#8a5a36', '#a06f44'];
+
+function CigarSVG({ shade, id }: { shade: string; id: string | number }) {
+  const gradId = `cig-${id}`;
+  const grainId = `grain-${id}`;
+  return (
+    <svg
+      viewBox="0 0 80 280"
+      style={{ height: '100%', width: 'auto' }}
+      preserveAspectRatio="xMidYMid meet"
+    >
+      <defs>
+        <linearGradient id={gradId} x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stopColor={shade} stopOpacity="0.85" />
+          <stop offset="50%" stopColor={shade} stopOpacity="1" />
+          <stop offset="100%" stopColor={shade} stopOpacity="0.7" />
+        </linearGradient>
+        <pattern id={grainId} width="3" height="3" patternUnits="userSpaceOnUse">
+          <rect width="3" height="3" fill="transparent" />
+          <line x1="0" y1="0" x2="0" y2="3" stroke="rgba(0,0,0,0.12)" strokeWidth="0.5" />
+        </pattern>
+      </defs>
+      <rect x="28" y="10" width="24" height="240" rx="12" fill={`url(#${gradId})`} />
+      <rect x="28" y="10" width="24" height="240" rx="12" fill={`url(#${grainId})`} />
+      <rect x="26" y="180" width="28" height="28" fill="#1a1410" />
+      <rect x="26" y="184" width="28" height="1" fill="#c9a961" />
+      <rect x="26" y="203" width="28" height="1" fill="#c9a961" />
+      <ellipse cx="40" cy="252" rx="12" ry="3" fill="rgba(0,0,0,0.5)" />
+    </svg>
+  );
 }
 
-export default function PuroCard({ puro }: PuroCardProps) {
+interface PuroCardProps {
+  puro: PuroPublico;
+  idx: number;
+}
+
+export default function PuroCard({ puro, idx }: PuroCardProps) {
+  const soldOut = puro.stock === 0;
+  const low = puro.stock > 0 && puro.stock < 15;
+  const shade = SHADES[idx % SHADES.length] ?? '#a87a4a';
+  const [intero, deci] = puro.precioVenta.toFixed(2).split('.');
+
   return (
     <Link
       href={`/catalogo/${puro.id}`}
-      className="group relative block overflow-hidden rounded-xl cursor-pointer
-        shadow-[var(--shadow-card)]
-        hover:shadow-[var(--shadow-card-hover)]
-        transition-all duration-500 ease-out"
+      className="group block relative"
+      style={{
+        borderRight: '1px solid #1f1a14',
+        borderBottom: '1px solid #1f1a14',
+        padding: '44px 36px 32px',
+        background: '#0e0c0a',
+        opacity: soldOut ? 0.45 : 1,
+        transition: 'background 0.4s ease',
+      }}
     >
-      {/* Image layer — landscape-first, object-cover fills any photo ratio */}
-      <div className="relative aspect-[4/3] bg-[#0C0906]">
-        {puro.fotoUrl ? (
-          <Image
-            src={puro.fotoUrl}
-            alt={puro.nombre}
-            fill
-            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06]"
-          />
-        ) : (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-            <svg viewBox="0 0 64 20" className="w-20 opacity-20" fill="none" stroke="#C9A84C" strokeWidth="1">
-              <rect x="1" y="1" width="62" height="18" rx="9" />
-              <line x1="12" y1="1" x2="12" y2="19" />
-              <line x1="52" y1="1" x2="52" y2="19" />
-            </svg>
-          </div>
-        )}
+      <div
+        style={{
+          position: 'absolute',
+          top: '20px',
+          left: '36px',
+          fontFamily: 'var(--font-code)',
+          fontSize: '10px',
+          letterSpacing: '0.2em',
+          color: '#5a4f3e',
+        }}
+      >
+        № {String(idx + 1).padStart(3, '0')}
+      </div>
 
-        {/* Gradient — always on, heavier at bottom for legibility */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#080604]/96 via-[#080604]/25 to-transparent" />
+      {puro.paisOrigen && (
+        <div
+          style={{
+            position: 'absolute',
+            top: '20px',
+            right: '36px',
+            fontFamily: 'var(--font-code)',
+            fontSize: '10px',
+            letterSpacing: '0.2em',
+            color: '#5a4f3e',
+            textTransform: 'uppercase',
+          }}
+        >
+          {puro.paisOrigen}
+        </div>
+      )}
 
-        {/* Low stock badge */}
-        {puro.stock <= 3 && (
-          <div className="absolute top-3 right-3">
-            <span
-              className="text-[9px] uppercase tracking-[0.18em] px-2 py-0.5 rounded-full"
-              style={{
-                background: 'rgba(201,168,76,0.12)',
-                color: '#C9A84C',
-                border: '1px solid rgba(201,168,76,0.3)',
-                fontFamily: 'var(--font-body)',
-              }}
-            >
-              Últimas
-            </span>
-          </div>
-        )}
+      <div
+        style={{
+          height: '260px',
+          margin: '24px 0 32px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <CigarSVG shade={shade} id={`${idx}-${puro.id ?? idx}`} />
+      </div>
 
-        {/* Text overlay */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 flex flex-col gap-1">
-          <p
-            className="text-[9px] uppercase tracking-[0.22em]"
-            style={{ color: '#C9A84C', fontFamily: 'var(--font-body)', fontWeight: 500 }}
-          >
-            {puro.marca}
-          </p>
+      <div
+        style={{
+          fontFamily: 'var(--font-code)',
+          fontSize: '10px',
+          letterSpacing: '0.32em',
+          textTransform: 'uppercase',
+          color: '#c9a961',
+          marginBottom: '10px',
+        }}
+      >
+        {puro.marca}
+      </div>
 
-          <h3
-            className="leading-tight line-clamp-2"
+      <h3
+        style={{
+          fontFamily: 'var(--font-serif)',
+          fontWeight: 400,
+          fontSize: '28px',
+          lineHeight: 1.1,
+          letterSpacing: '-0.01em',
+          color: '#f0e8d8',
+          margin: '0 0 24px',
+          minHeight: '62px',
+        }}
+      >
+        {puro.nombre}
+      </h3>
+
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr 1fr',
+          gap: '16px',
+          paddingTop: '20px',
+          borderTop: '1px solid #2a241c',
+          marginBottom: '24px',
+        }}
+      >
+        <div>
+          <div
             style={{
-              fontFamily: 'var(--font-serif)',
-              fontWeight: 600,
-              fontSize: '1.05rem',
-              color: '#EDE0C4',
-              letterSpacing: '0.01em',
+              fontFamily: 'var(--font-code)',
+              fontSize: '9px',
+              letterSpacing: '0.18em',
+              textTransform: 'uppercase',
+              color: '#6a5f4e',
+              marginBottom: '4px',
             }}
           >
-            {puro.nombre}
-          </h3>
-
-          <div className="flex items-end justify-between gap-2 mt-1.5">
-            <span
-              className="text-xs"
-              style={{ color: 'rgba(237,224,196,0.45)', fontFamily: 'var(--font-body)', fontWeight: 300 }}
-            >
-              {puro.vitola}
-            </span>
-            <span
-              style={{
-                fontFamily: 'var(--font-serif)',
-                fontWeight: 600,
-                fontSize: '1.1rem',
-                color: '#E2C47A',
-                letterSpacing: '0.02em',
-              }}
-            >
-              ${puro.precioVenta.toLocaleString('es-MX')}
-            </span>
+            Vitola
+          </div>
+          <div style={{ fontFamily: 'var(--font-serif)', fontSize: '16px', color: '#e8dfd1' }}>
+            {puro.vitola}
           </div>
         </div>
+        <div>
+          <div
+            style={{
+              fontFamily: 'var(--font-code)',
+              fontSize: '9px',
+              letterSpacing: '0.18em',
+              textTransform: 'uppercase',
+              color: '#6a5f4e',
+              marginBottom: '4px',
+            }}
+          >
+            Cepo
+          </div>
+          <div style={{ fontFamily: 'var(--font-serif)', fontSize: '16px', color: '#e8dfd1' }}>
+            {puro.ringGauge ?? '—'}
+          </div>
+        </div>
+        <div>
+          <div
+            style={{
+              fontFamily: 'var(--font-code)',
+              fontSize: '9px',
+              letterSpacing: '0.18em',
+              textTransform: 'uppercase',
+              color: '#6a5f4e',
+              marginBottom: '4px',
+            }}
+          >
+            Stock
+          </div>
+          <div style={{ fontFamily: 'var(--font-serif)', fontSize: '16px', color: '#e8dfd1' }}>
+            {puro.stock || '—'}
+          </div>
+        </div>
+      </div>
 
-        {/* Hover: inset gold ring */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
         <div
-          className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
-          style={{ boxShadow: 'inset 0 0 0 1px rgba(201,168,76,0.4)' }}
-        />
+          style={{
+            fontFamily: 'var(--font-serif)',
+            fontSize: '32px',
+            fontWeight: 300,
+            color: '#c9a961',
+            letterSpacing: '-0.01em',
+          }}
+        >
+          ${intero}
+          <span style={{ fontSize: '18px' }}>.{deci}</span>
+        </div>
+        <div
+          style={{
+            fontFamily: 'var(--font-code)',
+            fontSize: '10px',
+            letterSpacing: '0.18em',
+            textTransform: 'uppercase',
+            color: soldOut ? '#8b3a2a' : low ? '#c47a3d' : '#7a6f5e',
+          }}
+        >
+          {soldOut ? 'Agotado' : low ? `Quedan ${puro.stock}` : 'Disponible'}
+        </div>
       </div>
     </Link>
   );

@@ -7,7 +7,7 @@ import { getPuros } from '@/lib/sheets';
 import { filtrarPuros, paginar, getUniqueValues } from '@/lib/filters';
 import type { FilterParams, PuroPublico } from '@/types';
 import PuroCard from '@/components/catalogo/PuroCard';
-import FilterSidebar from '@/components/catalogo/FilterSidebar';
+import FilterToolbar from '@/components/catalogo/FilterToolbar';
 import PaginationBar from '@/components/catalogo/PaginationBar';
 
 interface PageProps {
@@ -16,6 +16,13 @@ interface PageProps {
 
 function sp(val: string | string[] | undefined): string | undefined {
   return Array.isArray(val) ? val[0] : val;
+}
+
+function formatDate(d: Date): string {
+  const dd = String(d.getDate()).padStart(2, '0');
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const yy = String(d.getFullYear()).slice(2);
+  return `${dd}.${mm}.${yy}`;
 }
 
 export default async function CatalogoPage({ searchParams }: PageProps) {
@@ -49,6 +56,8 @@ export default async function CatalogoPage({ searchParams }: PageProps) {
     precioVenta: p.precioVenta,
     fotoUrl: p.fotoUrl,
     stock: p.stock,
+    ringGauge: p.ringGauge,
+    paisOrigen: p.paisOrigen,
   }));
 
   const marcas = getUniqueValues(publicPuros, 'marca') as string[];
@@ -56,102 +65,117 @@ export default async function CatalogoPage({ searchParams }: PageProps) {
   const paises = getUniqueValues(publicPuros, 'paisOrigen') as string[];
   const cepos = getUniqueValues(publicPuros, 'ringGauge') as number[];
 
+  const today = formatDate(new Date());
+
   return (
-    <div className="min-h-screen relative" style={{ background: '#0A0806' }}>
-      {/* Editorial header */}
-      <header className="px-6 pt-14 pb-10 text-center" style={{ borderBottom: '1px solid rgba(237,224,196,0.06)' }}>
-        <p
-          className="text-[9px] uppercase tracking-[0.4em] mb-4"
-          style={{ fontFamily: 'var(--font-body)', fontWeight: 600, color: '#C9A84C', letterSpacing: '0.4em' }}
-        >
-          Boutique · Colección Premium
-        </p>
-
-        <h1
-          className="leading-none"
-          style={{
-            fontFamily: 'var(--font-serif)',
-            fontWeight: 600,
-            fontSize: 'clamp(3rem, 8vw, 6rem)',
-            color: '#EDE0C4',
-            letterSpacing: '-0.01em',
-          }}
-        >
-          Vitola
-        </h1>
-
-        <div className="flex items-center justify-center gap-4 mt-6">
-          <span className="h-px w-16" style={{ background: 'rgba(201,168,76,0.3)' }} />
+    <div style={{ background: '#0e0c0a', color: '#e8dfd1', minHeight: '100vh' }}>
+      {/* Hero */}
+      <header
+        style={{
+          padding: '56px 64px 40px',
+          borderBottom: '1px solid #2a241c',
+          display: 'grid',
+          gridTemplateColumns: '1fr auto',
+          alignItems: 'end',
+          gap: '40px',
+        }}
+        className="max-sm:grid-cols-1 max-sm:px-6 max-sm:pt-10 max-sm:pb-8"
+      >
+        <div>
           <p
-            className="text-[10px] uppercase tracking-[0.3em]"
-            style={{ fontFamily: 'var(--font-body)', fontWeight: 300, color: 'rgba(237,224,196,0.35)' }}
+            style={{
+              fontFamily: 'var(--font-code)',
+              fontSize: '10px',
+              letterSpacing: '0.32em',
+              textTransform: 'uppercase',
+              color: '#7a6f5e',
+              marginBottom: '12px',
+            }}
           >
-            {publicPuros.length} referencias
+            Boutique · Colección Premium
           </p>
-          <span className="h-px w-16" style={{ background: 'rgba(201,168,76,0.3)' }} />
+          <h1
+            style={{
+              fontFamily: 'var(--font-serif)',
+              fontWeight: 300,
+              fontSize: 'clamp(3.5rem, 8vw, 5.25rem)',
+              lineHeight: 0.9,
+              letterSpacing: '-0.02em',
+              color: '#e8dfd1',
+              margin: 0,
+            }}
+          >
+            Vitola
+            <span style={{ fontStyle: 'italic', color: '#c9a961' }}>.</span>
+          </h1>
+        </div>
+        <div
+          style={{
+            fontFamily: 'var(--font-code)',
+            fontSize: '10px',
+            letterSpacing: '0.18em',
+            textTransform: 'uppercase',
+            color: '#7a6f5e',
+            textAlign: 'right',
+            lineHeight: 1.8,
+          }}
+          className="max-sm:text-left"
+        >
+          <div>{publicPuros.length} referencias activas</div>
+          <div>Actualizado · {today}</div>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-5 sm:px-8 py-10">
-        <div className="flex gap-12">
-          {/* Filter sidebar */}
-          <div className="hidden lg:block w-44 shrink-0 pt-0.5">
+      {/* Filter toolbar */}
+      <Suspense>
+        <FilterToolbar marcas={marcas} vitolas={vitolas} paises={paises} cepos={cepos} />
+      </Suspense>
+
+      {/* Grid */}
+      {items.length === 0 ? (
+        <div className="flex flex-col items-center justify-center py-40">
+          <p
+            style={{
+              fontFamily: 'var(--font-serif)',
+              fontSize: '2rem',
+              color: 'rgba(232,223,209,0.3)',
+              fontStyle: 'italic',
+              marginBottom: '8px',
+            }}
+          >
+            Sin resultados
+          </p>
+          <p
+            style={{
+              fontFamily: 'var(--font-code)',
+              fontSize: '10px',
+              letterSpacing: '0.3em',
+              textTransform: 'uppercase',
+              color: 'rgba(232,223,209,0.15)',
+            }}
+          >
+            Ajusta los filtros
+          </p>
+        </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+            {publicItems.map((puro, idx) => (
+              <PuroCard key={puro.id} puro={puro} idx={idx} />
+            ))}
+          </div>
+          <div className="px-6 sm:px-10 py-8">
             <Suspense>
-              <FilterSidebar
-                marcas={marcas}
-                vitolas={vitolas}
-                paises={paises}
-                cepos={cepos}
-              />
+              <PaginationBar page={filterParams.page ?? 1} pages={pages} total={total} />
             </Suspense>
           </div>
-
-          {/* Grid */}
-          <div className="flex-1 min-w-0">
-            {total > 0 && (
-              <p
-                className="text-[10px] uppercase tracking-widest mb-6"
-                style={{ fontFamily: 'var(--font-body)', color: 'rgba(237,224,196,0.25)' }}
-              >
-                {total} {total === 1 ? 'puro' : 'puros'}
-              </p>
-            )}
-
-            {items.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-40">
-                <p
-                  className="text-2xl mb-2"
-                  style={{ fontFamily: 'var(--font-serif)', color: 'rgba(237,224,196,0.3)', fontStyle: 'italic' }}
-                >
-                  Sin resultados
-                </p>
-                <p
-                  className="text-xs uppercase tracking-widest"
-                  style={{ fontFamily: 'var(--font-body)', color: 'rgba(237,224,196,0.15)' }}
-                >
-                  Ajusta los filtros
-                </p>
-              </div>
-            ) : (
-              <>
-                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
-                  {publicItems.map((puro) => (
-                    <PuroCard key={puro.id} puro={puro} />
-                  ))}
-                </div>
-                <Suspense>
-                  <PaginationBar page={filterParams.page ?? 1} pages={pages} total={total} />
-                </Suspense>
-              </>
-            )}
-          </div>
-        </div>
-      </div>
+        </>
+      )}
 
       <Link
         href="/admin/login"
         className="fixed bottom-5 right-5 p-2 transition-opacity duration-300"
-        style={{ color: 'rgba(237,224,196,0.1)' }}
+        style={{ color: 'rgba(232,223,209,0.1)' }}
         aria-label="Admin"
       >
         <Lock size={13} />
