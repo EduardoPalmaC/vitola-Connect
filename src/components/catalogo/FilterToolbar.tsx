@@ -73,12 +73,13 @@ function FilterCellInner({ label, paramKey, options, isOpen, onToggle, onClose }
       <button onClick={onToggle} style={cellStyle} type="button">
         <span
           style={{
-            fontFamily: 'var(--font-code)',
-            fontSize: '13px',
+            fontFamily: 'var(--font-serif)',
+            fontSize: '16px',
             fontWeight: 700,
-            letterSpacing: '0.15em',
+            letterSpacing: '0.08em',
             textTransform: 'uppercase',
-            color: '#c9a961',
+            color: '#e8dfd1',
+            textShadow: '0 2px 4px rgba(0,0,0,0.5)',
           }}
         >
           {label}
