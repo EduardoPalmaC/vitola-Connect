@@ -44,15 +44,15 @@ export default async function CatalogoPage() {
       {/* Hero */}
       <header
         style={{
-          padding: '56px 64px 40px',
+          padding: '20px 64px 16px',
           borderBottom: '1px solid #E2D9C8',
           display: 'grid',
           gridTemplateColumns: '1fr auto',
           alignItems: 'end',
-          gap: '40px',
+          gap: '20px',
           background: '#F9F6F0',
         }}
-        className="max-sm:grid-cols-1 max-sm:px-6 max-sm:pt-10 max-sm:pb-8"
+        className="max-sm:grid-cols-1 max-sm:px-6 max-sm:pt-4 max-sm:pb-3"
       >
         <div>
           <p
