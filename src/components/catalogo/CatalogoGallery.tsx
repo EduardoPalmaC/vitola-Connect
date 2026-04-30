@@ -79,7 +79,6 @@ export default function CatalogoGallery({ puros, marcas, vitolas, paises, cepos,
                     textTransform: 'uppercase',
                     color: '#6B4423',
                     fontWeight: 900,
-                    textShadow: '0 1px 2px rgba(0,0,0,0.3)',
                   }}
                 >
                   {LABEL[key]}
