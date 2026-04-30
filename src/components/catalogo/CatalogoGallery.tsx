@@ -9,19 +9,21 @@ interface Props {
   marcas: string[];
   vitolas: string[];
   paises: string[];
+  cepos: number[];
 }
 
-type Filters = { marca: string; vitola: string; pais: string };
+type Filters = { marca: string; vitola: string; pais: string; cepo: string };
 
-const EMPTY: Filters = { marca: '', vitola: '', pais: '' };
+const EMPTY: Filters = { marca: '', vitola: '', pais: '', cepo: '' };
 
 const LABEL: Record<keyof Filters, string> = {
   marca: 'Marca',
+  cepo: 'Cepo',
   vitola: 'Vitola',
   pais: 'País',
 };
 
-export default function CatalogoGallery({ puros, marcas, vitolas, paises }: Props) {
+export default function CatalogoGallery({ puros, marcas, vitolas, paises, cepos }: Props) {
   const [filters, setFilters] = useState<Filters>(EMPTY);
   const [openKey, setOpenKey] = useState<keyof Filters | null>(null);
 
@@ -38,6 +40,7 @@ export default function CatalogoGallery({ puros, marcas, vitolas, paises }: Prop
   const visible = useMemo(() => {
     return puros.filter((p) => {
       if (filters.marca && p.marca !== filters.marca) return false;
+      if (filters.cepo && String(p.ringGauge) !== filters.cepo) return false;
       if (filters.vitola && p.vitola !== filters.vitola) return false;
       if (filters.pais && p.paisOrigen !== filters.pais) return false;
       return true;
@@ -48,6 +51,7 @@ export default function CatalogoGallery({ puros, marcas, vitolas, paises }: Prop
 
   const filterDefs: { key: keyof Filters; opts: string[] }[] = [
     { key: 'marca', opts: marcas },
+    { key: 'cepo', opts: cepos.map(String) },
     { key: 'vitola', opts: vitolas },
     { key: 'pais', opts: paises },
   ];

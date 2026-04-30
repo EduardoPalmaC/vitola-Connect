@@ -33,6 +33,7 @@ export default async function CatalogoPage() {
   const marcas = getUniqueValues(publicPuros, 'marca') as string[];
   const vitolas = getUniqueValues(publicPuros, 'vitola') as string[];
   const paises = getUniqueValues(publicPuros, 'paisOrigen') as string[];
+  const cepos = getUniqueValues(publicPuros, 'ringGauge') as number[];
 
   const today = formatDate(new Date());
 
@@ -101,6 +102,7 @@ export default async function CatalogoPage() {
         marcas={marcas}
         vitolas={vitolas}
         paises={paises}
+        cepos={cepos}
       />
 
       <Link
