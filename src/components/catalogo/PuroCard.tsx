@@ -235,14 +235,14 @@ export default function PuroCard({ puro, idx }: PuroCardProps) {
         <div
           style={{
             fontFamily: 'Inter, sans-serif',
-            fontSize: '20px',
+            fontSize: '24px',
             fontWeight: 600,
             color: '#BA8A5E',
             letterSpacing: '-0.02em',
           }}
         >
           ${intero}
-          <span style={{ fontSize: '12px' }}>.{deci}</span>
+          <span style={{ fontSize: '14px' }}>.{deci}</span>
         </div>
         <div
           style={{
