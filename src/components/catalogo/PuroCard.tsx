@@ -147,7 +147,7 @@ export default function PuroCard({ puro, idx }: PuroCardProps) {
           letterSpacing: '0.32em',
           textTransform: 'uppercase',
           color: '#9B7840',
-          marginBottom: '10px',
+          marginBottom: '6px',
         }}
       >
         {puro.marca}
@@ -161,7 +161,7 @@ export default function PuroCard({ puro, idx }: PuroCardProps) {
           lineHeight: 1.15,
           letterSpacing: '-0.01em',
           color: '#2C1E1A',
-          margin: '0 0 12px',
+          margin: '0 0 8px',
           minHeight: '60px',
         }}
       >
@@ -172,10 +172,10 @@ export default function PuroCard({ puro, idx }: PuroCardProps) {
         style={{
           display: 'grid',
           gridTemplateColumns: '1fr 1fr 1fr',
-          gap: '12px',
-          paddingTop: '12px',
+          gap: '10px',
+          paddingTop: '8px',
           borderTop: '1px solid #EDE8DE',
-          marginBottom: '14px',
+          marginBottom: '10px',
         }}
       >
         <div>
