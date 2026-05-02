@@ -1,5 +1,4 @@
 import Image from 'next/image';
-import Link from 'next/link';
 import type { PuroPublico } from '@/types/index';
 
 const SHADES: string[] = ['#C4956A', '#B07F52', '#D4A574', '#A06840', '#BA8A5E'];
@@ -37,18 +36,20 @@ function CigarSVG({ shade, id }: { shade: string; id: string | number }) {
 interface PuroCardProps {
   puro: PuroPublico;
   idx: number;
+  onOpenDetail?: () => void;
 }
 
-export default function PuroCard({ puro, idx }: PuroCardProps) {
+export default function PuroCard({ puro, idx, onOpenDetail }: PuroCardProps) {
   const soldOut = puro.stock === 0;
   const low = puro.stock > 0 && puro.stock < 15;
   const shade = SHADES[idx % SHADES.length] ?? '#C4956A';
   const [intero, deci] = puro.precioVenta.toFixed(2).split('.');
 
   return (
-    <Link
-      href={`/catalogo/${puro.id}`}
-      className="group block relative"
+    <button
+      type="button"
+      onClick={onOpenDetail}
+      className="group block relative text-left w-full"
       style={{
         borderRight: '1px solid #EDE8DE',
         borderBottom: '1px solid #EDE8DE',
@@ -56,10 +57,11 @@ export default function PuroCard({ puro, idx }: PuroCardProps) {
         background: '#FFFFFF',
         opacity: soldOut ? 0.5 : 1,
         transition: 'background 0.2s ease',
+        cursor: onOpenDetail ? 'pointer' : 'default',
       }}
     >
       <style>{`
-        a.group:hover { background: #FDFAF5 !important; }
+        button.group:hover { background: #FDFAF5 !important; }
       `}</style>
 
       <div
@@ -256,6 +258,6 @@ export default function PuroCard({ puro, idx }: PuroCardProps) {
           {soldOut ? 'Agotado' : low ? `Quedan ${puro.stock}` : 'Disponible'}
         </div>
       </div>
-    </Link>
+    </button>
   );
 }

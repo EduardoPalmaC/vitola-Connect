@@ -1,7 +1,9 @@
 'use client';
 
+import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import PuroCard from '@/components/catalogo/PuroCard';
+import PuroDetailModal from '@/components/catalogo/PuroDetailModal';
 import type { PuroPublico } from '@/types/index';
 import { usePuros, LABEL, type Filters } from '@/hooks/usePuros';
 
@@ -17,6 +19,8 @@ interface Props {
 export default function CatalogoGallery({ puros, marcas, vitolas, paises, cepos, fortalezas }: Props) {
   const { filters, openKey, dropdownPos, btnRefs, dropdownRef, handleToggle, set, clear, visible, hasActive, filterDefs } =
     usePuros({ puros, marcas, vitolas, paises, cepos, fortalezas });
+
+  const [selectedPuro, setSelectedPuro] = useState<{ puro: PuroPublico; idx: number } | null>(null);
 
   return (
     <>
@@ -282,10 +286,22 @@ export default function CatalogoGallery({ puros, marcas, vitolas, paises, cepos,
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
           {visible.map((puro, idx) => (
-            <PuroCard key={puro.id} puro={puro} idx={idx} />
+            <PuroCard
+              key={puro.id}
+              puro={puro}
+              idx={idx}
+              onOpenDetail={() => setSelectedPuro({ puro, idx })}
+            />
           ))}
         </div>
       )}
+
+      <PuroDetailModal
+        puro={selectedPuro?.puro ?? null}
+        idx={selectedPuro?.idx ?? 0}
+        open={!!selectedPuro}
+        onOpenChange={(open) => { if (!open) setSelectedPuro(null); }}
+      />
     </>
   );
 }

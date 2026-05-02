@@ -30,6 +30,9 @@ export default async function CatalogoPage() {
     ringGauge: p.ringGauge,
     paisOrigen: p.paisOrigen,
     fortaleza: p.fortaleza,
+    largo: p.largo,
+    tiempoAnejamiento: p.tiempoAnejamiento,
+    notasCata: p.notasCata,
   }));
 
   const marcas = getUniqueValues(publicPuros, 'marca') as string[];

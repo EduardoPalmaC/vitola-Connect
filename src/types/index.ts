@@ -57,6 +57,9 @@ export interface PuroPublico {
   ringGauge?: number;
   paisOrigen?: string;
   fortaleza?: string;
+  largo?: number;
+  tiempoAnejamiento?: number;
+  notasCata?: string;
 }
 
 export interface Cata {
