@@ -23,6 +23,13 @@ interface FormValues {
   fotoUrl: string;
   fotosAdicionales: string[];
   calificacion: number;
+  cuerpo: number;
+  dulzor: number;
+  especia: number;
+  tierra: number;
+  madera: number;
+  etiquetasAromaRaw: string;
+  maridaje: string;
 }
 
 async function uploadToCloudinary(file: File): Promise<string> {
@@ -52,6 +59,13 @@ export default function CataEditForm({ cata }: Props) {
     fotoUrl: cata.fotoUrl ?? '',
     fotosAdicionales: cata.fotosAdicionales ?? [],
     calificacion: cata.calificacion,
+    cuerpo: cata.cuerpo ?? 0,
+    dulzor: cata.dulzor ?? 0,
+    especia: cata.especia ?? 0,
+    tierra: cata.tierra ?? 0,
+    madera: cata.madera ?? 0,
+    etiquetasAromaRaw: (cata.etiquetasAroma ?? []).join(', '),
+    maridaje: cata.maridaje ?? '',
   });
   const [uploading, setUploading] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -120,6 +134,15 @@ export default function CataEditForm({ cata }: Props) {
           cepo: values.cepo,
           paisOrigen: values.paisOrigen,
           capa: values.capa,
+          cuerpo: values.cuerpo || undefined,
+          dulzor: values.dulzor || undefined,
+          especia: values.especia || undefined,
+          tierra: values.tierra || undefined,
+          madera: values.madera || undefined,
+          etiquetasAroma: values.etiquetasAromaRaw
+            ? values.etiquetasAromaRaw.split(',').map((t) => t.trim()).filter(Boolean)
+            : undefined,
+          maridaje: values.maridaje || undefined,
         }),
       });
       if (!res.ok) {
@@ -305,6 +328,60 @@ export default function CataEditForm({ cata }: Props) {
             {values.fotoUrl ? 'Selecciona más para agregar fotos adicionales.' : 'La primera imagen será la portada.'}
           </p>
           {uploading && <p className="text-xs text-text-muted">Subiendo imágenes...</p>}
+        </div>
+      </section>
+
+      {/* Perfil aromático */}
+      <section className="flex flex-col gap-4">
+        <h2 className="text-xs font-semibold text-text-muted uppercase tracking-wider">
+          Perfil aromático
+        </h2>
+
+        <div className="flex flex-col gap-3">
+          {(['cuerpo', 'dulzor', 'especia', 'tierra', 'madera'] as const).map((attr) => (
+            <div key={attr} className="flex items-center gap-4">
+              <span className="text-sm text-text-muted capitalize w-20 shrink-0">{attr.charAt(0).toUpperCase() + attr.slice(1)}</span>
+              <div className="flex gap-2">
+                {[0, 1, 2, 3, 4, 5].map((n) => (
+                  <button
+                    key={n}
+                    type="button"
+                    onClick={() => set(attr, n)}
+                    className={`w-8 h-8 rounded-lg border text-sm font-medium transition-colors ${
+                      values[attr] === n
+                        ? 'bg-secondary text-white border-secondary'
+                        : 'bg-surface border-border text-text-muted hover:border-secondary/60'
+                    }`}
+                  >
+                    {n}
+                  </button>
+                ))}
+              </div>
+              <span className="text-xs text-text-muted">{values[attr]} / 5</span>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label className="text-sm font-medium text-text-muted">
+            Notas de aroma <span className="font-normal">(separadas por coma)</span>
+          </label>
+          <Input
+            value={values.etiquetasAromaRaw}
+            onChange={(e) => set('etiquetasAromaRaw', e.target.value)}
+            placeholder="Ej: Cedro tostado, Cacao, Tierra húmeda, Cuero..."
+          />
+        </div>
+
+        <div className="flex flex-col gap-1.5">
+          <label className="text-sm font-medium text-text-muted">Maridaje sugerido</label>
+          <textarea
+            value={values.maridaje}
+            onChange={(e) => set('maridaje', e.target.value)}
+            rows={3}
+            className="w-full rounded-lg border border-border bg-surface px-3 py-2 text-sm text-text placeholder:text-text-muted focus:outline-none focus:ring-2 focus:ring-secondary focus:border-transparent transition-colors resize-none"
+            placeholder="Ej: Ron añejo dominicano, whisky ahumado o café de origen..."
+          />
         </div>
       </section>
 

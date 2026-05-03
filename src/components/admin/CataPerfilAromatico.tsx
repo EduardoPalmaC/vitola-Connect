@@ -38,6 +38,9 @@ const s = {
     width: '72px',
     flexShrink: 0,
   } as React.CSSProperties,
+  atributoNombreEmpty: {
+    color: '#C8BFB0',
+  } as React.CSSProperties,
   dotsRow: {
     display: 'flex',
     gap: '6px',
@@ -56,6 +59,14 @@ const s = {
     borderRadius: '50%',
     background: 'transparent',
     border: '1px solid #C8BFB0',
+    flexShrink: 0,
+  } as React.CSSProperties,
+  dotPlaceholder: {
+    width: '10px',
+    height: '10px',
+    borderRadius: '50%',
+    background: 'transparent',
+    border: '1px dashed #DDD5C5',
     flexShrink: 0,
   } as React.CSSProperties,
   atributoValor: {
@@ -86,6 +97,12 @@ const s = {
     color: '#5C4A30',
     background: 'transparent',
   } as React.CSSProperties,
+  placeholder: {
+    fontFamily: 'var(--font-serif)',
+    fontStyle: 'italic',
+    fontSize: '14px',
+    color: '#C8BFB0',
+  } as React.CSSProperties,
   maridajeParagraph: {
     fontFamily: 'var(--font-serif)',
     fontSize: '15px',
@@ -96,12 +113,13 @@ const s = {
   } as React.CSSProperties,
 };
 
-function DotScore({ value, max = 5 }: { value: number; max?: number }) {
+function DotScore({ value }: { value: number | undefined }) {
   return (
     <div style={s.dotsRow}>
-      {Array.from({ length: max }).map((_, i) => (
-        <div key={i} style={i < value ? s.dotFilled : s.dotEmpty} />
-      ))}
+      {Array.from({ length: 5 }).map((_, i) => {
+        if (value == null) return <div key={i} style={s.dotPlaceholder} />;
+        return <div key={i} style={i < value ? s.dotFilled : s.dotEmpty} />;
+      })}
     </div>
   );
 }
@@ -115,51 +133,49 @@ const ATRIBUTOS: { key: keyof Cata; label: string }[] = [
 ];
 
 export default function CataPerfilAromatico({ cata }: { cata: Cata }) {
-  const tieneAtributos = ATRIBUTOS.some((a) => cata[a.key] != null);
-  const tieneEtiquetas = (cata.etiquetasAroma ?? []).length > 0;
-
-  if (!tieneAtributos && !tieneEtiquetas && !cata.maridaje) return null;
+  const etiquetas = cata.etiquetasAroma ?? [];
 
   return (
     <div style={s.section}>
       <div style={s.label}>Cata</div>
       <h2 style={s.heading}>Perfil aromático</h2>
 
-      {tieneAtributos && (
-        <div style={{ marginBottom: '0' }}>
-          {ATRIBUTOS.map(({ key, label }) => {
-            const val = cata[key] as number | undefined;
-            if (val == null) return null;
-            return (
-              <div key={key} style={s.atributoRow}>
-                <div style={s.atributoNombre}>{label}</div>
-                <DotScore value={val} />
-                <div style={s.atributoValor}>{val} / 5</div>
+      <div>
+        {ATRIBUTOS.map(({ key, label }) => {
+          const val = cata[key] as number | undefined;
+          return (
+            <div key={key} style={s.atributoRow}>
+              <div style={{ ...s.atributoNombre, ...(val == null ? s.atributoNombreEmpty : {}) }}>
+                {label}
               </div>
-            );
-          })}
-        </div>
-      )}
+              <DotScore value={val} />
+              <div style={s.atributoValor}>
+                {val != null ? `${val} / 5` : '— / 5'}
+              </div>
+            </div>
+          );
+        })}
+      </div>
 
-      {tieneEtiquetas && (
-        <>
-          <div style={s.divider} />
-          <div style={s.tagsWrap}>
-            {(cata.etiquetasAroma ?? []).map((tag, i) => (
-              <span key={i} style={s.tag}>
-                {tag}
-              </span>
-            ))}
-          </div>
-        </>
-      )}
+      <div style={s.divider} />
 
-      {cata.maridaje && (
-        <>
-          <div style={s.divider} />
-          <div style={{ ...s.label, marginBottom: '12px' }}>Maridaje sugerido</div>
-          <p style={s.maridajeParagraph}>{cata.maridaje}</p>
-        </>
+      <div style={s.tagsWrap}>
+        {etiquetas.length > 0 ? (
+          etiquetas.map((tag, i) => (
+            <span key={i} style={s.tag}>{tag}</span>
+          ))
+        ) : (
+          <span style={s.placeholder}>Sin notas de aroma registradas</span>
+        )}
+      </div>
+
+      <div style={s.divider} />
+
+      <div style={{ ...s.label, marginBottom: '12px' }}>Maridaje sugerido</div>
+      {cata.maridaje ? (
+        <p style={s.maridajeParagraph}>{cata.maridaje}</p>
+      ) : (
+        <p style={{ ...s.maridajeParagraph, ...s.placeholder }}>Sin maridaje registrado</p>
       )}
     </div>
   );

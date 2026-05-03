@@ -180,6 +180,7 @@ export async function registrarVentaItems(
 
 function rowToCata(row: string[]): Cata {
   const fotosRaw = row[14] ?? '';
+  const etiquetasRaw = row[20] ?? '';
   return {
     id: row[0]!,
     fecha: row[1]!,
@@ -196,6 +197,13 @@ function rowToCata(row: string[]): Cata {
     usuarioId: row[12] || 'admin',
     createdAt: row[13]!,
     fotosAdicionales: fotosRaw ? fotosRaw.split(',').map((u) => u.trim()).filter(Boolean) : undefined,
+    cuerpo: row[15] ? parseInt(row[15]) || undefined : undefined,
+    dulzor: row[16] ? parseInt(row[16]) || undefined : undefined,
+    especia: row[17] ? parseInt(row[17]) || undefined : undefined,
+    tierra: row[18] ? parseInt(row[18]) || undefined : undefined,
+    madera: row[19] ? parseInt(row[19]) || undefined : undefined,
+    etiquetasAroma: etiquetasRaw ? etiquetasRaw.split(',').map((t) => t.trim()).filter(Boolean) : undefined,
+    maridaje: row[21] || undefined,
   };
 }
 
@@ -216,13 +224,20 @@ function cataToRow(cata: Cata): (string | number)[] {
     cata.usuarioId,
     cata.createdAt,
     (cata.fotosAdicionales ?? []).join(','),
+    cata.cuerpo ?? '',
+    cata.dulzor ?? '',
+    cata.especia ?? '',
+    cata.tierra ?? '',
+    cata.madera ?? '',
+    (cata.etiquetasAroma ?? []).join(','),
+    cata.maridaje ?? '',
   ];
 }
 
 export async function getCatas(): Promise<Cata[]> {
   const response = await sheets.spreadsheets.values.get({
     spreadsheetId: SPREADSHEET_ID,
-    range: 'Catas!A2:O',
+    range: 'Catas!A2:V',
   });
   const rows = (response.data.values ?? []) as string[][];
   return rows.filter((r) => r.length >= 5).map(rowToCata);
@@ -235,7 +250,7 @@ export async function createCata(cata: Omit<Cata, 'id' | 'createdAt'>): Promise<
 
   await sheets.spreadsheets.values.append({
     spreadsheetId: SPREADSHEET_ID,
-    range: 'Catas!A:O',
+    range: 'Catas!A:V',
     valueInputOption: 'USER_ENTERED',
     requestBody: { values: [cataToRow(full)] },
   });
@@ -252,7 +267,7 @@ export async function updateCata(id: string, data: Partial<Omit<Cata, 'id' | 'cr
 
   await sheets.spreadsheets.values.update({
     spreadsheetId: SPREADSHEET_ID,
-    range: `Catas!A${index + 2}:O${index + 2}`,
+    range: `Catas!A${index + 2}:V${index + 2}`,
     valueInputOption: 'USER_ENTERED',
     requestBody: { values: [cataToRow(updated)] },
   });
