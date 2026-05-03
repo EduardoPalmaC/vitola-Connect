@@ -172,6 +172,8 @@ const s = {
     fontStyle: 'italic',
     fontSize: '38px',
     color: '#9B7840',
+    display: 'block',
+    marginTop: '4px',
   } as React.CSSProperties,
   origenLine: {
     fontFamily: 'var(--font-code)',
