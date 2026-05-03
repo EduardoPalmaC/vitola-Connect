@@ -162,14 +162,15 @@ const s = {
   name: {
     fontFamily: 'var(--font-serif)',
     fontWeight: 400,
-    fontSize: '76px',
+    fontSize: '56px',
     lineHeight: 0.95,
     letterSpacing: '-0.025em',
     color: '#2C1E1A',
-    margin: '0 0 18px',
+    margin: '0 0 16px',
   } as React.CSSProperties,
   nameItalic: {
     fontStyle: 'italic',
+    fontSize: '38px',
     color: '#9B7840',
   } as React.CSSProperties,
   origenLine: {
