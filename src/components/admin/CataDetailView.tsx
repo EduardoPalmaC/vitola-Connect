@@ -206,11 +206,12 @@ const s = {
   scoreCellLast: { borderRight: 'none' } as React.CSSProperties,
   scoreLabel: {
     fontFamily: 'var(--font-code)',
-    fontSize: '9px',
+    fontSize: '12px',
     letterSpacing: '0.32em',
     textTransform: 'uppercase',
-    color: '#B0A090',
+    color: '#5C4A30',
     marginBottom: '10px',
+    fontWeight: 500,
   } as React.CSSProperties,
   scoreBox: {
     background: '#9B7840',
@@ -552,7 +553,7 @@ export default function CataDetailView({ cata }: { cata: Cata }) {
             {cata.marca} <span style={s.nameItalic}>{cata.vitola}</span>
           </h1>
           <div style={s.origenLine}>
-            <span style={{ color: '#2C1E1A', fontWeight: 500, fontSize: '12px' }}>
+            <span style={{ color: '#5C4A30', fontWeight: 500, fontSize: '12px' }}>
               {fechaFormateada}
             </span>
             {' · Cepo ' + cata.cepo + ' · ' + cata.paisOrigen}
