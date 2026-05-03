@@ -78,6 +78,13 @@ export interface Cata {
   puroId?: string;
   usuarioId: string;
   createdAt: string;
+  cuerpo?: number;
+  dulzor?: number;
+  especia?: number;
+  tierra?: number;
+  madera?: number;
+  etiquetasAroma?: string[];
+  maridaje?: string;
 }
 
 export interface DashboardKPIs {

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import type { Cata } from '@/types/index';
+import CataPerfilAromatico from '@/components/admin/CataPerfilAromatico';
 
 const s = {
   page: {
@@ -660,6 +661,9 @@ export default function CataDetailView({ cata }: { cata: Cata }) {
           </div>
         </div>
       </div>
+
+      {/* Perfil aromático */}
+      <CataPerfilAromatico cata={cata} />
 
       {/* Actions strip */}
       <div style={s.actionsStrip}>
