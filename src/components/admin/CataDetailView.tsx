@@ -545,13 +545,11 @@ export default function CataDetailView({ cata }: { cata: Cata }) {
 
         {/* Info */}
         <div style={s.info}>
-          <div style={s.marca}>{cata.marca}</div>
           <h1 style={s.name}>
-            {vitolaHead && <>{vitolaHead} </>}
-            <span style={s.nameItalic}>{vitolaItalic}</span>
+            {cata.marca} <span style={s.nameItalic}>{cata.vitola}</span>
           </h1>
           <div style={s.origenLine}>
-            {cata.vitola} · Cepo {cata.cepo} · {cata.paisOrigen}
+            Cepo {cata.cepo} · {cata.paisOrigen}
           </div>
 
           {cata.notas && (
