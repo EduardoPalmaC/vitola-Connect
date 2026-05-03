@@ -552,7 +552,10 @@ export default function CataDetailView({ cata }: { cata: Cata }) {
             {cata.marca} <span style={s.nameItalic}>{cata.vitola}</span>
           </h1>
           <div style={s.origenLine}>
-            {fechaFormateada} · Cepo {cata.cepo} · {cata.paisOrigen}
+            <span style={{ color: '#2C1E1A', fontWeight: 500, fontSize: '12px' }}>
+              {fechaFormateada}
+            </span>
+            {' · Cepo ' + cata.cepo + ' · ' + cata.paisOrigen}
           </div>
 
           {cata.notas && (
