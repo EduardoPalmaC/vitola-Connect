@@ -552,7 +552,7 @@ export default function CataDetailView({ cata }: { cata: Cata }) {
             {cata.marca} <span style={s.nameItalic}>{cata.vitola}</span>
           </h1>
           <div style={s.origenLine}>
-            Cepo {cata.cepo} · {cata.paisOrigen}
+            {fechaFormateada} · Cepo {cata.cepo} · {cata.paisOrigen}
           </div>
 
           {cata.notas && (
