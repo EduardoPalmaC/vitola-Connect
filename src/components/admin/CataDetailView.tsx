@@ -162,11 +162,11 @@ const s = {
   name: {
     fontFamily: 'var(--font-serif)',
     fontWeight: 400,
-    fontSize: '56px',
-    lineHeight: 1.0,
-    letterSpacing: '-0.02em',
+    fontSize: '76px',
+    lineHeight: 0.95,
+    letterSpacing: '-0.025em',
     color: '#2C1E1A',
-    margin: '0 0 14px',
+    margin: '0 0 18px',
   } as React.CSSProperties,
   nameItalic: {
     fontStyle: 'italic',
