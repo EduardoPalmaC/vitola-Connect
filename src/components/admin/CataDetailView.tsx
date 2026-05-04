@@ -608,10 +608,10 @@ export default function CataDetailView({ cata }: { cata: Cata }) {
             </div>
           </div>
         </div>
-
-        {/* Perfil aromático */}
-        <CataPerfilAromatico cata={cata} />
       </div>
+
+      {/* Perfil aromático */}
+      <CataPerfilAromatico cata={cata} />
 
       {/* Split row */}
       <div style={s.splitRow}>
