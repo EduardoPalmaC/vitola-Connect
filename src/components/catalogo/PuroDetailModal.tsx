@@ -316,7 +316,7 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
           {/* Right: details */}
           <div style={{ padding: '16px 40px 40px', paddingRight: '56px' }}>
             {/* Header */}
-            <div style={{ marginBottom: '4px' }}>
+            <div style={{ marginBottom: '-8px' }}>
               <div
                 style={{
                   fontFamily: 'var(--font-code)',
