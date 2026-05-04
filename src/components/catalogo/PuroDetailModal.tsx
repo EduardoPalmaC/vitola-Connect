@@ -290,8 +290,8 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
             {puro.fotoUrl ? (
               <div
                 style={{
-                  width: '240px',
-                  height: '440px',
+                  width: '550px',
+                  height: '400px',
                   position: 'relative',
                   overflow: 'hidden',
                   flexShrink: 0,
@@ -304,7 +304,7 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
                     height: '450px',
                     top: '50%',
                     left: '50%',
-                    transform: 'translate(-50%, -50%) rotate(90deg)',
+                    transform: 'translate(-50%, -50%) rotate(90deg) scale(1.5)',
                   }}
                 >
                   <Image
