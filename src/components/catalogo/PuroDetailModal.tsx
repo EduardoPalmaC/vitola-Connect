@@ -314,53 +314,60 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
           </div>
 
           {/* Right: details */}
-          <div style={{ padding: '36px 44px 40px 40px', position: 'relative' }}>
-            {/* Logo — absolute, no afecta el flujo */}
-            {puro.logoMarcaUrl && (
+          <div style={{ padding: '0 44px 40px 40px', position: 'relative' }}>
+            {/* Zona header fija — logo y nombre flotan aquí sin afectar el flujo */}
+            <div style={{ position: 'relative', height: '200px', marginBottom: '16px' }}>
+              {puro.logoMarcaUrl && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '20px',
+                    right: '0',
+                    width: '160px',
+                    height: '160px',
+                  }}
+                >
+                  <Image
+                    src={puro.logoMarcaUrl}
+                    alt={`Logo ${puro.marca}`}
+                    fill
+                    sizes="160px"
+                    style={{ objectFit: 'contain', objectPosition: 'center' }}
+                  />
+                </div>
+              )}
               <div
                 style={{
                   position: 'absolute',
-                  top: '36px',
-                  right: '44px',
-                  width: '160px',
-                  height: '160px',
+                  bottom: '0',
+                  left: '0',
+                  paddingRight: puro.logoMarcaUrl ? '180px' : '0',
                 }}
               >
-                <Image
-                  src={puro.logoMarcaUrl}
-                  alt={`Logo ${puro.marca}`}
-                  fill
-                  sizes="160px"
-                  style={{ objectFit: 'contain', objectPosition: 'center' }}
-                />
-              </div>
-            )}
-
-            {/* Header */}
-            <div style={{ marginBottom: '12px', marginTop: '60px', paddingRight: puro.logoMarcaUrl ? '180px' : '0' }}>
-              <h2
-                style={{
-                  fontFamily: 'var(--font-serif)',
-                  fontWeight: 400,
-                  fontSize: '30px',
-                  lineHeight: 1.1,
-                  letterSpacing: '-0.01em',
-                  color: '#2C1E1A',
-                  margin: '0 0 8px 0',
-                }}
-              >
-                {puro.nombre}
-              </h2>
-              <div
-                style={{
-                  fontFamily: 'var(--font-code)',
-                  fontSize: '9px',
-                  letterSpacing: '0.36em',
-                  textTransform: 'uppercase',
-                  color: '#9B7840',
-                }}
-              >
-                {puro.marca}
+                <h2
+                  style={{
+                    fontFamily: 'var(--font-serif)',
+                    fontWeight: 400,
+                    fontSize: '30px',
+                    lineHeight: 1.1,
+                    letterSpacing: '-0.01em',
+                    color: '#2C1E1A',
+                    margin: '0 0 8px 0',
+                  }}
+                >
+                  {puro.nombre}
+                </h2>
+                <div
+                  style={{
+                    fontFamily: 'var(--font-code)',
+                    fontSize: '9px',
+                    letterSpacing: '0.36em',
+                    textTransform: 'uppercase',
+                    color: '#9B7840',
+                  }}
+                >
+                  {puro.marca}
+                </div>
               </div>
             </div>
 
