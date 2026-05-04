@@ -60,6 +60,7 @@ export interface PuroPublico {
   largo?: number;
   tiempoAnejamiento?: number;
   notasCata?: string;
+  logoMarcaUrl?: string;
 }
 
 export interface Cata {

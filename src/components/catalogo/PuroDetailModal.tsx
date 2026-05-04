@@ -329,19 +329,47 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
               >
                 {puro.marca}
               </div>
-              <h2
+              <div
                 style={{
-                  fontFamily: 'var(--font-serif)',
-                  fontWeight: 400,
-                  fontSize: '30px',
-                  lineHeight: 1.1,
-                  letterSpacing: '-0.01em',
-                  color: '#2C1E1A',
-                  margin: 0,
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  gap: '16px',
                 }}
               >
-                {puro.nombre}
-              </h2>
+                <h2
+                  style={{
+                    fontFamily: 'var(--font-serif)',
+                    fontWeight: 400,
+                    fontSize: '30px',
+                    lineHeight: 1.1,
+                    letterSpacing: '-0.01em',
+                    color: '#2C1E1A',
+                    margin: 0,
+                    flex: 1,
+                  }}
+                >
+                  {puro.nombre}
+                </h2>
+                {puro.logoMarcaUrl && (
+                  <div
+                    style={{
+                      position: 'relative',
+                      width: '60px',
+                      height: '60px',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <Image
+                      src={puro.logoMarcaUrl}
+                      alt={`Logo ${puro.marca}`}
+                      fill
+                      sizes="60px"
+                      style={{ objectFit: 'contain', objectPosition: 'center' }}
+                    />
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Price + stock */}
