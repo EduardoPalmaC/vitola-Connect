@@ -38,7 +38,7 @@ export function DialogContent({ children, onClose }: DialogContentProps) {
           transform: 'translate(-50%, -50%)',
           width: 'min(90vw, 920px)',
           maxHeight: '90vh',
-          overflowY: 'auto',
+          overflowY: 'hidden',
           background: '#F9F6F0',
           zIndex: 51,
           outline: 'none',
