@@ -355,8 +355,8 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
                   <div
                     style={{
                       position: 'relative',
-                      width: '100px',
-                      height: '100px',
+                      width: '180px',
+                      height: '180px',
                       flexShrink: 0,
                     }}
                   >
@@ -364,7 +364,7 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
                       src={puro.logoMarcaUrl}
                       alt={`Logo ${puro.marca}`}
                       fill
-                      sizes="100px"
+                      sizes="180px"
                       style={{ objectFit: 'contain', objectPosition: 'center' }}
                     />
                   </div>
