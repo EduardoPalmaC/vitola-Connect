@@ -301,7 +301,7 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
                   style={{
                     position: 'absolute',
                     width: '440px',
-                    height: '240px',
+                    height: '450px',
                     top: '50%',
                     left: '50%',
                     transform: 'translate(-50%, -50%) rotate(90deg)',
@@ -312,7 +312,6 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
                     alt={puro.nombre}
                     fill
                     sizes="440px"
-                    className="scale-125"
                     style={{ objectFit: 'contain', objectPosition: 'center' }}
                   />
                 </div>
