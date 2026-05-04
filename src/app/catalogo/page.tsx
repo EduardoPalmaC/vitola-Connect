@@ -26,6 +26,7 @@ export default async function CatalogoPage() {
     vitola: p.vitola,
     precioVenta: p.precioVenta,
     fotoUrl: p.fotoUrl,
+    logoMarcaUrl: p.logoMarcaUrl,
     stock: p.stock,
     ringGauge: p.ringGauge,
     paisOrigen: p.paisOrigen,

@@ -351,23 +351,24 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
                 >
                   {puro.nombre}
                 </h2>
-                {/* Test logo */}
-                <div
-                  style={{
-                    position: 'relative',
-                    width: '60px',
-                    height: '60px',
-                    flexShrink: 0,
-                  }}
-                >
-                  <Image
-                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Logo_Partagas.png/200px-Logo_Partagas.png"
-                    alt={`Logo ${puro.marca}`}
-                    fill
-                    sizes="60px"
-                    style={{ objectFit: 'contain', objectPosition: 'center' }}
-                  />
-                </div>
+                {puro.logoMarcaUrl && (
+                  <div
+                    style={{
+                      position: 'relative',
+                      width: '60px',
+                      height: '60px',
+                      flexShrink: 0,
+                    }}
+                  >
+                    <Image
+                      src={puro.logoMarcaUrl}
+                      alt={`Logo ${puro.marca}`}
+                      fill
+                      sizes="60px"
+                      style={{ objectFit: 'contain', objectPosition: 'center' }}
+                    />
+                  </div>
+                )}
               </div>
             </div>
 
