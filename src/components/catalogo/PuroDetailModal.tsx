@@ -290,18 +290,19 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
             {puro.fotoUrl ? (
               <div
                 style={{
-                  width: '550px',
-                  height: '650px',
+                  width: '400px',
+                  height: '600px',
                   position: 'relative',
                   overflow: 'hidden',
                   flexShrink: 0,
                 }}
+                className="rotate-90"
               >
                 <Image
                   src={puro.fotoUrl}
                   alt={puro.nombre}
                   fill
-                  sizes="550px"
+                  sizes="400px"
                   style={{ objectFit: 'contain', objectPosition: 'center' }}
                 />
               </div>
