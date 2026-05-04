@@ -312,6 +312,7 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
                     alt={puro.nombre}
                     fill
                     sizes="440px"
+                    className="scale-125"
                     style={{ objectFit: 'contain', objectPosition: 'center' }}
                   />
                 </div>
