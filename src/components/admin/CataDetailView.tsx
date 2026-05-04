@@ -610,6 +610,9 @@ export default function CataDetailView({ cata }: { cata: Cata }) {
         </div>
       </div>
 
+      {/* Perfil aromático */}
+      <CataPerfilAromatico cata={cata} />
+
       {/* Split row */}
       <div style={s.splitRow}>
         {/* Ficha técnica */}
@@ -661,9 +664,6 @@ export default function CataDetailView({ cata }: { cata: Cata }) {
           </div>
         </div>
       </div>
-
-      {/* Perfil aromático */}
-      <CataPerfilAromatico cata={cata} />
 
       {/* Actions strip */}
       <div style={s.actionsStrip}>
