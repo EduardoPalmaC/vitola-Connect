@@ -290,8 +290,8 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
             {puro.fotoUrl ? (
               <div
                 style={{
-                  width: '160px',
-                  height: '360px',
+                  width: '240px',
+                  height: '440px',
                   position: 'relative',
                   overflow: 'hidden',
                   flexShrink: 0,
@@ -300,8 +300,8 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
                 <div
                   style={{
                     position: 'absolute',
-                    width: '360px',
-                    height: '160px',
+                    width: '440px',
+                    height: '240px',
                     top: '50%',
                     left: '50%',
                     transform: 'translate(-50%, -50%) rotate(90deg)',
@@ -311,7 +311,7 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
                     src={puro.fotoUrl}
                     alt={puro.nombre}
                     fill
-                    sizes="360px"
+                    sizes="440px"
                     style={{ objectFit: 'contain', objectPosition: 'center' }}
                   />
                 </div>
