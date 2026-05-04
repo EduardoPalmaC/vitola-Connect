@@ -291,30 +291,19 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
               <div
                 style={{
                   width: '550px',
-                  height: '400px',
+                  height: '650px',
                   position: 'relative',
                   overflow: 'hidden',
                   flexShrink: 0,
                 }}
               >
-                <div
-                  style={{
-                    position: 'absolute',
-                    width: '440px',
-                    height: '450px',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%) rotate(90deg) scale(1.5)',
-                  }}
-                >
-                  <Image
-                    src={puro.fotoUrl}
-                    alt={puro.nombre}
-                    fill
-                    sizes="440px"
-                    style={{ objectFit: 'contain', objectPosition: 'center' }}
-                  />
-                </div>
+                <Image
+                  src={puro.fotoUrl}
+                  alt={puro.nombre}
+                  fill
+                  sizes="550px"
+                  style={{ objectFit: 'contain', objectPosition: 'center' }}
+                />
               </div>
             ) : (
               <div style={{ height: '340px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
