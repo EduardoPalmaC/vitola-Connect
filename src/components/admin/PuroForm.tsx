@@ -27,6 +27,7 @@ const EMPTY: FormValues = {
   humedad: 65,
   fechaRevisionHumedad: '',
   fotoUrl: '',
+  logoMarcaUrl: '',
   notasCata: '',
   stock: 1,
   fortaleza: '',
@@ -42,6 +43,7 @@ export default function PuroForm({ mode, id, initialData }: Props) {
   const router = useRouter();
   const [values, setValues] = useState<FormValues>({ ...EMPTY, ...initialData });
   const [uploading, setUploading] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [error, setError] = useState('');
@@ -139,6 +141,34 @@ export default function PuroForm({ mode, id, initialData }: Props) {
       setError('Error de red al subir imagen');
     } finally {
       setUploading(false);
+    }
+  }
+
+  async function handleLogoUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingLogo(true);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      fd.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!);
+
+      const res = await fetch(
+        `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
+        { method: 'POST', body: fd },
+      );
+      const data = (await res.json()) as { secure_url?: string; error?: { message: string } };
+
+      if (!res.ok || !data.secure_url) {
+        setError(data.error?.message ?? 'Error al subir logo');
+        return;
+      }
+      set('logoMarcaUrl', data.secure_url);
+    } catch {
+      setError('Error de red al subir logo');
+    } finally {
+      setUploadingLogo(false);
     }
   }
 
@@ -492,6 +522,24 @@ export default function PuroForm({ mode, id, initialData }: Props) {
             />
             {uploading && <p className="text-xs text-text-muted">Subiendo imagen...</p>}
           </div>
+
+          {values.logoMarcaUrl && (
+            <div className="relative h-24 w-24 rounded-lg overflow-hidden border border-border bg-white">
+              <Image src={values.logoMarcaUrl} alt="Logo de marca" fill className="object-contain" />
+            </div>
+          )}
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-text-muted">Logo de marca</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleLogoUpload}
+              disabled={uploadingLogo}
+              className="text-sm text-text-muted file:mr-3 file:rounded-lg file:border file:border-border file:bg-surface file:px-3 file:py-1 file:text-sm file:text-text file:cursor-pointer hover:file:border-secondary/60 disabled:opacity-50"
+            />
+            {uploadingLogo && <p className="text-xs text-text-muted">Subiendo logo...</p>}
+          </div>
+
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-text-muted">Notas de cata</label>
             <textarea

@@ -16,6 +16,7 @@ export interface Puro {
   humedad: number;
   fechaRevisionHumedad: string;
   fotoUrl?: string;
+  logoMarcaUrl?: string;
   notasCata?: string;
   stock: number;
   fortaleza?: string;
