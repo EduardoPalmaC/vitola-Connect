@@ -314,9 +314,9 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
           </div>
 
           {/* Right: details */}
-          <div style={{ padding: '44px 40px 40px', paddingRight: '56px' }}>
+          <div style={{ padding: '28px 40px 40px', paddingRight: '56px' }}>
             {/* Header */}
-            <div style={{ marginBottom: '24px' }}>
+            <div style={{ marginBottom: '12px' }}>
               <div
                 style={{
                   fontFamily: 'var(--font-code)',
@@ -378,8 +378,8 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
                 display: 'flex',
                 alignItems: 'baseline',
                 gap: '14px',
-                marginBottom: '28px',
-                paddingBottom: '24px',
+                marginBottom: '16px',
+                paddingBottom: '16px',
                 borderBottom: '1px solid #EDE8DE',
               }}
             >
@@ -414,8 +414,8 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
                 display: 'flex',
                 alignItems: 'center',
                 gap: '20px',
-                marginBottom: '28px',
-                paddingBottom: '24px',
+                marginBottom: '16px',
+                paddingBottom: '16px',
                 borderBottom: '1px solid #EDE8DE',
               }}
             >
