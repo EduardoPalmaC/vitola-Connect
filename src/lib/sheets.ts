@@ -112,7 +112,7 @@ export async function updatePuro(id: string, updates: Partial<Puro>): Promise<vo
 
   await sheets.spreadsheets.values.update({
     spreadsheetId: SPREADSHEET_ID,
-    range: `Inventario!A${index + 2}:V${index + 2}`,
+    range: `Inventario!A${index + 2}:W${index + 2}`,
     valueInputOption: 'USER_ENTERED',
     requestBody: { values: [puroToRow(updated)] },
   });
