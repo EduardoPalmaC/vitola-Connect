@@ -314,61 +314,53 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
           </div>
 
           {/* Right: details */}
-          <div style={{ padding: '36px 44px 40px 40px' }}>
-            {/* Header */}
-            <div style={{ marginBottom: '28px' }}>
+          <div style={{ padding: '36px 44px 40px 40px', position: 'relative' }}>
+            {/* Logo — absolute, no afecta el flujo */}
+            {puro.logoMarcaUrl && (
               <div
                 style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'flex-start',
-                  gap: '20px',
+                  position: 'absolute',
+                  top: '36px',
+                  right: '44px',
+                  width: '160px',
+                  height: '160px',
                 }}
               >
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <h2
-                    style={{
-                      fontFamily: 'var(--font-serif)',
-                      fontWeight: 400,
-                      fontSize: '30px',
-                      lineHeight: 1.1,
-                      letterSpacing: '-0.01em',
-                      color: '#2C1E1A',
-                      margin: '0 0 8px 0',
-                    }}
-                  >
-                    {puro.nombre}
-                  </h2>
-                  <div
-                    style={{
-                      fontFamily: 'var(--font-code)',
-                      fontSize: '9px',
-                      letterSpacing: '0.36em',
-                      textTransform: 'uppercase',
-                      color: '#9B7840',
-                    }}
-                  >
-                    {puro.marca}
-                  </div>
-                </div>
-                {puro.logoMarcaUrl && (
-                  <div
-                    style={{
-                      position: 'relative',
-                      width: '160px',
-                      height: '160px',
-                      flexShrink: 0,
-                    }}
-                  >
-                    <Image
-                      src={puro.logoMarcaUrl}
-                      alt={`Logo ${puro.marca}`}
-                      fill
-                      sizes="160px"
-                      style={{ objectFit: 'contain', objectPosition: 'center' }}
-                    />
-                  </div>
-                )}
+                <Image
+                  src={puro.logoMarcaUrl}
+                  alt={`Logo ${puro.marca}`}
+                  fill
+                  sizes="160px"
+                  style={{ objectFit: 'contain', objectPosition: 'center' }}
+                />
+              </div>
+            )}
+
+            {/* Header */}
+            <div style={{ marginBottom: '28px', paddingRight: puro.logoMarcaUrl ? '180px' : '0' }}>
+              <h2
+                style={{
+                  fontFamily: 'var(--font-serif)',
+                  fontWeight: 400,
+                  fontSize: '30px',
+                  lineHeight: 1.1,
+                  letterSpacing: '-0.01em',
+                  color: '#2C1E1A',
+                  margin: '0 0 8px 0',
+                }}
+              >
+                {puro.nombre}
+              </h2>
+              <div
+                style={{
+                  fontFamily: 'var(--font-code)',
+                  fontSize: '9px',
+                  letterSpacing: '0.36em',
+                  textTransform: 'uppercase',
+                  color: '#9B7840',
+                }}
+              >
+                {puro.marca}
               </div>
             </div>
 
