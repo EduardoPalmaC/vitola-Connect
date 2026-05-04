@@ -288,24 +288,13 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
             className="max-sm:min-h-[260px] max-sm:border-r-0 max-sm:border-b max-sm:border-[#EDE8DE]"
           >
             {puro.fotoUrl ? (
-              <div
-                style={{
-                  width: '300px',
-                  height: '700px',
-                  position: 'relative',
-                  flexShrink: 0,
-                }}
-                className="rotate-90"
-              >
-                <Image
-                  src={puro.fotoUrl}
-                  alt={puro.nombre}
-                  fill
-                  sizes="300px"
-                  className="h-full scale-200"
-                  style={{ objectFit: 'contain', objectPosition: 'center' }}
-                />
-              </div>
+              <Image
+                src={puro.fotoUrl}
+                alt={puro.nombre}
+                width={200}
+                height={300}
+                style={{ objectFit: 'contain', objectPosition: 'center' }}
+              />
             ) : (
               <div style={{ height: '340px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                 <CigarSVG shade={shade} id={puro.id} />
