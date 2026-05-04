@@ -1,5 +1,8 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
+import { useState } from 'react';
 import type { Puro } from '@/types';
 
 function formatAnejamiento(fechaLlegada: string): string {
@@ -32,6 +35,13 @@ interface ColeccionCardProps {
 }
 
 export default function ColeccionCard({ puro }: ColeccionCardProps) {
+  const [isLandscape, setIsLandscape] = useState(false);
+
+  const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget;
+    setIsLandscape(img.naturalWidth > img.naturalHeight);
+  };
+
   return (
     <Link
       href={`/admin/inventario/${puro.id}`}
@@ -44,7 +54,10 @@ export default function ColeccionCard({ puro }: ColeccionCardProps) {
             alt={puro.nombre}
             fill
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-            className="object-contain group-hover:scale-105 transition-transform duration-300"
+            onLoad={handleImageLoad}
+            className={`object-contain group-hover:scale-105 transition-transform duration-300 ${
+              isLandscape ? 'rotate-90 scale-150' : ''
+            }`}
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center text-text-muted text-4xl select-none">
