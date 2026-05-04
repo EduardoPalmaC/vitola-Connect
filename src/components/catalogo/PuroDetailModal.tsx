@@ -326,18 +326,6 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
                 }}
               >
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div
-                    style={{
-                      fontFamily: 'var(--font-code)',
-                      fontSize: '9px',
-                      letterSpacing: '0.36em',
-                      textTransform: 'uppercase',
-                      color: '#9B7840',
-                      marginBottom: '8px',
-                    }}
-                  >
-                    {puro.marca}
-                  </div>
                   <h2
                     style={{
                       fontFamily: 'var(--font-serif)',
@@ -346,11 +334,22 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
                       lineHeight: 1.1,
                       letterSpacing: '-0.01em',
                       color: '#2C1E1A',
-                      margin: 0,
+                      margin: '0 0 8px 0',
                     }}
                   >
                     {puro.nombre}
                   </h2>
+                  <div
+                    style={{
+                      fontFamily: 'var(--font-code)',
+                      fontSize: '9px',
+                      letterSpacing: '0.36em',
+                      textTransform: 'uppercase',
+                      color: '#9B7840',
+                    }}
+                  >
+                    {puro.marca}
+                  </div>
                 </div>
                 {puro.logoMarcaUrl && (
                   <div
