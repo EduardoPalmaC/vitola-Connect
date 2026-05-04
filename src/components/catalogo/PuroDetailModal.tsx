@@ -314,14 +314,14 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
           </div>
 
           {/* Right: details */}
-          <div style={{ padding: '0 44px 40px 40px', position: 'relative' }}>
+          <div style={{ padding: '36px 44px 40px 40px', position: 'relative' }}>
             {/* Zona header fija — logo y nombre flotan aquí sin afectar el flujo */}
-            <div style={{ position: 'relative', height: '200px', marginBottom: '16px' }}>
+            <div style={{ position: 'relative', height: '140px', marginBottom: '12px' }}>
               {puro.logoMarcaUrl && (
                 <div
                   style={{
                     position: 'absolute',
-                    top: '20px',
+                    top: '0',
                     right: '0',
                     width: '160px',
                     height: '160px',
