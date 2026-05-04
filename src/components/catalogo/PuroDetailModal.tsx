@@ -314,50 +314,50 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
           </div>
 
           {/* Right: details */}
-          <div style={{ padding: '16px 40px 40px', paddingRight: '56px' }}>
+          <div style={{ padding: '36px 44px 40px 40px' }}>
             {/* Header */}
-            <div style={{ marginBottom: '-24px' }}>
-              <div
-                style={{
-                  fontFamily: 'var(--font-code)',
-                  fontSize: '9px',
-                  letterSpacing: '0.36em',
-                  textTransform: 'uppercase',
-                  color: '#9B7840',
-                  marginBottom: '0px',
-                  marginTop: '32px',
-                }}
-              >
-                {puro.marca}
-              </div>
+            <div style={{ marginBottom: '28px' }}>
               <div
                 style={{
                   display: 'flex',
                   justifyContent: 'space-between',
                   alignItems: 'flex-start',
-                  gap: '16px',
+                  gap: '20px',
                 }}
               >
-                <h2
-                  style={{
-                    fontFamily: 'var(--font-serif)',
-                    fontWeight: 400,
-                    fontSize: '30px',
-                    lineHeight: 1.1,
-                    letterSpacing: '-0.01em',
-                    color: '#2C1E1A',
-                    margin: 0,
-                    flex: 1,
-                  }}
-                >
-                  {puro.nombre}
-                </h2>
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div
+                    style={{
+                      fontFamily: 'var(--font-code)',
+                      fontSize: '9px',
+                      letterSpacing: '0.36em',
+                      textTransform: 'uppercase',
+                      color: '#9B7840',
+                      marginBottom: '8px',
+                    }}
+                  >
+                    {puro.marca}
+                  </div>
+                  <h2
+                    style={{
+                      fontFamily: 'var(--font-serif)',
+                      fontWeight: 400,
+                      fontSize: '30px',
+                      lineHeight: 1.1,
+                      letterSpacing: '-0.01em',
+                      color: '#2C1E1A',
+                      margin: 0,
+                    }}
+                  >
+                    {puro.nombre}
+                  </h2>
+                </div>
                 {puro.logoMarcaUrl && (
                   <div
                     style={{
                       position: 'relative',
-                      width: '180px',
-                      height: '180px',
+                      width: '110px',
+                      height: '110px',
                       flexShrink: 0,
                     }}
                   >
@@ -365,7 +365,7 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
                       src={puro.logoMarcaUrl}
                       alt={`Logo ${puro.marca}`}
                       fill
-                      sizes="180px"
+                      sizes="110px"
                       style={{ objectFit: 'contain', objectPosition: 'center' }}
                     />
                   </div>
@@ -379,8 +379,8 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
                 display: 'flex',
                 alignItems: 'baseline',
                 gap: '14px',
-                marginBottom: '8px',
-                paddingBottom: '8px',
+                marginBottom: '20px',
+                paddingBottom: '20px',
                 borderBottom: '1px solid #EDE8DE',
               }}
             >
@@ -415,8 +415,8 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
                 display: 'flex',
                 alignItems: 'center',
                 gap: '20px',
-                marginBottom: '8px',
-                paddingBottom: '8px',
+                marginBottom: '20px',
+                paddingBottom: '20px',
                 borderBottom: '1px solid #EDE8DE',
               }}
             >
