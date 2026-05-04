@@ -316,7 +316,7 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
           {/* Right: details */}
           <div style={{ padding: '16px 40px 40px', paddingRight: '56px' }}>
             {/* Header */}
-            <div style={{ marginBottom: '12px' }}>
+            <div style={{ marginBottom: '-48px' }}>
               <div
                 style={{
                   fontFamily: 'var(--font-code)',
@@ -324,7 +324,7 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
                   letterSpacing: '0.36em',
                   textTransform: 'uppercase',
                   color: '#9B7840',
-                  marginBottom: '8px',
+                  marginBottom: '10px',
                 }}
               >
                 {puro.marca}
