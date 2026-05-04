@@ -337,7 +337,7 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
             )}
 
             {/* Header */}
-            <div style={{ marginBottom: '28px', paddingRight: puro.logoMarcaUrl ? '180px' : '0' }}>
+            <div style={{ marginBottom: '12px', marginTop: '60px', paddingRight: puro.logoMarcaUrl ? '180px' : '0' }}>
               <h2
                 style={{
                   fontFamily: 'var(--font-serif)',
