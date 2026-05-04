@@ -324,7 +324,8 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
                   letterSpacing: '0.36em',
                   textTransform: 'uppercase',
                   color: '#9B7840',
-                  marginBottom: '3px',
+                  marginBottom: '0px',
+                  marginTop: '-8px',
                 }}
               >
                 {puro.marca}
@@ -333,7 +334,7 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
                 style={{
                   display: 'flex',
                   justifyContent: 'space-between',
-                  alignItems: 'center',
+                  alignItems: 'flex-start',
                   gap: '16px',
                 }}
               >
