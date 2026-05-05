@@ -42,10 +42,9 @@ interface Props {
   cata: Cata;
   idx?: number;
   onEdit?: (cata: Cata) => void;
-  onDelete?: (id: string) => void;
 }
 
-export default function CataCard({ cata, idx = 0, onEdit, onDelete }: Props) {
+export default function CataCard({ cata, idx = 0, onEdit }: Props) {
   const router = useRouter();
   const [isLandscape, setIsLandscape] = useState(false);
   const shade = SHADES[idx % SHADES.length] ?? '#C4956A';
@@ -75,34 +74,6 @@ export default function CataCard({ cata, idx = 0, onEdit, onDelete }: Props) {
       onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.background = '#FDFAF5'; }}
       onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.background = '#FFFFFF'; }}
     >
-      {/* Delete button */}
-      {onDelete && (
-        <button
-          onClick={(e) => { e.stopPropagation(); onDelete(cata?.id ?? ''); }}
-          style={{
-            position: 'absolute',
-            top: '12px',
-            right: '12px',
-            width: '22px',
-            height: '22px',
-            borderRadius: '50%',
-            background: 'rgba(239,68,68,0.12)',
-            border: '1px solid rgba(239,68,68,0.3)',
-            color: '#EF4444',
-            fontSize: '13px',
-            lineHeight: 1,
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 10,
-          }}
-          title="Eliminar cata"
-        >
-          ×
-        </button>
-      )}
-
       {/* Index */}
       <div style={{
         position: 'absolute',

@@ -193,66 +193,74 @@ function normalizeDate(value: string | undefined): string {
   return value;
 }
 
+// Columnas Catas (A-W = 23 cols):
+// [0]A id  [1]B fecha  [2]C nombre  [3]D lugar  [4]E fotoUrl  [5]F notas
+// [6]G calificacion  [7]H marca  [8]I vitola  [9]J cepo  [10]K paisOrigen
+// [11]L capa  [12]M puroId  [13]N usuarioId  [14]O createdAt
+// [15]P fotosAdicionales  [16]Q cuerpo  [17]R dulzor  [18]S especia
+// [19]T tierra  [20]U madera  [21]V etiquetasAroma  [22]W maridaje
 function rowToCata(row: string[]): Cata {
-  const fotosRaw = row[14] ?? '';
-  const etiquetasRaw = row[20] ?? '';
+  const fotosRaw = row[15] ?? '';
+  const etiquetasRaw = row[21] ?? '';
   return {
     id: row[0]!,
     fecha: normalizeDate(row[1]),
-    lugar: row[2]!,
-    fotoUrl: row[3] || undefined,
-    notas: row[4]!,
-    calificacion: parseInt(row[5]!) || 0,
-    marca: row[6]!,
-    vitola: row[7]!,
-    cepo: parseInt(row[8]!) || 0,
-    paisOrigen: row[9]!,
-    capa: row[10]!,
-    puroId: row[11] || undefined,
-    usuarioId: row[12] || 'admin',
-    createdAt: row[13]!,
+    nombre: row[2] || undefined,
+    lugar: row[3]!,
+    fotoUrl: row[4] || undefined,
+    notas: row[5]!,
+    calificacion: parseInt(row[6]!) || 0,
+    marca: row[7]!,
+    vitola: row[8]!,
+    cepo: parseInt(row[9]!) || 0,
+    paisOrigen: row[10]!,
+    capa: row[11]!,
+    puroId: row[12] || undefined,
+    usuarioId: row[13] || 'admin',
+    createdAt: row[14]!,
     fotosAdicionales: fotosRaw ? fotosRaw.split(',').map((u) => u.trim()).filter(Boolean) : undefined,
-    cuerpo: row[15] ? parseInt(row[15]) || undefined : undefined,
-    dulzor: row[16] ? parseInt(row[16]) || undefined : undefined,
-    especia: row[17] ? parseInt(row[17]) || undefined : undefined,
-    tierra: row[18] ? parseInt(row[18]) || undefined : undefined,
-    madera: row[19] ? parseInt(row[19]) || undefined : undefined,
+    cuerpo: row[16] ? parseInt(row[16]) || undefined : undefined,
+    dulzor: row[17] ? parseInt(row[17]) || undefined : undefined,
+    especia: row[18] ? parseInt(row[18]) || undefined : undefined,
+    tierra: row[19] ? parseInt(row[19]) || undefined : undefined,
+    madera: row[20] ? parseInt(row[20]) || undefined : undefined,
     etiquetasAroma: etiquetasRaw ? etiquetasRaw.split(',').map((t) => t.trim()).filter(Boolean) : undefined,
-    maridaje: row[21] || undefined,
+    maridaje: row[22] || undefined,
   };
 }
 
 function cataToRow(cata: Cata): (string | number)[] {
   return [
-    cata.id,
-    cata.fecha,
-    cata.lugar,
-    cata.fotoUrl ?? '',
-    cata.notas,
-    cata.calificacion,
-    cata.marca,
-    cata.vitola,
-    cata.cepo,
-    cata.paisOrigen,
-    cata.capa,
-    cata.puroId ?? '',
-    cata.usuarioId,
-    cata.createdAt,
-    (cata.fotosAdicionales ?? []).join(','),
-    cata.cuerpo ?? '',
-    cata.dulzor ?? '',
-    cata.especia ?? '',
-    cata.tierra ?? '',
-    cata.madera ?? '',
-    (cata.etiquetasAroma ?? []).join(','),
-    cata.maridaje ?? '',
+    cata.id,               // A [0]
+    cata.fecha,            // B [1]
+    cata.nombre ?? '',     // C [2]
+    cata.lugar,            // D [3]
+    cata.fotoUrl ?? '',    // E [4]
+    cata.notas,            // F [5]
+    cata.calificacion,     // G [6]
+    cata.marca,            // H [7]
+    cata.vitola,           // I [8]
+    cata.cepo,             // J [9]
+    cata.paisOrigen,       // K [10]
+    cata.capa,             // L [11]
+    cata.puroId ?? '',     // M [12]
+    cata.usuarioId,        // N [13]
+    cata.createdAt,        // O [14]
+    (cata.fotosAdicionales ?? []).join(','), // P [15]
+    cata.cuerpo ?? '',     // Q [16]
+    cata.dulzor ?? '',     // R [17]
+    cata.especia ?? '',    // S [18]
+    cata.tierra ?? '',     // T [19]
+    cata.madera ?? '',     // U [20]
+    (cata.etiquetasAroma ?? []).join(','),   // V [21]
+    cata.maridaje ?? '',   // W [22]
   ];
 }
 
 export async function getCatas(): Promise<Cata[]> {
   const response = await sheets.spreadsheets.values.get({
     spreadsheetId: SPREADSHEET_ID,
-    range: 'Catas!A2:V',
+    range: 'Catas!A2:W',
   });
   const rows = (response.data.values ?? []) as string[][];
   return rows.filter((r) => r.length >= 5).map(rowToCata);
@@ -265,8 +273,9 @@ export async function createCata(cata: Omit<Cata, 'id' | 'createdAt'>): Promise<
 
   await sheets.spreadsheets.values.append({
     spreadsheetId: SPREADSHEET_ID,
-    range: 'Catas!A:V',
-    valueInputOption: 'USER_ENTERED',
+    range: 'Catas!A1',
+    valueInputOption: 'RAW',
+    insertDataOption: 'INSERT_ROWS',
     requestBody: { values: [cataToRow(full)] },
   });
 
@@ -282,8 +291,8 @@ export async function updateCata(id: string, data: Partial<Omit<Cata, 'id' | 'cr
 
   await sheets.spreadsheets.values.update({
     spreadsheetId: SPREADSHEET_ID,
-    range: `Catas!A${index + 2}:V${index + 2}`,
-    valueInputOption: 'USER_ENTERED',
+    range: `Catas!A${index + 2}:W${index + 2}`,
+    valueInputOption: 'RAW',
     requestBody: { values: [cataToRow(updated)] },
   });
 
