@@ -4,6 +4,31 @@ import type { Cata } from '@/types';
 
 const SHADES = ['#C4956A', '#B07F52', '#D4A574', '#A06840', '#BA8A5E'];
 
+function Stars({ value }: { value: number }) {
+  const stars = value / 20;
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+      <div style={{ display: 'flex', gap: '2px' }}>
+        {[0, 1, 2, 3, 4].map((i) => {
+          const fill = Math.min(1, Math.max(0, stars - i));
+          return (
+            <span key={i} style={{ position: 'relative', display: 'inline-block', fontSize: '14px', lineHeight: 1 }}>
+              <span style={{ color: '#DDD5C5' }}>★</span>
+              {fill > 0 && (
+                <span style={{
+                  position: 'absolute', left: 0, top: 0,
+                  overflow: 'hidden', width: `${fill * 100}%`, whiteSpace: 'nowrap',
+                  color: '#9B7840',
+                }}>★</span>
+              )}
+            </span>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function CigarSVG({ shade, id }: { shade: string; id: string }) {
   const gradId = `cig-${id}`;
   const grainId = `grain-${id}`;
@@ -32,8 +57,6 @@ function CigarSVG({ shade, id }: { shade: string; id: string }) {
 
 export default function CataCard({ cata, idx = 0 }: { cata: Cata; idx?: number }) {
   const shade = SHADES[idx % SHADES.length] ?? '#C4956A';
-  const scoreNorm = cata.calificacion / 100;
-
   const fechaCorta = new Date(cata.fecha).toLocaleDateString('es-MX', {
     day: 'numeric',
     month: 'short',
@@ -192,27 +215,7 @@ export default function CataCard({ cata, idx = 0 }: { cata: Cata; idx?: number }
             marginLeft: '4px',
           }}>pts</span>
         </div>
-        <div style={{ flex: 1, height: '2px', background: '#EDE8DE', position: 'relative' }}>
-          <div style={{
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            height: '100%',
-            width: `${scoreNorm * 100}%`,
-            background: '#9B7840',
-          }} />
-          <div style={{
-            position: 'absolute',
-            top: '50%',
-            left: `${scoreNorm * 100}%`,
-            transform: 'translate(-50%, -50%)',
-            width: '6px',
-            height: '6px',
-            borderRadius: '50%',
-            background: '#9B7840',
-            border: '1px solid #F9F6F0',
-          }} />
-        </div>
+        <Stars value={cata.calificacion} />
       </div>
 
       {cata.lugar && (
