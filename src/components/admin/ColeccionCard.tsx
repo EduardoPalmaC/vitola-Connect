@@ -244,7 +244,7 @@ export default function ColeccionCard({ puro, idx }: ColeccionCardProps) {
             Unidades
           </div>
           <div style={{ fontFamily: 'var(--font-serif)', fontSize: '13px', color: '#2C1E1A' }}>
-            {puro.cantidad ?? '—'}
+            {puro.stock ?? '—'}
           </div>
         </div>
       </div>
