@@ -1,13 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import type { Cata } from '@/types';
 
 const SHADES = ['#C4956A', '#B07F52', '#D4A574', '#A06840', '#BA8A5E'];
 
 function Stars({ value }: { value: number }) {
-  const stars = value / 20;
+  const stars = (value ?? 0) / 20;
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
       <div style={{ display: 'flex', gap: '2px' }}>
@@ -31,45 +31,36 @@ function Stars({ value }: { value: number }) {
   );
 }
 
-function CigarSVG({ shade, id }: { shade: string; id: string }) {
-  const gradId = `cig-${id}`;
-  const grainId = `grain-${id}`;
-  return (
-    <svg viewBox="0 0 80 280" style={{ height: '100%', width: 'auto' }} preserveAspectRatio="xMidYMid meet">
-      <defs>
-        <linearGradient id={gradId} x1="0" x2="0" y1="0" y2="1">
-          <stop offset="0%" stopColor={shade} stopOpacity="0.7" />
-          <stop offset="50%" stopColor={shade} stopOpacity="0.9" />
-          <stop offset="100%" stopColor={shade} stopOpacity="0.6" />
-        </linearGradient>
-        <pattern id={grainId} width="3" height="3" patternUnits="userSpaceOnUse">
-          <rect width="3" height="3" fill="transparent" />
-          <line x1="0" y1="0" x2="0" y2="3" stroke="rgba(0,0,0,0.08)" strokeWidth="0.5" />
-        </pattern>
-      </defs>
-      <rect x="28" y="10" width="24" height="240" rx="12" fill={`url(#${gradId})`} />
-      <rect x="28" y="10" width="24" height="240" rx="12" fill={`url(#${grainId})`} />
-      <rect x="26" y="180" width="28" height="28" fill="#3A2A1A" />
-      <rect x="26" y="184" width="28" height="1" fill="#C4A472" />
-      <rect x="26" y="203" width="28" height="1" fill="#C4A472" />
-      <ellipse cx="40" cy="252" rx="12" ry="3" fill="rgba(0,0,0,0.15)" />
-    </svg>
-  );
+function formatFecha(fecha: string | undefined): string {
+  if (!fecha) return 'Fecha pendiente';
+  const d = new Date(fecha);
+  if (isNaN(d.getTime())) return 'Fecha pendiente';
+  return d.toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
-export default function CataCard({ cata, idx = 0 }: { cata: Cata; idx?: number }) {
+interface Props {
+  cata: Cata;
+  idx?: number;
+  onEdit?: (cata: Cata) => void;
+}
+
+export default function CataCard({ cata, idx = 0, onEdit }: Props) {
+  const router = useRouter();
   const [isLandscape, setIsLandscape] = useState(false);
   const shade = SHADES[idx % SHADES.length] ?? '#C4956A';
-  const fechaCorta = new Date(cata.fecha).toLocaleDateString('es-MX', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  });
+  const fechaCorta = formatFecha(cata?.fecha);
+
+  function handleClick() {
+    if (onEdit) {
+      onEdit(cata);
+    } else {
+      router.push(`/admin/diario/${cata?.id}`);
+    }
+  }
 
   return (
-    <Link
-      href={`/admin/diario/${cata.id}`}
-      className="group"
+    <div
+      onClick={handleClick}
       style={{
         display: 'block',
         borderRight: '1px solid #EDE8DE',
@@ -77,12 +68,12 @@ export default function CataCard({ cata, idx = 0 }: { cata: Cata; idx?: number }
         padding: '36px 28px 24px',
         background: '#FFFFFF',
         transition: 'background 0.2s ease',
-        textDecoration: 'none',
         position: 'relative',
+        cursor: 'pointer',
       }}
+      onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.background = '#FDFAF5'; }}
+      onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.background = '#FFFFFF'; }}
     >
-      <style>{`.group:hover { background: #FDFAF5 !important; }`}</style>
-
       {/* Index */}
       <div style={{
         position: 'absolute',
@@ -92,8 +83,9 @@ export default function CataCard({ cata, idx = 0 }: { cata: Cata; idx?: number }
         fontSize: '10px',
         letterSpacing: '0.2em',
         color: '#C8BFB0',
+        pointerEvents: 'none',
       }}>
-        № {String(idx + 1).padStart(3, '0')}
+        № {String((idx ?? 0) + 1).padStart(3, '0')}
       </div>
 
       {/* Date */}
@@ -106,28 +98,46 @@ export default function CataCard({ cata, idx = 0 }: { cata: Cata; idx?: number }
         letterSpacing: '0.16em',
         color: '#C8BFB0',
         textTransform: 'uppercase',
+        pointerEvents: 'none',
       }}>
         {fechaCorta}
       </div>
 
       {/* Image */}
-      <div className="relative aspect-[2/3] overflow-hidden my-5 rounded" style={{ background: '#F7F3EC' }}>
+      <div
+        className="relative aspect-[2/3] overflow-hidden my-5 rounded"
+        style={{ background: '#F7F3EC', pointerEvents: 'none' }}
+      >
         <div className="absolute inset-0 flex items-center justify-center">
-          {cata.fotoUrl ? (
+          {cata?.fotoUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={cata.fotoUrl}
-              alt={`${cata.marca} ${cata.vitola}`}
+              alt={`${cata?.marca ?? ''} ${cata?.vitola ?? ''}`}
               className={`max-w-full max-h-full object-contain transition-transform duration-300 ${isLandscape ? 'rotate-90 scale-[1.35]' : ''}`}
               onLoad={(e) => setIsLandscape(e.currentTarget.naturalWidth > e.currentTarget.naturalHeight)}
             />
           ) : (
-            <CigarSVG shade={shade} id={cata.id} />
+            <div style={{
+              width: '100%',
+              height: '100%',
+              background: '#F0ECE6',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontFamily: 'var(--font-code)',
+              fontSize: '10px',
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase',
+              color: '#C8BFB0',
+            }}>
+              Sin imagen
+            </div>
           )}
         </div>
       </div>
 
-      {/* Nombre (marca) — hero */}
+      {/* Marca */}
       <h3 style={{
         fontFamily: 'var(--font-serif)',
         fontWeight: 400,
@@ -136,8 +146,9 @@ export default function CataCard({ cata, idx = 0 }: { cata: Cata; idx?: number }
         letterSpacing: '-0.015em',
         color: '#2C1E1A',
         margin: '0 0 6px',
+        pointerEvents: 'none',
       }}>
-        {cata.marca}
+        {cata?.marca ?? 'Sin marca'}
       </h3>
 
       {/* Vitola */}
@@ -148,8 +159,9 @@ export default function CataCard({ cata, idx = 0 }: { cata: Cata; idx?: number }
         textTransform: 'uppercase',
         color: '#B0A090',
         marginBottom: '12px',
+        pointerEvents: 'none',
       }}>
-        {cata.vitola}
+        {cata?.vitola ?? '—'}
       </div>
 
       {/* Details */}
@@ -160,6 +172,7 @@ export default function CataCard({ cata, idx = 0 }: { cata: Cata; idx?: number }
         paddingTop: '12px',
         borderTop: '1px solid #EDE8DE',
         marginBottom: '14px',
+        pointerEvents: 'none',
       }}>
         <div>
           <div style={{
@@ -171,7 +184,7 @@ export default function CataCard({ cata, idx = 0 }: { cata: Cata; idx?: number }
             marginBottom: '2px',
           }}>Cepo</div>
           <div style={{ fontFamily: 'var(--font-serif)', fontSize: '16px', color: '#2C1E1A' }}>
-            {cata.cepo}
+            {cata?.cepo ?? 0}
           </div>
         </div>
         <div>
@@ -184,13 +197,13 @@ export default function CataCard({ cata, idx = 0 }: { cata: Cata; idx?: number }
             marginBottom: '2px',
           }}>Origen</div>
           <div style={{ fontFamily: 'var(--font-serif)', fontSize: '16px', color: '#2C1E1A' }}>
-            {cata.paisOrigen || '—'}
+            {cata?.paisOrigen ?? '—'}
           </div>
         </div>
       </div>
 
       {/* Score */}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px', pointerEvents: 'none' }}>
         <div style={{
           fontFamily: 'var(--font-serif)',
           fontSize: '28px',
@@ -200,7 +213,7 @@ export default function CataCard({ cata, idx = 0 }: { cata: Cata; idx?: number }
           lineHeight: 1,
           flexShrink: 0,
         }}>
-          {cata.calificacion}
+          {cata?.calificacion ?? 0}
           <span style={{
             fontFamily: 'var(--font-code)',
             fontSize: '10px',
@@ -210,10 +223,10 @@ export default function CataCard({ cata, idx = 0 }: { cata: Cata; idx?: number }
             marginLeft: '4px',
           }}>pts</span>
         </div>
-        <Stars value={cata.calificacion} />
+        <Stars value={cata?.calificacion ?? 0} />
       </div>
 
-      {cata.lugar && (
+      {cata?.lugar && (
         <div style={{
           marginTop: '10px',
           fontFamily: 'var(--font-code)',
@@ -221,10 +234,11 @@ export default function CataCard({ cata, idx = 0 }: { cata: Cata; idx?: number }
           letterSpacing: '0.16em',
           textTransform: 'uppercase',
           color: '#B0A090',
+          pointerEvents: 'none',
         }}>
           {cata.lugar}
         </div>
       )}
-    </Link>
+    </div>
   );
 }
