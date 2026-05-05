@@ -84,7 +84,7 @@ export default function ColeccionCard({ puro, idx }: ColeccionCardProps) {
       style={{
         borderRight: '1px solid #EDE8DE',
         borderBottom: '1px solid #EDE8DE',
-        padding: '44px 36px 32px',
+        padding: '36px 20px 24px',
         background: '#FFFFFF',
         transition: 'background 0.2s ease',
         cursor: 'pointer',
@@ -97,8 +97,8 @@ export default function ColeccionCard({ puro, idx }: ColeccionCardProps) {
       <div
         style={{
           position: 'absolute',
-          top: '20px',
-          left: '36px',
+          top: '14px',
+          left: '20px',
           fontFamily: 'var(--font-code)',
           fontSize: '10px',
           letterSpacing: '0.2em',
@@ -112,8 +112,8 @@ export default function ColeccionCard({ puro, idx }: ColeccionCardProps) {
         <div
           style={{
             position: 'absolute',
-            top: '20px',
-            right: '36px',
+            top: '14px',
+            right: '20px',
             fontFamily: 'var(--font-code)',
             fontSize: '10px',
             letterSpacing: '0.2em',
@@ -127,8 +127,8 @@ export default function ColeccionCard({ puro, idx }: ColeccionCardProps) {
 
       <div
         style={{
-          height: '320px',
-          margin: '8px 0 14px',
+          height: '240px',
+          margin: '8px 0 12px',
           position: 'relative',
           display: 'flex',
           alignItems: 'center',
@@ -141,8 +141,8 @@ export default function ColeccionCard({ puro, idx }: ColeccionCardProps) {
         {puro.fotoUrl ? (
           <div
             style={{
-              width: '240px',
-              height: '320px',
+              width: '160px',
+              height: '240px',
               position: 'relative',
               overflow: 'visible',
               flexShrink: 0,
@@ -151,8 +151,8 @@ export default function ColeccionCard({ puro, idx }: ColeccionCardProps) {
             <div
               style={{
                 position: 'absolute',
-                width: isLandscape ? '320px' : '240px',
-                height: isLandscape ? '240px' : '320px',
+                width: isLandscape ? '240px' : '160px',
+                height: isLandscape ? '160px' : '240px',
                 top: '50%',
                 left: '50%',
                 transform: isLandscape
@@ -164,7 +164,7 @@ export default function ColeccionCard({ puro, idx }: ColeccionCardProps) {
                 src={puro.fotoUrl}
                 alt={puro.nombre}
                 fill
-                sizes="320px"
+                sizes="240px"
                 onLoad={handleImageLoad}
                 style={{ objectFit: 'contain', objectPosition: 'center' }}
               />
@@ -192,7 +192,7 @@ export default function ColeccionCard({ puro, idx }: ColeccionCardProps) {
         style={{
           fontFamily: 'var(--font-serif)',
           fontWeight: 400,
-          fontSize: '26px',
+          fontSize: '20px',
           lineHeight: 1.15,
           letterSpacing: '-0.01em',
           color: '#2C1E1A',
@@ -226,7 +226,7 @@ export default function ColeccionCard({ puro, idx }: ColeccionCardProps) {
           >
             Vitola
           </div>
-          <div style={{ fontFamily: 'var(--font-serif)', fontSize: '17px', color: '#2C1E1A' }}>
+          <div style={{ fontFamily: 'var(--font-serif)', fontSize: '14px', color: '#2C1E1A' }}>
             {puro.vitola}
           </div>
         </div>
@@ -243,7 +243,7 @@ export default function ColeccionCard({ puro, idx }: ColeccionCardProps) {
           >
             Cepo
           </div>
-          <div style={{ fontFamily: 'var(--font-serif)', fontSize: '17px', color: '#2C1E1A' }}>
+          <div style={{ fontFamily: 'var(--font-serif)', fontSize: '14px', color: '#2C1E1A' }}>
             {puro.ringGauge ?? '—'}
           </div>
         </div>
@@ -260,7 +260,7 @@ export default function ColeccionCard({ puro, idx }: ColeccionCardProps) {
           >
             Añejamiento
           </div>
-          <div style={{ fontFamily: 'var(--font-serif)', fontSize: '17px', color: '#2C1E1A' }}>
+          <div style={{ fontFamily: 'var(--font-serif)', fontSize: '14px', color: '#2C1E1A' }}>
             {formatAnejamiento(puro.fechaLlegada)}
           </div>
         </div>
