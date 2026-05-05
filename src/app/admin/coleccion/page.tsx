@@ -108,8 +108,8 @@ export default async function ColeccionPage({ searchParams }: PageProps) {
             ) : (
               <>
                 <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4">
-                  {items.map((puro) => (
-                    <ColeccionCard key={puro.id} puro={puro} />
+                  {items.map((puro, idx) => (
+                    <ColeccionCard key={puro.id} puro={puro} idx={idx} />
                   ))}
                 </div>
                 <Suspense>

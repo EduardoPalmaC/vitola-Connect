@@ -5,6 +5,38 @@ import Link from 'next/link';
 import { useState } from 'react';
 import type { Puro } from '@/types';
 
+const SHADES: string[] = ['#C4956A', '#B07F52', '#D4A574', '#A06840', '#BA8A5E'];
+
+function CigarSVG({ shade, id }: { shade: string; id: string | number }) {
+  const gradId = `cig-col-${id}`;
+  const grainId = `grain-col-${id}`;
+  return (
+    <svg
+      viewBox="0 0 80 280"
+      style={{ height: '100%', width: 'auto' }}
+      preserveAspectRatio="xMidYMid meet"
+    >
+      <defs>
+        <linearGradient id={gradId} x1="0" x2="0" y1="0" y2="1">
+          <stop offset="0%" stopColor={shade} stopOpacity="0.7" />
+          <stop offset="50%" stopColor={shade} stopOpacity="0.9" />
+          <stop offset="100%" stopColor={shade} stopOpacity="0.6" />
+        </linearGradient>
+        <pattern id={grainId} width="3" height="3" patternUnits="userSpaceOnUse">
+          <rect width="3" height="3" fill="transparent" />
+          <line x1="0" y1="0" x2="0" y2="3" stroke="rgba(0,0,0,0.08)" strokeWidth="0.5" />
+        </pattern>
+      </defs>
+      <rect x="28" y="10" width="24" height="240" rx="12" fill={`url(#${gradId})`} />
+      <rect x="28" y="10" width="24" height="240" rx="12" fill={`url(#${grainId})`} />
+      <rect x="26" y="180" width="28" height="28" fill="#3A2A1A" />
+      <rect x="26" y="184" width="28" height="1" fill="#C4A472" />
+      <rect x="26" y="203" width="28" height="1" fill="#C4A472" />
+      <ellipse cx="40" cy="252" rx="12" ry="3" fill="rgba(0,0,0,0.15)" />
+    </svg>
+  );
+}
+
 function formatAnejamiento(fechaLlegada: string): string {
   const llegada = new Date(fechaLlegada);
   const hoy = new Date();
@@ -32,15 +64,18 @@ function anejamientoColor(fechaLlegada: string): string {
 
 interface ColeccionCardProps {
   puro: Puro;
+  idx: number;
 }
 
-export default function ColeccionCard({ puro }: ColeccionCardProps) {
+export default function ColeccionCard({ puro, idx }: ColeccionCardProps) {
   const [isLandscape, setIsLandscape] = useState(false);
 
   const handleImageLoad = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const img = e.currentTarget;
     setIsLandscape(img.naturalWidth > img.naturalHeight);
   };
+
+  const shade = SHADES[idx % SHADES.length] ?? '#C4956A';
 
   return (
     <Link
@@ -70,7 +105,7 @@ export default function ColeccionCard({ puro }: ColeccionCardProps) {
           color: '#C8BFB0',
         }}
       >
-        {puro.id}
+        № {String(idx + 1).padStart(3, '0')}
       </div>
 
       {puro.paisOrigen && (
@@ -120,7 +155,9 @@ export default function ColeccionCard({ puro }: ColeccionCardProps) {
                 height: isLandscape ? '200px' : '300px',
                 top: '50%',
                 left: '50%',
-                transform: isLandscape ? 'translate(-50%, -50%) rotate(90deg) scale(1.5)' : 'translate(-50%, -50%)',
+                transform: isLandscape
+                  ? 'translate(-50%, -50%) rotate(90deg) scale(1.5)'
+                  : 'translate(-50%, -50%)',
               }}
             >
               <Image
@@ -134,7 +171,7 @@ export default function ColeccionCard({ puro }: ColeccionCardProps) {
             </div>
           </div>
         ) : (
-          <div style={{ fontSize: '48px' }}>🚬</div>
+          <CigarSVG shade={shade} id={`${idx}-${puro.id ?? idx}`} />
         )}
       </div>
 
@@ -221,7 +258,7 @@ export default function ColeccionCard({ puro }: ColeccionCardProps) {
               marginBottom: '3px',
             }}
           >
-            Anejamiento
+            Añejamiento
           </div>
           <div style={{ fontFamily: 'var(--font-serif)', fontSize: '17px', color: '#2C1E1A' }}>
             {formatAnejamiento(puro.fechaLlegada)}
@@ -229,7 +266,18 @@ export default function ColeccionCard({ puro }: ColeccionCardProps) {
         </div>
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'baseline' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+        <div
+          style={{
+            fontFamily: 'Inter, sans-serif',
+            fontSize: '24px',
+            fontWeight: 700,
+            color: '#B28F69',
+            letterSpacing: '-0.02em',
+          }}
+        >
+          ${puro.precioBruto?.toFixed(0) ?? '—'}
+        </div>
         <span
           style={{
             fontFamily: 'var(--font-code)',
