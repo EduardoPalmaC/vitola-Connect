@@ -11,47 +11,137 @@ export default async function DiarioPage() {
   );
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border px-6 py-5 flex items-center justify-between">
+    <div style={{ background: '#F9F6F0', color: '#2C1E1A', minHeight: '100vh' }}>
+      <header
+        style={{
+          padding: '20px 64px 16px',
+          borderBottom: '1px solid #E2D9C8',
+          display: 'grid',
+          gridTemplateColumns: '1fr auto',
+          alignItems: 'end',
+          gap: '20px',
+          background: '#F9F6F0',
+        }}
+        className="max-sm:grid-cols-1 max-sm:px-6 max-sm:pt-4 max-sm:pb-3"
+      >
         <div>
-          <h1 className="text-2xl font-heading font-bold text-text">Mi Diario</h1>
-          <p className="text-sm text-text-muted mt-0.5">{catas.length} catas registradas</p>
+          <p style={{
+            fontFamily: 'var(--font-code)',
+            fontSize: '10px',
+            letterSpacing: '0.32em',
+            textTransform: 'uppercase',
+            color: '#B0A090',
+            marginBottom: '10px',
+          }}>
+            Admin · Diario de Catas
+          </p>
+          <h1 style={{
+            fontFamily: 'var(--font-serif)',
+            fontWeight: 400,
+            fontSize: '40px',
+            lineHeight: 0.9,
+            letterSpacing: '-0.02em',
+            color: '#2C1E1A',
+            margin: 0,
+          }}>
+            Mi Diario<span style={{ color: '#9B7840' }}>.</span>
+          </h1>
         </div>
-        <div className="flex items-center gap-3">
-          <Link
-            href="/admin/dashboard"
-            className="text-sm text-text-muted hover:text-secondary transition-colors"
-          >
-            Dashboard
-          </Link>
-          <Link
-            href="/admin/catas/nuevo"
-            className="inline-flex items-center px-4 py-2 rounded-lg bg-secondary text-background text-sm font-medium hover:opacity-90 transition-opacity"
-          >
-            + Nueva cata
-          </Link>
+        <div
+          style={{
+            fontFamily: 'var(--font-code)',
+            fontSize: '10px',
+            letterSpacing: '0.18em',
+            textTransform: 'uppercase',
+            color: '#B0A090',
+            textAlign: 'right',
+            lineHeight: 1.8,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'flex-end',
+            gap: '10px',
+          }}
+          className="max-sm:text-left max-sm:items-start"
+        >
+          <div>{catas.length} catas registradas</div>
+          <div style={{ display: 'flex', gap: '0', alignItems: 'stretch' }}>
+            <Link
+              href="/admin/dashboard"
+              style={{
+                fontFamily: 'var(--font-code)',
+                fontSize: '10px',
+                letterSpacing: '0.22em',
+                textTransform: 'uppercase',
+                color: '#9B7840',
+                textDecoration: 'none',
+                border: '1px solid #DDD5C5',
+                padding: '8px 20px',
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
+              Dashboard
+            </Link>
+            <Link
+              href="/admin/catas/nuevo"
+              style={{
+                fontFamily: 'var(--font-code)',
+                fontSize: '10px',
+                letterSpacing: '0.22em',
+                textTransform: 'uppercase',
+                background: '#9B7840',
+                color: '#FFFFFF',
+                textDecoration: 'none',
+                padding: '8px 20px',
+                display: 'flex',
+                alignItems: 'center',
+                borderLeft: 'none',
+              }}
+            >
+              + Nueva cata
+            </Link>
+          </div>
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-        {sorted.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-32 gap-4 text-text-muted">
-            <p className="text-lg">El diario está vacío</p>
-            <Link
-              href="/admin/catas/nuevo"
-              className="text-sm text-secondary hover:underline"
-            >
-              Registrar primera cata →
-            </Link>
-          </div>
-        ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-4">
-            {sorted.map((cata) => (
-              <CataCard key={cata.id} cata={cata} />
-            ))}
-          </div>
-        )}
-      </div>
+      {sorted.length === 0 ? (
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '160px 0',
+          gap: '16px',
+        }}>
+          <p style={{
+            fontFamily: 'var(--font-serif)',
+            fontSize: '2rem',
+            color: 'rgba(44,30,20,0.2)',
+            fontStyle: 'italic',
+          }}>
+            El diario está vacío
+          </p>
+          <Link
+            href="/admin/catas/nuevo"
+            style={{
+              fontFamily: 'var(--font-code)',
+              fontSize: '10px',
+              letterSpacing: '0.3em',
+              textTransform: 'uppercase',
+              color: '#9B7840',
+              textDecoration: 'none',
+            }}
+          >
+            Registrar primera cata →
+          </Link>
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4">
+          {sorted.map((cata, idx) => (
+            <CataCard key={cata.id} cata={cata} idx={idx} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
