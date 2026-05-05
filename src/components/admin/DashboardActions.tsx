@@ -10,23 +10,57 @@ export default function DashboardActions({ puros }: { puros: Puro[] }) {
 
   return (
     <>
-      <div className="flex flex-wrap gap-3">
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px' }}>
         <button
           type="button"
           onClick={() => setModalOpen(true)}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-secondary text-background text-sm font-medium hover:opacity-90 transition-opacity"
+          style={{
+            fontFamily: 'var(--font-code)',
+            fontSize: '10px',
+            letterSpacing: '0.2em',
+            textTransform: 'uppercase',
+            background: '#2C1E1A',
+            color: '#F2EDE4',
+            border: 'none',
+            padding: '14px 24px',
+            cursor: 'pointer',
+            transition: 'opacity 0.15s',
+          }}
+          className="hover:opacity-75"
         >
-          + Registrar Nueva Venta
+          + Registrar venta
         </button>
         <Link
           href="/admin/inventario/nuevo"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border text-text text-sm font-medium hover:border-secondary/60 transition-colors"
+          style={{
+            fontFamily: 'var(--font-code)',
+            fontSize: '10px',
+            letterSpacing: '0.2em',
+            textTransform: 'uppercase',
+            color: '#5C3D1E',
+            border: '1px solid #C4A472',
+            padding: '14px 24px',
+            textDecoration: 'none',
+            transition: 'background 0.15s',
+          }}
+          className="hover:bg-[#F5EDD8]"
         >
           + Nuevo puro
         </Link>
         <Link
           href="/admin/inventario"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-border text-text text-sm font-medium hover:border-secondary/60 transition-colors"
+          style={{
+            fontFamily: 'var(--font-code)',
+            fontSize: '10px',
+            letterSpacing: '0.2em',
+            textTransform: 'uppercase',
+            color: '#9A8572',
+            border: '1px solid #DDD5C5',
+            padding: '14px 24px',
+            textDecoration: 'none',
+            transition: 'background 0.15s',
+          }}
+          className="hover:bg-[#F2EDE4]"
         >
           Ver inventario
         </Link>
