@@ -2,7 +2,7 @@ export const dynamic = 'force-dynamic';
 
 import Link from 'next/link';
 import { getCatas } from '@/lib/sheets';
-import CataCard from '@/components/admin/CataCard';
+import CataGrid from '@/components/admin/CataGrid';
 
 export default async function DiarioPage() {
   const catas = await getCatas();
@@ -136,11 +136,7 @@ export default async function DiarioPage() {
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4">
-          {sorted.map((cata, idx) => (
-            <CataCard key={cata.id} cata={cata} idx={idx} />
-          ))}
-        </div>
+        <CataGrid catas={sorted} />
       )}
     </div>
   );
