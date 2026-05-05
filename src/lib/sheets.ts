@@ -180,12 +180,25 @@ export async function registrarVentaItems(
   });
 }
 
+function normalizeDate(value: string | undefined): string {
+  if (!value) return '';
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return value;
+  if (value.includes('T')) return value.substring(0, 10);
+  const num = Number(value);
+  if (!isNaN(num) && num > 30000 && num < 100000) {
+    return new Date((num - 25569) * 86400 * 1000).toISOString().slice(0, 10);
+  }
+  const d = new Date(value);
+  if (!isNaN(d.getTime())) return d.toISOString().slice(0, 10);
+  return value;
+}
+
 function rowToCata(row: string[]): Cata {
   const fotosRaw = row[14] ?? '';
   const etiquetasRaw = row[20] ?? '';
   return {
     id: row[0]!,
-    fecha: row[1]!,
+    fecha: normalizeDate(row[1]),
     lugar: row[2]!,
     fotoUrl: row[3] || undefined,
     notas: row[4]!,

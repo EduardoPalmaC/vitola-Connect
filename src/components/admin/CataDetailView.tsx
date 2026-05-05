@@ -473,7 +473,7 @@ export default function CataDetailView({ cata }: { cata: Cata }) {
     allImages.push({ url, label: `Foto ${i + 2}` }),
   );
 
-  const vitolaParts = cata.vitola.trim().split(' ');
+  const vitolaParts = (cata.vitola ?? '').trim().split(' ');
   const vitolaHead = vitolaParts.length > 1 ? vitolaParts.slice(0, -1).join(' ') : '';
   const vitolaItalic = vitolaParts.length > 1 ? vitolaParts.slice(-1)[0] : cata.vitola;
 
