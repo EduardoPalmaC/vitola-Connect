@@ -137,7 +137,7 @@ export default function CataCard({ cata, idx = 0, onEdit }: Props) {
         </div>
       </div>
 
-      {/* Marca */}
+      {/* Nombre */}
       <h3 style={{
         fontFamily: 'var(--font-serif)',
         fontWeight: 400,
@@ -148,10 +148,10 @@ export default function CataCard({ cata, idx = 0, onEdit }: Props) {
         margin: '0 0 6px',
         pointerEvents: 'none',
       }}>
-        {cata?.marca ?? 'Sin marca'}
+        {cata?.nombre || cata?.marca || 'Sin nombre'}
       </h3>
 
-      {/* Vitola */}
+      {/* Marca */}
       <div style={{
         fontFamily: 'var(--font-code)',
         fontSize: '10px',
@@ -161,7 +161,7 @@ export default function CataCard({ cata, idx = 0, onEdit }: Props) {
         marginBottom: '12px',
         pointerEvents: 'none',
       }}>
-        {cata?.vitola ?? '—'}
+        {cata?.marca ?? '—'}
       </div>
 
       {/* Details */}
