@@ -14,6 +14,7 @@ interface Props {
 interface FormValues {
   puroId: string;
   marca: string;
+  nombre: string;
   vitola: string;
   cepo: number;
   paisOrigen: string;
@@ -36,6 +37,7 @@ interface FormValues {
 const EMPTY: FormValues = {
   puroId: '',
   marca: '',
+  nombre: '',
   vitola: '',
   cepo: 0,
   paisOrigen: '',
@@ -153,6 +155,7 @@ export default function CataForm({ puros }: Props) {
           notas: values.notas,
           calificacion: values.calificacion,
           marca: values.marca,
+          nombre: values.nombre,
           vitola: values.vitola,
           cepo: values.cepo,
           paisOrigen: values.paisOrigen,
@@ -240,6 +243,13 @@ export default function CataForm({ puros }: Props) {
               label="Marca"
               value={values.marca}
               onChange={(e) => set('marca', e.target.value)}
+              required
+              readOnly={mode === 'inventario'}
+            />
+            <Input
+              label="Nombre"
+              value={values.nombre}
+              onChange={(e) => set('nombre', e.target.value)}
               required
               readOnly={mode === 'inventario'}
             />
