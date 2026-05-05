@@ -13,6 +13,7 @@ interface Props {
 
 interface FormValues {
   marca: string;
+  nombre: string;
   vitola: string;
   cepo: number;
   paisOrigen: string;
@@ -49,11 +50,12 @@ export default function CataEditForm({ cata }: Props) {
   const router = useRouter();
   const [values, setValues] = useState<FormValues>({
     marca: cata.marca,
+    nombre: cata.nombre ?? '',
     vitola: cata.vitola,
     cepo: cata.cepo,
     paisOrigen: cata.paisOrigen,
     capa: cata.capa,
-    fecha: cata.fecha,
+    fecha: cata.fecha.includes('T') ? cata.fecha.split('T')[0] : cata.fecha,
     lugar: cata.lugar,
     notas: cata.notas,
     fotoUrl: cata.fotoUrl ?? '',
@@ -130,6 +132,7 @@ export default function CataEditForm({ cata }: Props) {
           notas: values.notas,
           calificacion: values.calificacion,
           marca: values.marca,
+          nombre: values.nombre,
           vitola: values.vitola,
           cepo: values.cepo,
           paisOrigen: values.paisOrigen,
@@ -171,6 +174,12 @@ export default function CataEditForm({ cata }: Props) {
             label="Marca"
             value={values.marca}
             onChange={(e) => set('marca', e.target.value)}
+            required
+          />
+          <Input
+            label="Nombre"
+            value={values.nombre}
+            onChange={(e) => set('nombre', e.target.value)}
             required
           />
           <Input
