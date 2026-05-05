@@ -73,6 +73,7 @@ export interface Cata {
   notas: string;
   calificacion: number;
   marca: string;
+  nombre?: string;
   vitola: string;
   cepo: number;
   paisOrigen: string;
