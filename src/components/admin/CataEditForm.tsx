@@ -55,7 +55,7 @@ export default function CataEditForm({ cata }: Props) {
     cepo: cata.cepo,
     paisOrigen: cata.paisOrigen,
     capa: cata.capa,
-    fecha: cata.fecha.includes('T') ? cata.fecha.split('T')[0] : cata.fecha,
+    fecha: cata.fecha.substring(0, 10),
     lugar: cata.lugar,
     notas: cata.notas,
     fotoUrl: cata.fotoUrl ?? '',
