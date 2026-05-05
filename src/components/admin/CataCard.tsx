@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import type { Cata } from '@/types';
 
@@ -112,19 +111,20 @@ export default function CataCard({ cata, idx = 0 }: { cata: Cata; idx?: number }
       </div>
 
       {/* Image */}
-      <div className="relative aspect-[2/3] overflow-hidden flex items-center justify-center my-5 rounded" style={{ background: '#F7F3EC' }}>
-        {cata.fotoUrl ? (
-          <Image
-            src={cata.fotoUrl}
-            alt={`${cata.marca} ${cata.vitola}`}
-            fill
-            sizes="(max-width: 640px) 50vw, (max-width: 1280px) 33vw, 25vw"
-            className={`object-contain ${isLandscape ? 'rotate-90 scale-[1.35]' : ''}`}
-            onLoad={(e) => setIsLandscape(e.currentTarget.naturalWidth > e.currentTarget.naturalHeight)}
-          />
-        ) : (
-          <CigarSVG shade={shade} id={cata.id} />
-        )}
+      <div className="relative aspect-[2/3] overflow-hidden my-5 rounded" style={{ background: '#F7F3EC' }}>
+        <div className="absolute inset-0 flex items-center justify-center">
+          {cata.fotoUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={cata.fotoUrl}
+              alt={`${cata.marca} ${cata.vitola}`}
+              className={`max-w-full max-h-full object-contain transition-transform duration-300 ${isLandscape ? 'rotate-90 scale-[1.35]' : ''}`}
+              onLoad={(e) => setIsLandscape(e.currentTarget.naturalWidth > e.currentTarget.naturalHeight)}
+            />
+          ) : (
+            <CigarSVG shade={shade} id={cata.id} />
+          )}
+        </div>
       </div>
 
       {/* Nombre (marca) — hero */}
