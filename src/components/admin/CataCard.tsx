@@ -135,24 +135,24 @@ export default function CataCard({ cata, idx = 0 }: { cata: Cata; idx?: number }
       {/* Marca */}
       <div style={{
         fontFamily: 'var(--font-code)',
-        fontSize: '10px',
-        letterSpacing: '0.32em',
+        fontSize: '9px',
+        letterSpacing: '0.24em',
         textTransform: 'uppercase',
-        color: '#9B7840',
-        marginBottom: '5px',
+        color: '#B0A090',
+        marginBottom: '3px',
       }}>
         {cata.marca}
       </div>
 
-      {/* Vitola */}
+      {/* Vitola — main hero */}
       <h3 style={{
         fontFamily: 'var(--font-serif)',
         fontWeight: 400,
-        fontSize: '22px',
-        lineHeight: 1.15,
-        letterSpacing: '-0.01em',
+        fontSize: '28px',
+        lineHeight: 1.1,
+        letterSpacing: '-0.015em',
         color: '#2C1E1A',
-        margin: '0 0 14px',
+        margin: '0 0 16px',
       }}>
         {cata.vitola}
       </h3>
