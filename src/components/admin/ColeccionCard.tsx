@@ -76,8 +76,6 @@ export default function ColeccionCard({ puro, idx }: ColeccionCardProps) {
   };
 
   const shade = SHADES[idx % SHADES.length] ?? '#C4956A';
-  const precio = puro.precioBruto ?? 0;
-  const [intero, deci] = precio.toFixed(2).split('.');
 
   return (
     <Link
@@ -135,7 +133,7 @@ export default function ColeccionCard({ puro, idx }: ColeccionCardProps) {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          overflow: 'hidden',
+          overflow: 'visible',
           background: '#F7F3EC',
           borderRadius: '4px',
         }}
@@ -143,22 +141,22 @@ export default function ColeccionCard({ puro, idx }: ColeccionCardProps) {
         {puro.fotoUrl ? (
           <div
             style={{
-              width: '200px',
-              height: '300px',
+              width: '240px',
+              height: '320px',
               position: 'relative',
-              overflow: 'hidden',
+              overflow: 'visible',
               flexShrink: 0,
             }}
           >
             <div
               style={{
                 position: 'absolute',
-                width: isLandscape ? '300px' : '200px',
-                height: isLandscape ? '200px' : '300px',
+                width: isLandscape ? '320px' : '240px',
+                height: isLandscape ? '240px' : '320px',
                 top: '50%',
                 left: '50%',
                 transform: isLandscape
-                  ? 'translate(-50%, -50%) rotate(90deg) scale(1.5)'
+                  ? 'translate(-50%, -50%) rotate(90deg)'
                   : 'translate(-50%, -50%)',
               }}
             >
@@ -166,7 +164,7 @@ export default function ColeccionCard({ puro, idx }: ColeccionCardProps) {
                 src={puro.fotoUrl}
                 alt={puro.nombre}
                 fill
-                sizes="300px"
+                sizes="320px"
                 onLoad={handleImageLoad}
                 style={{ objectFit: 'contain', objectPosition: 'center' }}
               />
@@ -268,19 +266,7 @@ export default function ColeccionCard({ puro, idx }: ColeccionCardProps) {
         </div>
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
-        <div
-          style={{
-            fontFamily: 'Inter, sans-serif',
-            fontSize: '24px',
-            fontWeight: 700,
-            color: '#B28F69',
-            letterSpacing: '-0.02em',
-          }}
-        >
-          ${intero}
-          <span style={{ fontSize: '14px' }}>.{deci}</span>
-        </div>
+      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
         <span
           style={{
             fontFamily: 'var(--font-code)',
