@@ -132,30 +132,30 @@ export default function CataCard({ cata, idx = 0 }: { cata: Cata; idx?: number }
         )}
       </div>
 
-      {/* Marca */}
-      <div style={{
-        fontFamily: 'var(--font-code)',
-        fontSize: '9px',
-        letterSpacing: '0.24em',
-        textTransform: 'uppercase',
-        color: '#B0A090',
-        marginBottom: '3px',
-      }}>
-        {cata.marca}
-      </div>
-
-      {/* Vitola — main hero */}
+      {/* Nombre (marca) — hero */}
       <h3 style={{
         fontFamily: 'var(--font-serif)',
         fontWeight: 400,
-        fontSize: '28px',
+        fontSize: '26px',
         lineHeight: 1.1,
         letterSpacing: '-0.015em',
         color: '#2C1E1A',
-        margin: '0 0 16px',
+        margin: '0 0 6px',
+      }}>
+        {cata.marca}
+      </h3>
+
+      {/* Vitola */}
+      <div style={{
+        fontFamily: 'var(--font-code)',
+        fontSize: '10px',
+        letterSpacing: '0.24em',
+        textTransform: 'uppercase',
+        color: '#B0A090',
+        marginBottom: '12px',
       }}>
         {cata.vitola}
-      </h3>
+      </div>
 
       {/* Details */}
       <div style={{
