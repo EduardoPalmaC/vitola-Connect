@@ -205,8 +205,8 @@ export default function ColeccionCard({ puro, idx }: ColeccionCardProps) {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: '1fr 1fr 1fr',
-          gap: '10px',
+          gridTemplateColumns: '1fr 1fr',
+          gap: '8px',
           marginTop: '12px',
           paddingTop: '12px',
           borderTop: '1px solid #EDE8DE',
@@ -217,33 +217,16 @@ export default function ColeccionCard({ puro, idx }: ColeccionCardProps) {
           <div
             style={{
               fontFamily: 'var(--font-code)',
-              fontSize: '11px',
+              fontSize: '9px',
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
               color: '#B0A090',
-              marginBottom: '3px',
-            }}
-          >
-            Vitola
-          </div>
-          <div style={{ fontFamily: 'var(--font-serif)', fontSize: '14px', color: '#2C1E1A' }}>
-            {puro.vitola}
-          </div>
-        </div>
-        <div>
-          <div
-            style={{
-              fontFamily: 'var(--font-code)',
-              fontSize: '11px',
-              letterSpacing: '0.14em',
-              textTransform: 'uppercase',
-              color: '#B0A090',
-              marginBottom: '3px',
+              marginBottom: '2px',
             }}
           >
             Cepo
           </div>
-          <div style={{ fontFamily: 'var(--font-serif)', fontSize: '14px', color: '#2C1E1A' }}>
+          <div style={{ fontFamily: 'var(--font-serif)', fontSize: '13px', color: '#2C1E1A' }}>
             {puro.ringGauge ?? '—'}
           </div>
         </div>
@@ -251,17 +234,17 @@ export default function ColeccionCard({ puro, idx }: ColeccionCardProps) {
           <div
             style={{
               fontFamily: 'var(--font-code)',
-              fontSize: '11px',
+              fontSize: '9px',
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
               color: '#B0A090',
-              marginBottom: '3px',
+              marginBottom: '2px',
             }}
           >
-            Añejamiento
+            Unidades
           </div>
-          <div style={{ fontFamily: 'var(--font-serif)', fontSize: '14px', color: '#2C1E1A' }}>
-            {formatAnejamiento(puro.fechaLlegada)}
+          <div style={{ fontFamily: 'var(--font-serif)', fontSize: '13px', color: '#2C1E1A' }}>
+            {puro.cantidad ?? '—'}
           </div>
         </div>
       </div>
