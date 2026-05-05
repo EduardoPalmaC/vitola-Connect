@@ -76,6 +76,8 @@ export default function ColeccionCard({ puro, idx }: ColeccionCardProps) {
   };
 
   const shade = SHADES[idx % SHADES.length] ?? '#C4956A';
+  const precio = puro.precioBruto ?? 0;
+  const [intero, deci] = precio.toFixed(2).split('.');
 
   return (
     <Link
@@ -276,7 +278,8 @@ export default function ColeccionCard({ puro, idx }: ColeccionCardProps) {
             letterSpacing: '-0.02em',
           }}
         >
-          ${puro.precioBruto?.toFixed(0) ?? '—'}
+          ${intero}
+          <span style={{ fontSize: '14px' }}>.{deci}</span>
         </div>
         <span
           style={{
