@@ -1,3 +1,6 @@
+'use client';
+
+import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import type { Cata } from '@/types';
@@ -56,6 +59,7 @@ function CigarSVG({ shade, id }: { shade: string; id: string }) {
 }
 
 export default function CataCard({ cata, idx = 0 }: { cata: Cata; idx?: number }) {
+  const [isLandscape, setIsLandscape] = useState(false);
   const shade = SHADES[idx % SHADES.length] ?? '#C4956A';
   const fechaCorta = new Date(cata.fecha).toLocaleDateString('es-MX', {
     day: 'numeric',
@@ -108,24 +112,15 @@ export default function CataCard({ cata, idx = 0 }: { cata: Cata; idx?: number }
       </div>
 
       {/* Image */}
-      <div style={{
-        height: '260px',
-        margin: '20px 0 16px',
-        position: 'relative',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        overflow: 'hidden',
-        background: '#F7F3EC',
-        borderRadius: '4px',
-      }}>
+      <div className="relative aspect-[2/3] overflow-hidden flex items-center justify-center my-5 rounded" style={{ background: '#F7F3EC' }}>
         {cata.fotoUrl ? (
           <Image
             src={cata.fotoUrl}
             alt={`${cata.marca} ${cata.vitola}`}
             fill
             sizes="(max-width: 640px) 50vw, (max-width: 1280px) 33vw, 25vw"
-            style={{ objectFit: 'contain' }}
+            className={`object-contain ${isLandscape ? 'rotate-90 scale-[1.35]' : ''}`}
+            onLoad={(e) => setIsLandscape(e.currentTarget.naturalWidth > e.currentTarget.naturalHeight)}
           />
         ) : (
           <CigarSVG shade={shade} id={cata.id} />
