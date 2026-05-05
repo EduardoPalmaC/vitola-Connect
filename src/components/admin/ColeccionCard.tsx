@@ -205,7 +205,7 @@ export default function ColeccionCard({ puro, idx }: ColeccionCardProps) {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: '1fr 1fr',
+          gridTemplateColumns: '1fr 1fr 1fr',
           gap: '8px',
           marginTop: '12px',
           paddingTop: '12px',
@@ -213,6 +213,23 @@ export default function ColeccionCard({ puro, idx }: ColeccionCardProps) {
           marginBottom: '2px',
         }}
       >
+        <div>
+          <div
+            style={{
+              fontFamily: 'var(--font-code)',
+              fontSize: '9px',
+              letterSpacing: '0.14em',
+              textTransform: 'uppercase',
+              color: '#B0A090',
+              marginBottom: '2px',
+            }}
+          >
+            Vitola
+          </div>
+          <div style={{ fontFamily: 'var(--font-serif)', fontSize: '13px', color: '#2C1E1A' }}>
+            {puro.vitola}
+          </div>
+        </div>
         <div>
           <div
             style={{
