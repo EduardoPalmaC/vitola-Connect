@@ -86,6 +86,12 @@ export interface Cata {
   especia?: number;
   tierra?: number;
   madera?: number;
+  tiro?: number;
+  quemado?: number;
+  chocolate?: number;
+  nuez?: number;
+  cafe?: number;
+  caramelo?: number;
   etiquetasAroma?: string[];
   maridaje?: string;
 }

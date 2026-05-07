@@ -130,6 +130,12 @@ const ATRIBUTOS: { key: keyof Cata; label: string }[] = [
   { key: 'especia', label: 'Especia' },
   { key: 'tierra', label: 'Tierra' },
   { key: 'madera', label: 'Madera' },
+  { key: 'tiro', label: 'Tiro' },
+  { key: 'quemado', label: 'Quemado' },
+  { key: 'chocolate', label: 'Chocolate' },
+  { key: 'nuez', label: 'Nuez' },
+  { key: 'cafe', label: 'Café' },
+  { key: 'caramelo', label: 'Caramelo' },
 ];
 
 export default function CataPerfilAromatico({ cata }: { cata: Cata }) {

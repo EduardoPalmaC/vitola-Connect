@@ -29,6 +29,12 @@ interface FormValues {
   especia: number;
   tierra: number;
   madera: number;
+  tiro: number;
+  quemado: number;
+  chocolate: number;
+  nuez: number;
+  cafe: number;
+  caramelo: number;
   etiquetasAromaRaw: string;
   maridaje: string;
 }
@@ -66,6 +72,12 @@ export default function CataEditForm({ cata }: Props) {
     especia: cata.especia ?? 0,
     tierra: cata.tierra ?? 0,
     madera: cata.madera ?? 0,
+    tiro: cata.tiro ?? 0,
+    quemado: cata.quemado ?? 0,
+    chocolate: cata.chocolate ?? 0,
+    nuez: cata.nuez ?? 0,
+    cafe: cata.cafe ?? 0,
+    caramelo: cata.caramelo ?? 0,
     etiquetasAromaRaw: (cata.etiquetasAroma ?? []).join(', '),
     maridaje: cata.maridaje ?? '',
   });
@@ -142,6 +154,12 @@ export default function CataEditForm({ cata }: Props) {
           especia: values.especia || undefined,
           tierra: values.tierra || undefined,
           madera: values.madera || undefined,
+          tiro: values.tiro || undefined,
+          quemado: values.quemado || undefined,
+          chocolate: values.chocolate || undefined,
+          nuez: values.nuez || undefined,
+          cafe: values.cafe || undefined,
+          caramelo: values.caramelo || undefined,
           etiquetasAroma: values.etiquetasAromaRaw
             ? values.etiquetasAromaRaw.split(',').map((t) => t.trim()).filter(Boolean)
             : undefined,
@@ -347,9 +365,9 @@ export default function CataEditForm({ cata }: Props) {
         </h2>
 
         <div className="flex flex-col gap-3">
-          {(['cuerpo', 'dulzor', 'especia', 'tierra', 'madera'] as const).map((attr) => (
+          {(['cuerpo', 'dulzor', 'especia', 'tierra', 'madera', 'tiro', 'quemado', 'chocolate', 'nuez', 'cafe', 'caramelo'] as const).map((attr) => (
             <div key={attr} className="flex items-center gap-4">
-              <span className="text-sm text-text-muted capitalize w-20 shrink-0">{attr.charAt(0).toUpperCase() + attr.slice(1)}</span>
+              <span className="text-sm text-text-muted capitalize w-20 shrink-0">{attr === 'cafe' ? 'Café' : attr.charAt(0).toUpperCase() + attr.slice(1)}</span>
               <div className="flex gap-2">
                 {[0, 1, 2, 3, 4, 5].map((n) => (
                   <button

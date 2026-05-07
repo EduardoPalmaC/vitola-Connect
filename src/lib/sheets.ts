@@ -193,12 +193,13 @@ function normalizeDate(value: string | undefined): string {
   return value;
 }
 
-// Columnas Catas (A-W = 23 cols):
+// Columnas Catas (A-AC = 29 cols):
 // [0]A id  [1]B fecha  [2]C lugar  [3]D fotoUrl  [4]E notas  [5]F calificacion
 // [6]G marca  [7]H nombre  [8]I vitola  [9]J cepo  [10]K paisOrigen  [11]L capa
 // [12]M puroId  [13]N usuarioId  [14]O createdAt  [15]P fotosAdicionales
 // [16]Q cuerpo  [17]R dulzor  [18]S especia  [19]T tierra  [20]U madera
 // [21]V etiquetasAroma  [22]W maridaje
+// [23]X tiro  [24]Y quemado  [25]Z chocolate  [26]AA nuez  [27]AB cafe  [28]AC caramelo
 function rowToCata(row: string[]): Cata {
   const fotosRaw = row[15] || '';
   const etiquetasRaw = row[21] || '';
@@ -226,6 +227,12 @@ function rowToCata(row: string[]): Cata {
     madera: row[20] ? parseInt(row[20]) || undefined : undefined,
     etiquetasAroma: etiquetasRaw ? etiquetasRaw.split(',').map((t) => t.trim()).filter(Boolean) : undefined,
     maridaje: row[22] || undefined,
+    tiro: row[23] ? parseInt(row[23]) || undefined : undefined,
+    quemado: row[24] ? parseInt(row[24]) || undefined : undefined,
+    chocolate: row[25] ? parseInt(row[25]) || undefined : undefined,
+    nuez: row[26] ? parseInt(row[26]) || undefined : undefined,
+    cafe: row[27] ? parseInt(row[27]) || undefined : undefined,
+    caramelo: row[28] ? parseInt(row[28]) || undefined : undefined,
   };
 }
 
@@ -254,13 +261,19 @@ function cataToRow(cata: Cata): (string | number)[] {
     cata.madera ?? '',                        // U [20]
     (cata.etiquetasAroma ?? []).join(','),    // V [21]
     cata.maridaje ?? '',                      // W [22]
+    cata.tiro ?? '',                          // X [23]
+    cata.quemado ?? '',                       // Y [24]
+    cata.chocolate ?? '',                     // Z [25]
+    cata.nuez ?? '',                          // AA [26]
+    cata.cafe ?? '',                          // AB [27]
+    cata.caramelo ?? '',                      // AC [28]
   ];
 }
 
 export async function getCatas(): Promise<Cata[]> {
   const response = await sheets.spreadsheets.values.get({
     spreadsheetId: SPREADSHEET_ID,
-    range: 'Catas!A2:W',
+    range: 'Catas!A2:AC',
   });
   const rows = (response.data.values ?? []) as string[][];
   return rows.filter((r) => r.length >= 5).map(rowToCata);
