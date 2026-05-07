@@ -447,6 +447,34 @@ function CigarHero({ shade = '#C4956A' }: { shade?: string }) {
   );
 }
 
+function StarRating({ score }: { score: number }) {
+  const stars = score / 20;
+  return (
+    <div style={{ display: 'flex', gap: '3px', margin: '8px 0 6px' }}>
+      {Array.from({ length: 5 }).map((_, i) => {
+        const filled = stars >= i + 1;
+        const half = !filled && stars >= i + 0.5;
+        return (
+          <svg key={i} width="16" height="16" viewBox="0 0 24 24">
+            <defs>
+              <linearGradient id={`sg-${i}`}>
+                <stop offset={half ? '50%' : filled ? '100%' : '0%'} stopColor="#9B7840" />
+                <stop offset={half ? '50%' : filled ? '100%' : '0%'} stopColor="#DDD5C5" />
+              </linearGradient>
+            </defs>
+            <polygon
+              points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"
+              fill={`url(#sg-${i})`}
+              stroke={filled || half ? '#9B7840' : '#DDD5C5'}
+              strokeWidth="1.5"
+            />
+          </svg>
+        );
+      })}
+    </div>
+  );
+}
+
 function scoreLabel(score: number): string {
   if (score >= 95) return 'Clásico';
   if (score >= 90) return 'Excepcional';
@@ -576,10 +604,7 @@ export default function CataDetailView({ cata }: { cata: Cata }) {
 
             <div style={s.scoreCell}>
               <div style={s.scoreLabel}>Calificación</div>
-              <div style={s.bar}>
-                <div style={{ ...s.barFill, width: `${scoreNorm * 100}%` }} />
-                <div style={{ ...s.barDot, left: `${scoreNorm * 100}%` }} />
-              </div>
+              <StarRating score={cata.calificacion} />
               <div style={s.barCaption}>{scoreLabel(cata.calificacion)}</div>
             </div>
 
