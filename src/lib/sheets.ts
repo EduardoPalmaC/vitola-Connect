@@ -304,7 +304,7 @@ export async function updateCata(id: string, data: Partial<Omit<Cata, 'id' | 'cr
 
   await sheets.spreadsheets.values.update({
     spreadsheetId: SPREADSHEET_ID,
-    range: `Catas!A${index + 2}:W${index + 2}`,
+    range: `Catas!A${index + 2}:AC${index + 2}`,
     valueInputOption: 'RAW',
     requestBody: { values: [cataToRow(updated)] },
   });
