@@ -455,7 +455,7 @@ function StarRating({ score }: { score: number }) {
         const filled = stars >= i + 1;
         const half = !filled && stars >= i + 0.5;
         return (
-          <svg key={i} width="16" height="16" viewBox="0 0 24 24">
+          <svg key={i} width="24" height="24" viewBox="0 0 24 24">
             <defs>
               <linearGradient id={`sg-${i}`}>
                 <stop offset={half ? '50%' : filled ? '100%' : '0%'} stopColor="#9B7840" />

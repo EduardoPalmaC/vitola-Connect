@@ -193,13 +193,14 @@ function normalizeDate(value: string | undefined): string {
   return value;
 }
 
-// Columnas Catas (A-AC = 29 cols):
+// Columnas Catas (A-AD = 30 cols):
 // [0]A id  [1]B fecha  [2]C lugar  [3]D fotoUrl  [4]E notas  [5]F calificacion
 // [6]G marca  [7]H nombre  [8]I vitola  [9]J cepo  [10]K paisOrigen  [11]L capa
 // [12]M puroId  [13]N usuarioId  [14]O createdAt  [15]P fotosAdicionales
 // [16]Q cuerpo  [17]R dulzor  [18]S especia  [19]T tierra  [20]U madera
 // [21]V etiquetasAroma  [22]W maridaje
 // [23]X tiro  [24]Y quemado  [25]Z chocolate  [26]AA nuez  [27]AB cafe  [28]AC caramelo
+// [29]AD cuero
 function rowToCata(row: string[]): Cata {
   const fotosRaw = row[15] || '';
   const etiquetasRaw = row[21] || '';
@@ -233,6 +234,7 @@ function rowToCata(row: string[]): Cata {
     nuez: row[26] ? parseInt(row[26]) || undefined : undefined,
     cafe: row[27] ? parseInt(row[27]) || undefined : undefined,
     caramelo: row[28] ? parseInt(row[28]) || undefined : undefined,
+    cuero: row[29] ? parseInt(row[29]) || undefined : undefined,
   };
 }
 
@@ -267,13 +269,14 @@ function cataToRow(cata: Cata): (string | number)[] {
     cata.nuez ?? '',                          // AA [26]
     cata.cafe ?? '',                          // AB [27]
     cata.caramelo ?? '',                      // AC [28]
+    cata.cuero ?? '',                         // AD [29]
   ];
 }
 
 export async function getCatas(): Promise<Cata[]> {
   const response = await sheets.spreadsheets.values.get({
     spreadsheetId: SPREADSHEET_ID,
-    range: 'Catas!A2:AC',
+    range: 'Catas!A2:AD',
   });
   const rows = (response.data.values ?? []) as string[][];
   return rows.filter((r) => r.length >= 5).map(rowToCata);
@@ -304,7 +307,7 @@ export async function updateCata(id: string, data: Partial<Omit<Cata, 'id' | 'cr
 
   await sheets.spreadsheets.values.update({
     spreadsheetId: SPREADSHEET_ID,
-    range: `Catas!A${index + 2}:AC${index + 2}`,
+    range: `Catas!A${index + 2}:AD${index + 2}`,
     valueInputOption: 'RAW',
     requestBody: { values: [cataToRow(updated)] },
   });

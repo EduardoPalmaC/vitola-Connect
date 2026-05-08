@@ -35,6 +35,7 @@ interface FormValues {
   nuez: number;
   cafe: number;
   caramelo: number;
+  cuero: number;
   etiquetasAromaRaw: string;
   maridaje: string;
 }
@@ -78,6 +79,7 @@ export default function CataEditForm({ cata }: Props) {
     nuez: cata.nuez ?? 0,
     cafe: cata.cafe ?? 0,
     caramelo: cata.caramelo ?? 0,
+    cuero: cata.cuero ?? 0,
     etiquetasAromaRaw: (cata.etiquetasAroma ?? []).join(', '),
     maridaje: cata.maridaje ?? '',
   });
@@ -160,6 +162,7 @@ export default function CataEditForm({ cata }: Props) {
           nuez: values.nuez || undefined,
           cafe: values.cafe || undefined,
           caramelo: values.caramelo || undefined,
+          cuero: values.cuero || undefined,
           etiquetasAroma: values.etiquetasAromaRaw
             ? values.etiquetasAromaRaw.split(',').map((t) => t.trim()).filter(Boolean)
             : undefined,
@@ -365,7 +368,7 @@ export default function CataEditForm({ cata }: Props) {
         </h2>
 
         <div className="flex flex-col gap-3">
-          {(['cuerpo', 'dulzor', 'especia', 'tierra', 'madera', 'tiro', 'quemado', 'chocolate', 'nuez', 'cafe', 'caramelo'] as const).map((attr) => (
+          {(['cuerpo', 'dulzor', 'especia', 'tierra', 'madera', 'tiro', 'quemado', 'chocolate', 'nuez', 'cafe', 'caramelo', 'cuero'] as const).map((attr) => (
             <div key={attr} className="flex items-center gap-4">
               <span className="text-sm text-text-muted capitalize w-20 shrink-0">{attr === 'cafe' ? 'Café' : attr.charAt(0).toUpperCase() + attr.slice(1)}</span>
               <div className="flex gap-2">

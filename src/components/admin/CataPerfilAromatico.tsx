@@ -136,6 +136,7 @@ const ATRIBUTOS: { key: keyof Cata; label: string }[] = [
   { key: 'nuez', label: 'Nuez' },
   { key: 'cafe', label: 'Café' },
   { key: 'caramelo', label: 'Caramelo' },
+  { key: 'cuero', label: 'Cuero' },
 ];
 
 export default function CataPerfilAromatico({ cata }: { cata: Cata }) {
@@ -149,15 +150,12 @@ export default function CataPerfilAromatico({ cata }: { cata: Cata }) {
       <div>
         {ATRIBUTOS.map(({ key, label }) => {
           const val = cata[key] as number | undefined;
+          if (!val) return null;
           return (
             <div key={key} style={s.atributoRow}>
-              <div style={{ ...s.atributoNombre, ...(val == null ? s.atributoNombreEmpty : {}) }}>
-                {label}
-              </div>
+              <div style={s.atributoNombre}>{label}</div>
               <DotScore value={val} />
-              <div style={s.atributoValor}>
-                {val != null ? `${val} / 5` : '— / 5'}
-              </div>
+              <div style={s.atributoValor}>{val} / 5</div>
             </div>
           );
         })}

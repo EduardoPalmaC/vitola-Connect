@@ -92,6 +92,7 @@ export interface Cata {
   nuez?: number;
   cafe?: number;
   caramelo?: number;
+  cuero?: number;
   etiquetasAroma?: string[];
   maridaje?: string;
 }
