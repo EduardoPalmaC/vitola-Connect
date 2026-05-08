@@ -14,7 +14,7 @@ function Stars({ value }: { value: number }) {
         {[0, 1, 2, 3, 4].map((i) => {
           const fill = Math.min(1, Math.max(0, stars - i));
           return (
-            <span key={i} style={{ position: 'relative', display: 'inline-block', fontSize: '14px', lineHeight: 1 }}>
+            <span key={i} style={{ position: 'relative', display: 'inline-block', fontSize: '20px', lineHeight: 1 }}>
               <span style={{ color: '#DDD5C5' }}>★</span>
               {fill > 0 && (
                 <span style={{
