@@ -2,13 +2,10 @@ export const dynamic = 'force-dynamic';
 
 import Link from 'next/link';
 import { getCatas } from '@/lib/sheets';
-import CataGrid from '@/components/admin/CataGrid';
+import DiarioFilters from '@/components/admin/DiarioFilters';
 
 export default async function DiarioPage() {
   const catas = await getCatas();
-  const sorted = [...catas].sort(
-    (a, b) => new Date(b.fecha).getTime() - new Date(a.fecha).getTime(),
-  );
 
   return (
     <div style={{ background: '#F9F6F0', color: '#2C1E1A', minHeight: '100vh' }}>
@@ -104,7 +101,7 @@ export default async function DiarioPage() {
         </div>
       </header>
 
-      {sorted.length === 0 ? (
+      {catas.length === 0 ? (
         <div style={{
           display: 'flex',
           flexDirection: 'column',
@@ -136,7 +133,7 @@ export default async function DiarioPage() {
           </Link>
         </div>
       ) : (
-        <CataGrid catas={sorted} />
+        <DiarioFilters catas={catas} />
       )}
     </div>
   );
