@@ -31,6 +31,11 @@ const EMPTY: FormValues = {
   notasCata: '',
   stock: 1,
   fortaleza: '',
+  costoMazo: 0,
+  purosPorMazo: 25,
+  transporteMazo: 0,
+  almacenamientoMazo: 0,
+  modoIngreso: 'pieza',
 };
 
 interface Props {
@@ -41,23 +46,68 @@ interface Props {
 
 export default function PuroForm({ mode, id, initialData }: Props) {
   const router = useRouter();
-  const [values, setValues] = useState<FormValues>({ ...EMPTY, ...initialData });
-  const [uploading, setUploading] = useState(false);
-  const [uploadingLogo, setUploadingLogo] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [uploadingLogo, setUploadingLogo] = useState(false);
   const [error, setError] = useState('');
 
-  // Mazo/Pieza state
-  const [costMode, setCostMode] = useState<'pieza' | 'mazo'>('pieza');
-  const [costoMazo, setCostoMazo] = useState(0);
-  const [purosPorMazo, setPurosPorMazo] = useState(25);
-  const [transporteMazo, setTransporteMazo] = useState(0);
-  const [almacenamientoMazo, setAlmacenamientoMazo] = useState(0);
+  const initMode = initialData?.modoIngreso ?? 'pieza';
+  const [costMode, setCostMode] = useState<'pieza' | 'mazo'>(initMode);
+
+  // Pieza-level costs
+  const [precioBruto, setPrecioBruto] = useState(initialData?.precioBruto ?? 0);
+  const [costoTransporte, setCostoTransporte] = useState(initialData?.costoTransporte ?? 0);
+  const [costoAlmacenamiento, setCostoAlmacenamiento] = useState(initialData?.costoAlmacenamiento ?? 0);
+
+  // Mazo-level costs
+  const [costoMazo, setCostoMazo] = useState(() => {
+    if (initialData?.costoMazo) return initialData.costoMazo;
+    const qty = initialData?.purosPorMazo ?? 25;
+    return parseFloat(((initialData?.precioBruto ?? 0) * qty).toFixed(2));
+  });
+  const [purosPorMazo, setPurosPorMazo] = useState(initialData?.purosPorMazo ?? 25);
+  const [transporteMazo, setTransporteMazo] = useState(() => {
+    if (initialData?.transporteMazo) return initialData.transporteMazo;
+    const qty = initialData?.purosPorMazo ?? 25;
+    return parseFloat(((initialData?.costoTransporte ?? 0) * qty).toFixed(2));
+  });
+  const [almacenamientoMazo, setAlmacenamientoMazo] = useState(() => {
+    if (initialData?.almacenamientoMazo) return initialData.almacenamientoMazo;
+    const qty = initialData?.purosPorMazo ?? 25;
+    return parseFloat(((initialData?.costoAlmacenamiento ?? 0) * qty).toFixed(2));
+  });
+
+  // Rest of form values
+  const [values, setValues] = useState<Omit<FormValues, 'precioBruto' | 'costoTransporte' | 'costoAlmacenamiento' | 'costoMazo' | 'purosPorMazo' | 'transporteMazo' | 'almacenamientoMazo' | 'modoIngreso'>>({
+    nombre: initialData?.nombre ?? EMPTY.nombre,
+    marca: initialData?.marca ?? EMPTY.marca,
+    vitola: initialData?.vitola ?? EMPTY.vitola,
+    ringGauge: initialData?.ringGauge ?? EMPTY.ringGauge,
+    largo: initialData?.largo ?? EMPTY.largo,
+    paisOrigen: initialData?.paisOrigen ?? EMPTY.paisOrigen,
+    precioVenta: initialData?.precioVenta ?? EMPTY.precioVenta,
+    estado: initialData?.estado ?? EMPTY.estado,
+    fechaLlegada: initialData?.fechaLlegada ?? EMPTY.fechaLlegada,
+    tiempoAnejamiento: initialData?.tiempoAnejamiento ?? EMPTY.tiempoAnejamiento,
+    humedad: initialData?.humedad ?? EMPTY.humedad,
+    fechaRevisionHumedad: initialData?.fechaRevisionHumedad ?? EMPTY.fechaRevisionHumedad,
+    fotoUrl: initialData?.fotoUrl ?? EMPTY.fotoUrl,
+    logoMarcaUrl: initialData?.logoMarcaUrl ?? EMPTY.logoMarcaUrl,
+    notasCata: initialData?.notasCata ?? EMPTY.notasCata,
+    stock: initialData?.stock ?? EMPTY.stock,
+    fortaleza: initialData?.fortaleza ?? EMPTY.fortaleza,
+  });
 
   const isColeccion = values.estado === 'coleccion_personal';
 
-  // Auto-calculate añejamiento from fechaLlegada
+  // Derived: costo unitario (always from pieza fields for display)
+  const costoTotalUnitario = precioBruto + costoTransporte + costoAlmacenamiento;
+  const costoTotalMazo = costoMazo + transporteMazo + almacenamientoMazo;
+  const costoUnitarioFromMazo = purosPorMazo > 0 ? costoTotalMazo / purosPorMazo : 0;
+  const ganancia = values.precioVenta - costoTotalUnitario;
+  const margen = costoTotalUnitario > 0 ? (ganancia / costoTotalUnitario) * 100 : 0;
+
   useEffect(() => {
     if (!values.fechaLlegada) return;
     const llegada = new Date(values.fechaLlegada);
@@ -66,144 +116,123 @@ export default function PuroForm({ mode, id, initialData }: Props) {
     const meses =
       (hoy.getFullYear() - llegada.getFullYear()) * 12 +
       (hoy.getMonth() - llegada.getMonth());
-    set('tiempoAnejamiento', Math.max(0, meses));
+    setValues((prev) => ({ ...prev, tiempoAnejamiento: Math.max(0, meses) }));
   }, [values.fechaLlegada]);
 
-  // Live cost calculations (mode-aware to avoid double-counting in mazo)
-  const costoTotal =
-    costMode === 'mazo'
-      ? calcMazoPrecioBruto(costoMazo, transporteMazo, almacenamientoMazo, purosPorMazo)
-      : values.precioBruto + values.costoTransporte + values.costoAlmacenamiento;
-  const gananciaCalc = values.precioVenta - costoTotal;
-  const margenCalc = costoTotal > 0 ? (gananciaCalc / costoTotal) * 100 : 0;
-
-  function set<K extends keyof FormValues>(key: K, value: FormValues[K]) {
+  function set<K extends keyof typeof values>(key: K, value: typeof values[K]) {
     setValues((prev) => ({ ...prev, [key]: value }));
   }
 
-  function numericSet(key: keyof FormValues) {
-    return (e: React.ChangeEvent<HTMLInputElement>) =>
-      set(key, Number(e.target.value) as FormValues[typeof key]);
+  // Pieza field handlers — update mazo in sync
+  function handlePrecioBrutoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const v = Number(e.target.value);
+    setPrecioBruto(v);
+    setCostoMazo(parseFloat((v * purosPorMazo).toFixed(2)));
   }
 
-  function calcMazoPrecioBruto(mazo: number, transporte: number, almacenamiento: number, qty: number) {
-    return qty > 0 ? (mazo + transporte + almacenamiento) / qty : 0;
+  function handleCostoTransporteChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const v = Number(e.target.value);
+    setCostoTransporte(v);
+    setTransporteMazo(parseFloat((v * purosPorMazo).toFixed(2)));
   }
 
+  function handleCostoAlmacenamientoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const v = Number(e.target.value);
+    setCostoAlmacenamiento(v);
+    setAlmacenamientoMazo(parseFloat((v * purosPorMazo).toFixed(2)));
+  }
+
+  // Mazo field handlers — update pieza in sync
   function handleCostoMazoChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const mazo = Number(e.target.value);
-    setCostoMazo(mazo);
-    set('precioBruto', calcMazoPrecioBruto(mazo, transporteMazo, almacenamientoMazo, purosPorMazo));
+    const v = Number(e.target.value);
+    setCostoMazo(v);
+    setPrecioBruto(parseFloat((purosPorMazo > 0 ? v / purosPorMazo : 0).toFixed(4)));
+  }
+
+  function handleTransporteMazoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const v = Number(e.target.value);
+    setTransporteMazo(v);
+    setCostoTransporte(parseFloat((purosPorMazo > 0 ? v / purosPorMazo : 0).toFixed(4)));
+  }
+
+  function handleAlmacenamientoMazoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const v = Number(e.target.value);
+    setAlmacenamientoMazo(v);
+    setCostoAlmacenamiento(parseFloat((purosPorMazo > 0 ? v / purosPorMazo : 0).toFixed(4)));
   }
 
   function handlePurosPorMazoChange(e: React.ChangeEvent<HTMLInputElement>) {
     const qty = Number(e.target.value);
     setPurosPorMazo(qty);
-    set('precioBruto', calcMazoPrecioBruto(costoMazo, transporteMazo, almacenamientoMazo, qty));
-  }
-
-  function handleTransporteMazoChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const transporte = Number(e.target.value);
-    setTransporteMazo(transporte);
-    set('precioBruto', calcMazoPrecioBruto(costoMazo, transporte, almacenamientoMazo, purosPorMazo));
-  }
-
-  function handleAlmacenamientoMazoChange(e: React.ChangeEvent<HTMLInputElement>) {
-    const almacenamiento = Number(e.target.value);
-    setAlmacenamientoMazo(almacenamiento);
-    set('precioBruto', calcMazoPrecioBruto(costoMazo, transporteMazo, almacenamiento, purosPorMazo));
-  }
-
-  function handleCostModeChange(newMode: 'pieza' | 'mazo') {
-    if (newMode === 'mazo' && costMode === 'pieza') {
-      setCostoMazo(parseFloat((values.precioBruto * purosPorMazo).toFixed(2)));
-      setTransporteMazo(parseFloat((values.costoTransporte * purosPorMazo).toFixed(2)));
-      setAlmacenamientoMazo(parseFloat((values.costoAlmacenamiento * purosPorMazo).toFixed(2)));
-    } else if (newMode === 'pieza' && costMode === 'mazo') {
-      setValues((prev) => ({
-        ...prev,
-        precioBruto: parseFloat((purosPorMazo > 0 ? costoMazo / purosPorMazo : 0).toFixed(4)),
-        costoTransporte: parseFloat((purosPorMazo > 0 ? transporteMazo / purosPorMazo : 0).toFixed(4)),
-        costoAlmacenamiento: parseFloat((purosPorMazo > 0 ? almacenamientoMazo / purosPorMazo : 0).toFixed(4)),
-      }));
+    // Derive pieza from mazo when changing qty in mazo mode, else derive mazo from pieza
+    if (costMode === 'mazo') {
+      setPrecioBruto(parseFloat((qty > 0 ? costoMazo / qty : 0).toFixed(4)));
+      setCostoTransporte(parseFloat((qty > 0 ? transporteMazo / qty : 0).toFixed(4)));
+      setCostoAlmacenamiento(parseFloat((qty > 0 ? almacenamientoMazo / qty : 0).toFixed(4)));
+    } else {
+      setCostoMazo(parseFloat((precioBruto * qty).toFixed(2)));
+      setTransporteMazo(parseFloat((costoTransporte * qty).toFixed(2)));
+      setAlmacenamientoMazo(parseFloat((costoAlmacenamiento * qty).toFixed(2)));
     }
-    setCostMode(newMode);
   }
 
   async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-
     setUploading(true);
     try {
       const fd = new FormData();
       fd.append('file', file);
       fd.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!);
-
       const res = await fetch(
         `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
         { method: 'POST', body: fd },
       );
       const data = (await res.json()) as { secure_url?: string; error?: { message: string } };
-
-      if (!res.ok || !data.secure_url) {
-        setError(data.error?.message ?? 'Error al subir imagen');
-        return;
-      }
+      if (!res.ok || !data.secure_url) { setError(data.error?.message ?? 'Error al subir imagen'); return; }
       set('fotoUrl', data.secure_url);
-    } catch {
-      setError('Error de red al subir imagen');
-    } finally {
-      setUploading(false);
-    }
+    } catch { setError('Error de red al subir imagen'); }
+    finally { setUploading(false); }
   }
 
   async function handleLogoUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-
     setUploadingLogo(true);
     try {
       const fd = new FormData();
       fd.append('file', file);
       fd.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET!);
-
       const res = await fetch(
         `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload`,
         { method: 'POST', body: fd },
       );
       const data = (await res.json()) as { secure_url?: string; error?: { message: string } };
-
-      if (!res.ok || !data.secure_url) {
-        setError(data.error?.message ?? 'Error al subir logo');
-        return;
-      }
+      if (!res.ok || !data.secure_url) { setError(data.error?.message ?? 'Error al subir logo'); return; }
       set('logoMarcaUrl', data.secure_url);
-    } catch {
-      setError('Error de red al subir logo');
-    } finally {
-      setUploadingLogo(false);
-    }
+    } catch { setError('Error de red al subir logo'); }
+    finally { setUploadingLogo(false); }
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError('');
     setSaving(true);
-
     try {
       const url = mode === 'create' ? '/api/puros' : `/api/puros/${id}`;
       const method = mode === 'create' ? 'POST' : 'PUT';
 
-      const payload =
-        costMode === 'mazo'
-          ? {
-              ...values,
-              precioBruto: calcMazoPrecioBruto(costoMazo, transporteMazo, almacenamientoMazo, purosPorMazo),
-              costoTransporte: 0,
-              costoAlmacenamiento: 0,
-            }
-          : values;
+      const payload = {
+        ...values,
+        precioBruto,
+        costoTransporte,
+        costoAlmacenamiento,
+        costoMazo,
+        purosPorMazo,
+        transporteMazo,
+        almacenamientoMazo,
+        modoIngreso: costMode,
+      };
 
       const res = await fetch(url, {
         method,
@@ -219,11 +248,8 @@ export default function PuroForm({ mode, id, initialData }: Props) {
 
       router.push('/admin/inventario');
       router.refresh();
-    } catch {
-      setError('Error de red. Intenta de nuevo.');
-    } finally {
-      setSaving(false);
-    }
+    } catch { setError('Error de red. Intenta de nuevo.'); }
+    finally { setSaving(false); }
   }
 
   async function handleDelete() {
@@ -233,65 +259,47 @@ export default function PuroForm({ mode, id, initialData }: Props) {
       await fetch(`/api/puros/${id}`, { method: 'DELETE' });
       router.push('/admin/inventario');
       router.refresh();
-    } catch {
-      setError('Error al eliminar');
-      setDeleting(false);
-    }
+    } catch { setError('Error al eliminar'); setDeleting(false); }
   }
+
+  const summaryDisplay = (
+    <div className={`grid gap-3 rounded-lg border border-border bg-surface-alt p-4 ${isColeccion ? 'grid-cols-1' : 'grid-cols-3'}`}>
+      <div className="flex flex-col gap-0.5">
+        <p className="text-xs text-text-muted">Costo total unitario</p>
+        <p className="text-sm font-bold text-text">${costoTotalUnitario.toFixed(2)}</p>
+      </div>
+      {!isColeccion && (
+        <>
+          <div className="flex flex-col gap-0.5">
+            <p className="text-xs text-text-muted">Ganancia</p>
+            <p className={`text-sm font-bold ${ganancia >= 0 ? 'text-secondary' : 'text-red-400'}`}>
+              ${ganancia.toFixed(2)}
+            </p>
+          </div>
+          <div className="flex flex-col gap-0.5">
+            <p className="text-xs text-text-muted">Margen</p>
+            <p className={`text-sm font-bold ${margen >= 0 ? 'text-secondary' : 'text-red-400'}`}>
+              {margen.toFixed(1)}%
+            </p>
+          </div>
+        </>
+      )}
+    </div>
+  );
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-8">
       {/* Identificación */}
       <section className="flex flex-col gap-4">
-        <h2 className="text-xs font-semibold text-text-muted uppercase tracking-wider">
-          Identificación
-        </h2>
+        <h2 className="text-xs font-semibold text-text-muted uppercase tracking-wider">Identificación</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Input
-            label="Nombre"
-            value={values.nombre}
-            onChange={(e) => set('nombre', e.target.value)}
-            required
-          />
-          <Input
-            label="Marca"
-            value={values.marca}
-            onChange={(e) => set('marca', e.target.value)}
-            required
-          />
-          <Input
-            label="Vitola"
-            value={values.vitola}
-            onChange={(e) => set('vitola', e.target.value)}
-            required
-          />
-          <Input
-            label="País de origen"
-            value={values.paisOrigen}
-            onChange={(e) => set('paisOrigen', e.target.value)}
-            required
-          />
-          <Input
-            label="Ring gauge"
-            type="number"
-            min={0}
-            value={values.ringGauge}
-            onChange={numericSet('ringGauge')}
-            required
-          />
-          <Input
-            label="Largo (mm)"
-            type="number"
-            min={0}
-            value={values.largo}
-            onChange={numericSet('largo')}
-            required
-          />
-          <Select
-            label="Fortaleza"
-            value={values.fortaleza ?? ''}
-            onChange={(e) => set('fortaleza', e.target.value)}
-          >
+          <Input label="Nombre" value={values.nombre} onChange={(e) => set('nombre', e.target.value)} required />
+          <Input label="Marca" value={values.marca} onChange={(e) => set('marca', e.target.value)} required />
+          <Input label="Vitola" value={values.vitola} onChange={(e) => set('vitola', e.target.value)} required />
+          <Input label="País de origen" value={values.paisOrigen} onChange={(e) => set('paisOrigen', e.target.value)} required />
+          <Input label="Ring gauge" type="number" min={0} value={values.ringGauge} onChange={(e) => set('ringGauge', Number(e.target.value))} required />
+          <Input label="Largo (mm)" type="number" min={0} value={values.largo} onChange={(e) => set('largo', Number(e.target.value))} required />
+          <Select label="Fortaleza" value={values.fortaleza ?? ''} onChange={(e) => set('fortaleza', e.target.value)}>
             <option value="">Sin especificar</option>
             <option value="Suave">Suave</option>
             <option value="Media">Media</option>
@@ -302,32 +310,26 @@ export default function PuroForm({ mode, id, initialData }: Props) {
 
       {/* Costos y precio */}
       <section className="flex flex-col gap-4">
-        <h2 className="text-xs font-semibold text-text-muted uppercase tracking-wider">
-          Costos y precio
-        </h2>
+        <h2 className="text-xs font-semibold text-text-muted uppercase tracking-wider">Costos y precio</h2>
 
-        {/* Toggle mazo/pieza */}
+        {/* Tab toggle */}
         <div className="flex items-center gap-3">
           <span className="text-sm text-text-muted">Ingresar costo por:</span>
           <div className="flex rounded-lg border border-border overflow-hidden text-sm">
             <button
               type="button"
-              onClick={() => handleCostModeChange('pieza')}
+              onClick={() => setCostMode('pieza')}
               className={`px-4 py-1.5 transition-colors ${
-                costMode === 'pieza'
-                  ? 'bg-secondary text-white font-medium'
-                  : 'bg-surface text-text hover:bg-surface-alt'
+                costMode === 'pieza' ? 'bg-secondary text-white font-medium' : 'bg-surface text-text hover:bg-surface-alt'
               }`}
             >
               Pieza
             </button>
             <button
               type="button"
-              onClick={() => handleCostModeChange('mazo')}
+              onClick={() => setCostMode('mazo')}
               className={`px-4 py-1.5 transition-colors border-l border-border ${
-                costMode === 'mazo'
-                  ? 'bg-secondary text-white font-medium'
-                  : 'bg-surface text-text hover:bg-surface-alt'
+                costMode === 'mazo' ? 'bg-secondary text-white font-medium' : 'bg-surface text-text hover:bg-surface-alt'
               }`}
             >
               Mazo
@@ -335,149 +337,119 @@ export default function PuroForm({ mode, id, initialData }: Props) {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {costMode === 'pieza' ? (
+        {costMode === 'pieza' ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <Input
               label="Costo unitario ($)"
-              type="number"
-              min={0}
-              step="0.01"
-              value={values.precioBruto}
-              onChange={numericSet('precioBruto')}
+              type="number" min={0} step="0.01"
+              value={precioBruto}
+              onChange={handlePrecioBrutoChange}
               required
             />
-          ) : (
-            <>
-              <Input
-                label="Costo total del mazo ($)"
-                type="number"
-                min={0}
-                step="0.01"
-                value={costoMazo}
-                onChange={handleCostoMazoChange}
-                required
-              />
-              <Input
-                label="Puros por mazo"
-                type="number"
-                min={1}
-                value={purosPorMazo}
-                onChange={handlePurosPorMazoChange}
-                required
-              />
-              <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-text-muted">Costo unitario calculado</label>
-                <div className="px-3 py-2 rounded-lg border border-border bg-surface-alt text-sm text-text font-medium">
-                  ${purosPorMazo > 0 ? calcMazoPrecioBruto(costoMazo, transporteMazo, almacenamientoMazo, purosPorMazo).toFixed(2) : '0.00'}
-                </div>
-              </div>
-            </>
-          )}
-
-          <Input
-            label={costMode === 'mazo' ? 'Transporte del mazo ($)' : 'Costo transporte ($)'}
-            type="number"
-            min={0}
-            step="0.01"
-            value={costMode === 'mazo' ? transporteMazo : values.costoTransporte}
-            onChange={costMode === 'mazo' ? handleTransporteMazoChange : numericSet('costoTransporte')}
-            required
-          />
-          <Input
-            label={costMode === 'mazo' ? 'Almacenamiento del mazo ($)' : 'Costo almacenamiento ($)'}
-            type="number"
-            min={0}
-            step="0.01"
-            value={costMode === 'mazo' ? almacenamientoMazo : values.costoAlmacenamiento}
-            onChange={costMode === 'mazo' ? handleAlmacenamientoMazoChange : numericSet('costoAlmacenamiento')}
-            required
-          />
-          {!isColeccion && (
             <Input
-              label="Precio de venta ($)"
-              type="number"
-              min={0}
-              step="0.01"
-              value={values.precioVenta}
-              onChange={numericSet('precioVenta')}
+              label="Costo transporte ($)"
+              type="number" min={0} step="0.01"
+              value={costoTransporte}
+              onChange={handleCostoTransporteChange}
               required
             />
-          )}
-        </div>
-
-        {/* Costo total visible siempre; ganancia/margen solo para negocio */}
-        {costoTotal > 0 && (
-          <div className={`grid gap-3 rounded-lg border border-border bg-surface-alt p-4 ${isColeccion ? 'grid-cols-1' : 'grid-cols-3'}`}>
-            <div className="flex flex-col gap-0.5">
-              <p className="text-xs text-text-muted">Costo total unitario</p>
-              <p className="text-sm font-bold text-text">${costoTotal.toFixed(2)}</p>
+            <Input
+              label="Costo almacenamiento ($)"
+              type="number" min={0} step="0.01"
+              value={costoAlmacenamiento}
+              onChange={handleCostoAlmacenamientoChange}
+              required
+            />
+            {!isColeccion && (
+              <Input
+                label="Precio de venta ($)"
+                type="number" min={0} step="0.01"
+                value={values.precioVenta}
+                onChange={(e) => set('precioVenta', Number(e.target.value))}
+                required
+              />
+            )}
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <Input
+              label="Costo total del mazo ($)"
+              type="number" min={0} step="0.01"
+              value={costoMazo}
+              onChange={handleCostoMazoChange}
+              required
+            />
+            <Input
+              label="Puros por mazo"
+              type="number" min={1}
+              value={purosPorMazo}
+              onChange={handlePurosPorMazoChange}
+              required
+            />
+            <Input
+              label="Transporte del mazo ($)"
+              type="number" min={0} step="0.01"
+              value={transporteMazo}
+              onChange={handleTransporteMazoChange}
+              required
+            />
+            <Input
+              label="Almacenamiento del mazo ($)"
+              type="number" min={0} step="0.01"
+              value={almacenamientoMazo}
+              onChange={handleAlmacenamientoMazoChange}
+              required
+            />
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium text-text-muted">Costo unitario calculado</label>
+              <div className="px-3 py-2 rounded-lg border border-border bg-surface-alt text-sm text-text font-medium">
+                ${costoUnitarioFromMazo.toFixed(4)}
+              </div>
             </div>
             {!isColeccion && (
-              <>
-                <div className="flex flex-col gap-0.5">
-                  <p className="text-xs text-text-muted">Ganancia</p>
-                  <p className={`text-sm font-bold ${gananciaCalc >= 0 ? 'text-secondary' : 'text-red-400'}`}>
-                    ${gananciaCalc.toFixed(2)}
-                  </p>
-                </div>
-                <div className="flex flex-col gap-0.5">
-                  <p className="text-xs text-text-muted">Margen</p>
-                  <p className={`text-sm font-bold ${margenCalc >= 0 ? 'text-secondary' : 'text-red-400'}`}>
-                    {margenCalc.toFixed(1)}%
-                  </p>
-                </div>
-              </>
+              <Input
+                label="Precio de venta ($)"
+                type="number" min={0} step="0.01"
+                value={values.precioVenta}
+                onChange={(e) => set('precioVenta', Number(e.target.value))}
+                required
+              />
             )}
           </div>
         )}
+
+        {costoTotalUnitario > 0 && summaryDisplay}
       </section>
 
       {/* Estado y añejamiento */}
       <section className="flex flex-col gap-4">
-        <h2 className="text-xs font-semibold text-text-muted uppercase tracking-wider">
-          Estado y añejamiento
-        </h2>
+        <h2 className="text-xs font-semibold text-text-muted uppercase tracking-wider">Estado y añejamiento</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Select
-            label="Estado"
-            value={values.estado}
-            onChange={(e) => set('estado', e.target.value as FormValues['estado'])}
-            required
-          >
+          <Select label="Estado" value={values.estado} onChange={(e) => set('estado', e.target.value as typeof values.estado)} required>
             <option value="negocio">Negocio</option>
             <option value="coleccion_personal">Colección personal</option>
           </Select>
-          <Input
-            label="Fecha de llegada"
-            type="date"
-            value={values.fechaLlegada}
-            onChange={(e) => set('fechaLlegada', e.target.value)}
-            required
-          />
+          <Input label="Fecha de llegada" type="date" value={values.fechaLlegada} onChange={(e) => set('fechaLlegada', e.target.value)} required />
           <Input
             label={`Añejamiento (meses)${values.fechaLlegada ? ' — calculado' : ''}`}
-            type="number"
-            min={0}
+            type="number" min={0}
             value={values.tiempoAnejamiento}
-            onChange={numericSet('tiempoAnejamiento')}
+            onChange={(e) => set('tiempoAnejamiento', Number(e.target.value))}
             readOnly={!!values.fechaLlegada}
             required
           />
         </div>
       </section>
 
-      {/* Stock */}
+      {/* Inventario */}
       <section className="flex flex-col gap-4">
-        <h2 className="text-xs font-semibold text-text-muted uppercase tracking-wider">
-          Inventario
-        </h2>
+        <h2 className="text-xs font-semibold text-text-muted uppercase tracking-wider">Inventario</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <Input
             label="Stock disponible"
-            type="number"
-            min={0}
+            type="number" min={0}
             value={values.stock}
-            onChange={numericSet('stock')}
+            onChange={(e) => set('stock', Number(e.target.value))}
             required
           />
         </div>
@@ -499,35 +471,16 @@ export default function PuroForm({ mode, id, initialData }: Props) {
 
       {/* Humedad */}
       <section className="flex flex-col gap-4">
-        <h2 className="text-xs font-semibold text-text-muted uppercase tracking-wider">
-          Humedad
-        </h2>
+        <h2 className="text-xs font-semibold text-text-muted uppercase tracking-wider">Humedad</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <Input
-            label="Humedad (%)"
-            type="number"
-            min={0}
-            max={100}
-            step="0.1"
-            value={values.humedad}
-            onChange={numericSet('humedad')}
-            required
-          />
-          <Input
-            label="Fecha revisión humedad"
-            type="date"
-            value={values.fechaRevisionHumedad}
-            onChange={(e) => set('fechaRevisionHumedad', e.target.value)}
-            required
-          />
+          <Input label="Humedad (%)" type="number" min={0} max={100} step="0.1" value={values.humedad} onChange={(e) => set('humedad', Number(e.target.value))} required />
+          <Input label="Fecha revisión humedad" type="date" value={values.fechaRevisionHumedad} onChange={(e) => set('fechaRevisionHumedad', e.target.value)} required />
         </div>
       </section>
 
       {/* Foto y notas */}
       <section className="flex flex-col gap-4">
-        <h2 className="text-xs font-semibold text-text-muted uppercase tracking-wider">
-          Foto y notas
-        </h2>
+        <h2 className="text-xs font-semibold text-text-muted uppercase tracking-wider">Foto y notas</h2>
         <div className="flex flex-col gap-3">
           {values.fotoUrl && (
             <div className="relative h-48 w-48 rounded-lg overflow-hidden border border-border bg-white">
@@ -536,13 +489,8 @@ export default function PuroForm({ mode, id, initialData }: Props) {
           )}
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-text-muted">Foto</label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-              disabled={uploading}
-              className="text-sm text-text-muted file:mr-3 file:rounded-lg file:border file:border-border file:bg-surface file:px-3 file:py-1 file:text-sm file:text-text file:cursor-pointer hover:file:border-secondary/60 disabled:opacity-50"
-            />
+            <input type="file" accept="image/*" onChange={handleImageUpload} disabled={uploading}
+              className="text-sm text-text-muted file:mr-3 file:rounded-lg file:border file:border-border file:bg-surface file:px-3 file:py-1 file:text-sm file:text-text file:cursor-pointer hover:file:border-secondary/60 disabled:opacity-50" />
             {uploading && <p className="text-xs text-text-muted">Subiendo imagen...</p>}
           </div>
 
@@ -553,13 +501,8 @@ export default function PuroForm({ mode, id, initialData }: Props) {
           )}
           <div className="flex flex-col gap-1.5">
             <label className="text-sm font-medium text-text-muted">Logo de marca</label>
-            <input
-              type="file"
-              accept="image/*"
-              onChange={handleLogoUpload}
-              disabled={uploadingLogo}
-              className="text-sm text-text-muted file:mr-3 file:rounded-lg file:border file:border-border file:bg-surface file:px-3 file:py-1 file:text-sm file:text-text file:cursor-pointer hover:file:border-secondary/60 disabled:opacity-50"
-            />
+            <input type="file" accept="image/*" onChange={handleLogoUpload} disabled={uploadingLogo}
+              className="text-sm text-text-muted file:mr-3 file:rounded-lg file:border file:border-border file:bg-surface file:px-3 file:py-1 file:text-sm file:text-text file:cursor-pointer hover:file:border-secondary/60 disabled:opacity-50" />
             {uploadingLogo && <p className="text-xs text-text-muted">Subiendo logo...</p>}
           </div>
 
@@ -587,12 +530,7 @@ export default function PuroForm({ mode, id, initialData }: Props) {
           <span />
         )}
         <div className="flex items-center gap-3">
-          <Button
-            type="button"
-            variant="secondary"
-            size="md"
-            onClick={() => router.push('/admin/inventario')}
-          >
+          <Button type="button" variant="secondary" size="md" onClick={() => router.push('/admin/inventario')}>
             Cancelar
           </Button>
           <Button type="submit" variant="primary" size="md" loading={saving}>

@@ -39,6 +39,11 @@ function rowToPuro(row: string[]): Puro {
     stock: row[20] !== undefined && row[20] !== '' ? parseInt(row[20]) : 0,
     fortaleza: row[21] || undefined,
     logoMarcaUrl: row[22] || undefined,
+    costoMazo: row[23] !== undefined && row[23] !== '' ? parseFloat(row[23]) : undefined,
+    purosPorMazo: row[24] !== undefined && row[24] !== '' ? parseInt(row[24]) : undefined,
+    transporteMazo: row[25] !== undefined && row[25] !== '' ? parseFloat(row[25]) : undefined,
+    almacenamientoMazo: row[26] !== undefined && row[26] !== '' ? parseFloat(row[26]) : undefined,
+    modoIngreso: (row[27] === 'mazo' || row[27] === 'pieza') ? row[27] : undefined,
     createdAt: row[18]!,
     updatedAt: row[19]!,
   };
@@ -69,13 +74,18 @@ function puroToRow(puro: Puro): (string | number)[] {
     puro.stock ?? 0,
     puro.fortaleza ?? '',
     puro.logoMarcaUrl ?? '',
+    puro.costoMazo ?? '',
+    puro.purosPorMazo ?? '',
+    puro.transporteMazo ?? '',
+    puro.almacenamientoMazo ?? '',
+    puro.modoIngreso ?? '',
   ];
 }
 
 export async function getPuros(): Promise<Puro[]> {
   const response = await sheets.spreadsheets.values.get({
     spreadsheetId: SPREADSHEET_ID,
-    range: 'Inventario!A2:W',
+    range: 'Inventario!A2:AB',
   });
 
   const rows = (response.data.values ?? []) as string[][];
@@ -91,7 +101,7 @@ export async function createPuro(
 
   await sheets.spreadsheets.values.append({
     spreadsheetId: SPREADSHEET_ID,
-    range: 'Inventario!A:W',
+    range: 'Inventario!A:AB',
     valueInputOption: 'USER_ENTERED',
     requestBody: { values: [puroToRow(full)] },
   });
@@ -112,7 +122,7 @@ export async function updatePuro(id: string, updates: Partial<Puro>): Promise<vo
 
   await sheets.spreadsheets.values.update({
     spreadsheetId: SPREADSHEET_ID,
-    range: `Inventario!A${index + 2}:W${index + 2}`,
+    range: `Inventario!A${index + 2}:AB${index + 2}`,
     valueInputOption: 'USER_ENTERED',
     requestBody: { values: [puroToRow(updated)] },
   });
@@ -356,7 +366,7 @@ export async function actualizarStockMultiple(
 
       return sheets.spreadsheets.values.update({
         spreadsheetId: SPREADSHEET_ID,
-        range: `Inventario!A${index + 2}:U${index + 2}`,
+        range: `Inventario!A${index + 2}:AB${index + 2}`,
         valueInputOption: 'USER_ENTERED',
         requestBody: { values: [puroToRow(updated)] },
       });

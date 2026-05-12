@@ -20,6 +20,11 @@ export interface Puro {
   notasCata?: string;
   stock: number;
   fortaleza?: string;
+  costoMazo?: number;
+  purosPorMazo?: number;
+  transporteMazo?: number;
+  almacenamientoMazo?: number;
+  modoIngreso?: 'pieza' | 'mazo';
   createdAt: string;
   updatedAt: string;
 }
