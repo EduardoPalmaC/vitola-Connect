@@ -69,8 +69,11 @@ export default function PuroForm({ mode, id, initialData }: Props) {
     set('tiempoAnejamiento', Math.max(0, meses));
   }, [values.fechaLlegada]);
 
-  // Live cost calculations
-  const costoTotal = values.precioBruto + values.costoTransporte + values.costoAlmacenamiento;
+  // Live cost calculations (mode-aware to avoid double-counting in mazo)
+  const costoTotal =
+    costMode === 'mazo'
+      ? calcMazoPrecioBruto(costoMazo, transporteMazo, almacenamientoMazo, purosPorMazo)
+      : values.precioBruto + values.costoTransporte + values.costoAlmacenamiento;
   const gananciaCalc = values.precioVenta - costoTotal;
   const margenCalc = costoTotal > 0 ? (gananciaCalc / costoTotal) * 100 : 0;
 
@@ -111,8 +114,20 @@ export default function PuroForm({ mode, id, initialData }: Props) {
     set('precioBruto', calcMazoPrecioBruto(costoMazo, transporteMazo, almacenamiento, purosPorMazo));
   }
 
-  function handleCostModeChange(mode: 'pieza' | 'mazo') {
-    setCostMode(mode);
+  function handleCostModeChange(newMode: 'pieza' | 'mazo') {
+    if (newMode === 'mazo' && costMode === 'pieza') {
+      setCostoMazo(parseFloat((values.precioBruto * purosPorMazo).toFixed(2)));
+      setTransporteMazo(parseFloat((values.costoTransporte * purosPorMazo).toFixed(2)));
+      setAlmacenamientoMazo(parseFloat((values.costoAlmacenamiento * purosPorMazo).toFixed(2)));
+    } else if (newMode === 'pieza' && costMode === 'mazo') {
+      setValues((prev) => ({
+        ...prev,
+        precioBruto: parseFloat((purosPorMazo > 0 ? costoMazo / purosPorMazo : 0).toFixed(4)),
+        costoTransporte: parseFloat((purosPorMazo > 0 ? transporteMazo / purosPorMazo : 0).toFixed(4)),
+        costoAlmacenamiento: parseFloat((purosPorMazo > 0 ? almacenamientoMazo / purosPorMazo : 0).toFixed(4)),
+      }));
+    }
+    setCostMode(newMode);
   }
 
   async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
