@@ -97,7 +97,6 @@ export default function PuroForm({ mode, id, initialData }: Props) {
     const qty = Number(e.target.value);
     setPurosPorMazo(qty);
     set('precioBruto', calcMazoPrecioBruto(costoMazo, transporteMazo, almacenamientoMazo, qty));
-    set('stock', qty);
   }
 
   function handleTransporteMazoChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -467,10 +466,19 @@ export default function PuroForm({ mode, id, initialData }: Props) {
             required
           />
         </div>
-        {costMode === 'mazo' && (
-          <p className="text-xs text-text-muted -mt-2">
-            Sugerido automáticamente según los puros por mazo.
-          </p>
+        {costMode === 'mazo' && purosPorMazo > 0 && (
+          <div className="flex items-center gap-2 -mt-2">
+            <p className="text-xs text-text-muted">
+              Recomendado basado en puros por mazo: <span className="font-medium text-text">{purosPorMazo}</span>
+            </p>
+            <button
+              type="button"
+              onClick={() => set('stock', purosPorMazo)}
+              className="text-xs px-2 py-0.5 rounded border border-secondary/60 text-secondary hover:bg-secondary/10 transition-colors"
+            >
+              Usar
+            </button>
+          </div>
         )}
       </section>
 
