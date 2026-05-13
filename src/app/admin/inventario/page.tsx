@@ -8,10 +8,10 @@ export default async function InventarioPage() {
   const puros = await getPuros();
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#F2EDE4' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#F9F6F0' }}>
       <header
         className="px-6 py-5 flex items-center justify-between"
-        style={{ borderBottom: '1px solid #E2D9C8', backgroundColor: '#FFFDF8' }}
+        style={{ borderBottom: '1px solid #E2D9C8', backgroundColor: '#F9F6F0' }}
       >
         <div>
           <h1

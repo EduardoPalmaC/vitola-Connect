@@ -19,17 +19,17 @@ const col = createColumnHelper<Puro>();
 
 const labelStyle: React.CSSProperties = {
   fontFamily: 'var(--font-code)',
-  fontSize: '9px',
+  fontSize: '10px',
   fontWeight: 600,
-  letterSpacing: '0.28em',
+  letterSpacing: '0.12em',
   textTransform: 'uppercase' as const,
-  color: '#9A8572',
+  color: '#6B7280',
 };
 
 const cellStyle: React.CSSProperties = {
   fontFamily: 'var(--font-code)',
   fontSize: '13px',
-  color: '#4A3728',
+  color: '#1F2937',
 };
 
 const baseColumns = [
@@ -38,7 +38,7 @@ const baseColumns = [
     cell: (info) => (
       <Link
         href={`/admin/inventario/${info.row.original.id}`}
-        style={{ fontFamily: 'var(--font-serif)', fontSize: '15px', color: '#5C3D1E', fontWeight: 500 }}
+        style={{ fontFamily: 'var(--font-serif)', fontSize: '14px', color: '#2C1E1A', fontWeight: 500 }}
         className="hover:opacity-70 transition-opacity"
       >
         {info.getValue()}
@@ -58,9 +58,9 @@ const baseColumns = [
     cell: (info) => {
       const stock = info.getValue();
       const color =
-        stock === 0 ? '#C0392B' : stock <= 3 ? '#9B7840' : '#9A8572';
+        stock === 0 ? '#DC2626' : stock <= 3 ? '#B45309' : '#374151';
       return (
-        <span style={{ fontFamily: 'var(--font-code)', fontSize: '13px', fontWeight: 600, tabularNums: true, color } as React.CSSProperties}>
+        <span style={{ fontFamily: 'var(--font-code)', fontSize: '13px', fontWeight: 600, color } as React.CSSProperties}>
           {stock}
         </span>
       );
@@ -73,7 +73,7 @@ const baseColumns = [
     cell: (info) => (
       <Link
         href={`/admin/inventario/${info.row.original.id}`}
-        style={{ fontFamily: 'var(--font-code)', fontSize: '11px', color: '#9B7840', letterSpacing: '0.06em' }}
+        style={{ fontFamily: 'var(--font-code)', fontSize: '11px', color: '#5C3D1E', letterSpacing: '0.06em' }}
         className="hover:opacity-70 transition-opacity"
       >
         Editar →
@@ -88,7 +88,7 @@ const negocioColumns = [
     cell: (info) => (
       <Link
         href={`/admin/inventario/${info.row.original.id}`}
-        style={{ fontFamily: 'var(--font-serif)', fontSize: '15px', color: '#5C3D1E', fontWeight: 500 }}
+        style={{ fontFamily: 'var(--font-serif)', fontSize: '14px', color: '#2C1E1A', fontWeight: 500 }}
         className="hover:opacity-70 transition-opacity"
       >
         {info.getValue()}
@@ -117,7 +117,7 @@ const negocioColumns = [
     cell: (info) => {
       const stock = info.getValue();
       const color =
-        stock === 0 ? '#C0392B' : stock <= 3 ? '#9B7840' : '#9A8572';
+        stock === 0 ? '#DC2626' : stock <= 3 ? '#B45309' : '#374151';
       return (
         <span style={{ fontFamily: 'var(--font-code)', fontSize: '13px', fontWeight: 600, color } as React.CSSProperties}>
           {stock}
@@ -132,7 +132,7 @@ const negocioColumns = [
     cell: (info) => (
       <Link
         href={`/admin/inventario/${info.row.original.id}`}
-        style={{ fontFamily: 'var(--font-code)', fontSize: '11px', color: '#9B7840', letterSpacing: '0.06em' }}
+        style={{ fontFamily: 'var(--font-code)', fontSize: '11px', color: '#5C3D1E', letterSpacing: '0.06em' }}
         className="hover:opacity-70 transition-opacity"
       >
         Editar →
@@ -166,19 +166,19 @@ function PurosTable({
 
   return (
     <div className="flex flex-col gap-2">
-      <div style={{ backgroundColor: '#FFFDF8', border: '1px solid #E2D9C8', borderRadius: '6px', overflowX: 'auto', boxShadow: '0 8px 24px rgba(44,30,20,0.06)' }}>
+      <div style={{ backgroundColor: '#FFFFFF', border: '1px solid #E5E7EB', borderRadius: '4px', overflowX: 'auto' }}>
         <table className="w-full text-sm">
           <thead>
             {table.getHeaderGroups().map((hg) => (
-              <tr key={hg.id} style={{ borderBottom: '1px solid #E2D9C8', backgroundColor: '#F5EDD8' }}>
+              <tr key={hg.id} style={{ borderBottom: '1px solid #E5E7EB', backgroundColor: '#FFFFFF' }}>
                 {hg.headers.map((header) => (
                   <th
                     key={header.id}
-                    className="px-4 py-3 text-left whitespace-nowrap"
+                    className="px-4 py-2 text-left whitespace-nowrap"
                     style={{ ...labelStyle, cursor: header.column.getCanSort() ? 'pointer' : 'default' }}
                     onClick={header.column.getToggleSortingHandler()}
-                    onMouseEnter={(e) => { if (header.column.getCanSort()) (e.currentTarget as HTMLElement).style.color = '#9B7840'; }}
-                    onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = '#9A8572'; }}
+                    onMouseEnter={(e) => { if (header.column.getCanSort()) (e.currentTarget as HTMLElement).style.color = '#374151'; }}
+                    onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = '#6B7280'; }}
                   >
                     {flexRender(header.column.columnDef.header, header.getContext())}
                     {header.column.getIsSorted() === 'asc' && ' ↑'}
@@ -193,23 +193,23 @@ function PurosTable({
               <tr>
                 <td
                   colSpan={columns.length}
-                  className="px-4 py-12 text-center"
-                  style={{ fontFamily: 'var(--font-code)', fontSize: '12px', color: '#9A8572' }}
+                  className="px-4 py-10 text-center"
+                  style={{ fontFamily: 'var(--font-code)', fontSize: '12px', color: '#9CA3AF' }}
                 >
                   {emptyText}
                 </td>
               </tr>
             ) : (
-              table.getRowModel().rows.map((row) => (
+              table.getRowModel().rows.map((row, idx) => (
                 <tr
                   key={row.id}
                   className="transition-colors"
-                  style={{ borderBottom: '1px solid #E2D9C8' }}
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = '#EDE5D5'; }}
-                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = 'transparent'; }}
+                  style={{ borderBottom: '1px solid #F3F4F6', backgroundColor: idx % 2 === 1 ? '#FAFAFA' : '#FFFFFF' }}
+                  onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = '#F3F4F6'; }}
+                  onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = idx % 2 === 1 ? '#FAFAFA' : '#FFFFFF'; }}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id} className="px-4 py-3 whitespace-nowrap" style={cellStyle}>
+                    <td key={cell.id} className="px-4 py-2 whitespace-nowrap" style={cellStyle}>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </td>
                   ))}
@@ -219,7 +219,7 @@ function PurosTable({
           </tbody>
         </table>
       </div>
-      <p style={{ fontFamily: 'var(--font-code)', fontSize: '10px', color: '#9A8572', letterSpacing: '0.12em' }}>
+      <p style={{ fontFamily: 'var(--font-code)', fontSize: '10px', color: '#9CA3AF', letterSpacing: '0.12em' }}>
         {table.getFilteredRowModel().rows.length} DE {data.length} PUROS
       </p>
     </div>
@@ -242,17 +242,17 @@ export default function InventarioTable({ puros: initialPuros }: { puros: Puro[]
           onChange={(e) => setGlobalFilter(e.target.value)}
           style={{
             width: '100%',
-            padding: '8px 12px',
-            borderRadius: '6px',
-            border: '1px solid #E2D9C8',
-            backgroundColor: '#FFFDF8',
-            color: '#4A3728',
+            padding: '7px 12px',
+            borderRadius: '4px',
+            border: '1px solid #D1D5DB',
+            backgroundColor: '#FFFFFF',
+            color: '#111827',
             fontFamily: 'var(--font-code)',
             fontSize: '13px',
             outline: 'none',
           }}
-          onFocus={(e) => { (e.target as HTMLElement).style.borderColor = '#9B7840'; }}
-          onBlur={(e) => { (e.target as HTMLElement).style.borderColor = '#E2D9C8'; }}
+          onFocus={(e) => { (e.target as HTMLElement).style.borderColor = '#5C3D1E'; }}
+          onBlur={(e) => { (e.target as HTMLElement).style.borderColor = '#D1D5DB'; }}
         />
       </div>
 
