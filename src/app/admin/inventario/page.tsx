@@ -35,10 +35,8 @@ export default async function InventarioPage() {
         <div className="flex items-center gap-3">
           <Link
             href="/admin/dashboard"
-            className="transition-colors"
+            className="transition-colors hover:opacity-70"
             style={{ fontSize: '13px', color: '#9A8572', fontFamily: 'var(--font-code)' }}
-            onMouseEnter={(e) => ((e.target as HTMLElement).style.color = '#9B7840')}
-            onMouseLeave={(e) => ((e.target as HTMLElement).style.color = '#9A8572')}
           >
             Dashboard
           </Link>
