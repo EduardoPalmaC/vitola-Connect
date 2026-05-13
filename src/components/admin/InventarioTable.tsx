@@ -28,8 +28,8 @@ const labelStyle: React.CSSProperties = {
 
 const cellStyle: React.CSSProperties = {
   fontFamily: 'var(--font-code)',
-  fontSize: '13px',
-  color: '#1F2937',
+  fontSize: '12px',
+  color: '#6B7280',
 };
 
 const baseColumns = [
@@ -38,7 +38,7 @@ const baseColumns = [
     cell: (info) => (
       <Link
         href={`/admin/inventario/${info.row.original.id}`}
-        style={{ fontFamily: 'var(--font-serif)', fontSize: '14px', color: '#2C1E1A', fontWeight: 500 }}
+        style={{ fontFamily: 'var(--font-serif)', fontSize: '15px', color: '#2C1810', fontWeight: 700 }}
         className="hover:opacity-70 transition-opacity"
       >
         {info.getValue()}
@@ -88,7 +88,7 @@ const negocioColumns = [
     cell: (info) => (
       <Link
         href={`/admin/inventario/${info.row.original.id}`}
-        style={{ fontFamily: 'var(--font-serif)', fontSize: '14px', color: '#2C1E1A', fontWeight: 500 }}
+        style={{ fontFamily: 'var(--font-serif)', fontSize: '15px', color: '#2C1810', fontWeight: 700 }}
         className="hover:opacity-70 transition-opacity"
       >
         {info.getValue()}
