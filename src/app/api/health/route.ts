@@ -75,7 +75,10 @@ export async function GET() {
         body: new URLSearchParams({ grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer', assertion: jwt2 }),
       });
       const { access_token } = await r2.json() as { access_token: string };
-      const sheets = google.sheets({ version: 'v4', auth: access_token });
+      const { OAuth2Client: OA2 } = await import('google-auth-library');
+      const oa2 = new OA2();
+      oa2.setCredentials({ access_token });
+      const sheets = google.sheets({ version: 'v4', auth: oa2 });
       const resp = await sheets.spreadsheets.values.get({
         spreadsheetId: sheetsId,
         range: 'Inventario!A1:A2',

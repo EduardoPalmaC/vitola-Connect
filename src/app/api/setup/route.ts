@@ -1,4 +1,5 @@
 import { google } from 'googleapis';
+import { OAuth2Client } from 'google-auth-library';
 import { SignJWT, importPKCS8 } from 'jose';
 import { NextResponse } from 'next/server';
 
@@ -51,8 +52,9 @@ const CATAS_HEADERS = [
 ];
 
 export async function GET() {
-  const token = await getAccessToken();
-  const sheets = google.sheets({ version: 'v4', auth: token });
+  const oauth2 = new OAuth2Client();
+  oauth2.setCredentials({ access_token: await getAccessToken() });
+  const sheets = google.sheets({ version: 'v4', auth: oauth2 });
 
   const meta = await sheets.spreadsheets.get({ spreadsheetId: SPREADSHEET_ID });
   const existingSheets = meta.data.sheets ?? [];

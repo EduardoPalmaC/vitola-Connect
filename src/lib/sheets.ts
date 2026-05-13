@@ -1,4 +1,5 @@
 import { google } from 'googleapis';
+import { OAuth2Client } from 'google-auth-library';
 import { SignJWT, importPKCS8 } from 'jose';
 import type { Puro, Venta, Cata } from '@/types';
 
@@ -39,7 +40,9 @@ async function getAccessToken(): Promise<string> {
 }
 
 async function getSheets() {
-  return google.sheets({ version: 'v4', auth: await getAccessToken() });
+  const oauth2 = new OAuth2Client();
+  oauth2.setCredentials({ access_token: await getAccessToken() });
+  return google.sheets({ version: 'v4', auth: oauth2 });
 }
 
 function rowToPuro(row: string[]): Puro {
