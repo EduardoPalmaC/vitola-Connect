@@ -90,5 +90,15 @@ export async function GET() {
   }
   checks['sheets_read'] = sheetsResult;
 
+  let getPurosResult = 'not tested';
+  try {
+    const { getPuros } = await import('@/lib/sheets');
+    const puros = await getPuros();
+    getPurosResult = `OK - ${puros.length} puros`;
+  } catch (e) {
+    getPurosResult = `ERROR: ${e instanceof Error ? e.message : String(e)}`;
+  }
+  checks['getPuros'] = getPurosResult;
+
   return NextResponse.json(checks);
 }
