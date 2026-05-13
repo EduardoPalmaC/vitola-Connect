@@ -1,20 +1,44 @@
 import { google } from 'googleapis';
+import { SignJWT, importPKCS8 } from 'jose';
 import type { Puro, Venta, Cata } from '@/types';
 
-const auth = new google.auth.GoogleAuth({
-  credentials: {
-    type: 'service_account',
-    project_id: process.env.GOOGLE_PROJECT_ID,
-    private_key_id: process.env.GOOGLE_PRIVATE_KEY_ID,
-    private_key: (process.env.GOOGLE_PRIVATE_KEY ?? '').replace(/\\n/g, '\n'),
-    client_email: process.env.GOOGLE_CLIENT_EMAIL,
-    client_id: process.env.GOOGLE_CLIENT_ID,
-  },
-  scopes: ['https://www.googleapis.com/auth/spreadsheets'],
-});
-
-const sheets = google.sheets({ version: 'v4', auth });
 const SPREADSHEET_ID = process.env.GOOGLE_SHEETS_ID!;
+
+let cachedToken: { value: string; expiresAt: number } | null = null;
+
+async function getAccessToken(): Promise<string> {
+  const now = Date.now();
+  if (cachedToken && cachedToken.expiresAt > now + 60_000) return cachedToken.value;
+
+  const rawKey = (process.env.GOOGLE_PRIVATE_KEY ?? '').replace(/\\n/g, '\n');
+  const privateKey = await importPKCS8(rawKey, 'RS256');
+  const iat = Math.floor(now / 1000);
+
+  const jwt = await new SignJWT({ scope: 'https://www.googleapis.com/auth/spreadsheets' })
+    .setProtectedHeader({ alg: 'RS256' })
+    .setIssuedAt(iat)
+    .setExpirationTime(iat + 3600)
+    .setIssuer(process.env.GOOGLE_CLIENT_EMAIL ?? '')
+    .setAudience('https://oauth2.googleapis.com/token')
+    .sign(privateKey);
+
+  const res = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+      assertion: jwt,
+    }),
+  });
+
+  const data = await res.json() as { access_token: string; expires_in: number };
+  cachedToken = { value: data.access_token, expiresAt: now + data.expires_in * 1000 };
+  return cachedToken.value;
+}
+
+async function getSheets() {
+  return google.sheets({ version: 'v4', auth: await getAccessToken() });
+}
 
 function rowToPuro(row: string[]): Puro {
   return {
@@ -83,6 +107,7 @@ function puroToRow(puro: Puro): (string | number)[] {
 }
 
 export async function getPuros(): Promise<Puro[]> {
+  const sheets = await getSheets();
   const response = await sheets.spreadsheets.values.get({
     spreadsheetId: SPREADSHEET_ID,
     range: 'Inventario!A2:AB',
@@ -95,6 +120,7 @@ export async function getPuros(): Promise<Puro[]> {
 export async function createPuro(
   puro: Omit<Puro, 'id' | 'createdAt' | 'updatedAt'>
 ): Promise<Puro> {
+  const sheets = await getSheets();
   const id = crypto.randomUUID();
   const now = new Date().toISOString();
   const full: Puro = { ...puro, id, createdAt: now, updatedAt: now };
@@ -110,6 +136,7 @@ export async function createPuro(
 }
 
 export async function updatePuro(id: string, updates: Partial<Puro>): Promise<void> {
+  const sheets = await getSheets();
   const puros = await getPuros();
   const index = puros.findIndex((p) => p.id === id);
   if (index === -1) throw new Error('Puro no encontrado');
@@ -129,6 +156,7 @@ export async function updatePuro(id: string, updates: Partial<Puro>): Promise<vo
 }
 
 export async function deletePuro(id: string): Promise<void> {
+  const sheets = await getSheets();
   const puros = await getPuros();
   const index = puros.findIndex((p) => p.id === id);
   if (index === -1) throw new Error('Puro no encontrado');
@@ -153,6 +181,7 @@ export async function deletePuro(id: string): Promise<void> {
 }
 
 export async function getVentas(): Promise<Venta[]> {
+  const sheets = await getSheets();
   const response = await sheets.spreadsheets.values.get({
     spreadsheetId: SPREADSHEET_ID,
     range: 'Ventas!A2:F',
@@ -174,6 +203,7 @@ export async function getVentas(): Promise<Venta[]> {
 export async function registrarVentaItems(
   items: { puro: Puro; cantidad: number }[]
 ): Promise<void> {
+  const sheets = await getSheets();
   const fecha = new Date().toLocaleDateString('es-MX');
   const rows = items.map(({ puro, cantidad }) => {
     const costoUnitario = puro.precioBruto + puro.costoTransporte + puro.costoAlmacenamiento;
@@ -250,40 +280,41 @@ function rowToCata(row: string[]): Cata {
 
 function cataToRow(cata: Cata): (string | number)[] {
   return [
-    cata.id,                                  // A [0]
-    cata.fecha,                               // B [1]
-    cata.lugar,                               // C [2]
-    cata.fotoUrl ?? '',                       // D [3]
-    cata.notas,                               // E [4]
-    cata.calificacion,                        // F [5]
-    cata.marca,                               // G [6]
-    cata.nombre,                              // H [7]
-    cata.vitola,                              // I [8]
-    cata.cepo,                                // J [9]
-    cata.paisOrigen,                          // K [10]
-    cata.capa,                                // L [11]
-    cata.puroId ?? '',                        // M [12]
-    cata.usuarioId,                           // N [13]
-    cata.createdAt,                           // O [14]
-    (cata.fotosAdicionales ?? []).join(','),  // P [15]
-    cata.cuerpo ?? '',                        // Q [16]
-    cata.dulzor ?? '',                        // R [17]
-    cata.especia ?? '',                       // S [18]
-    cata.tierra ?? '',                        // T [19]
-    cata.madera ?? '',                        // U [20]
-    (cata.etiquetasAroma ?? []).join(','),    // V [21]
-    cata.maridaje ?? '',                      // W [22]
-    cata.tiro ?? '',                          // X [23]
-    cata.quemado ?? '',                       // Y [24]
-    cata.chocolate ?? '',                     // Z [25]
-    cata.nuez ?? '',                          // AA [26]
-    cata.cafe ?? '',                          // AB [27]
-    cata.caramelo ?? '',                      // AC [28]
-    cata.cuero ?? '',                         // AD [29]
+    cata.id,
+    cata.fecha,
+    cata.lugar,
+    cata.fotoUrl ?? '',
+    cata.notas,
+    cata.calificacion,
+    cata.marca,
+    cata.nombre,
+    cata.vitola,
+    cata.cepo,
+    cata.paisOrigen,
+    cata.capa,
+    cata.puroId ?? '',
+    cata.usuarioId,
+    cata.createdAt,
+    (cata.fotosAdicionales ?? []).join(','),
+    cata.cuerpo ?? '',
+    cata.dulzor ?? '',
+    cata.especia ?? '',
+    cata.tierra ?? '',
+    cata.madera ?? '',
+    (cata.etiquetasAroma ?? []).join(','),
+    cata.maridaje ?? '',
+    cata.tiro ?? '',
+    cata.quemado ?? '',
+    cata.chocolate ?? '',
+    cata.nuez ?? '',
+    cata.cafe ?? '',
+    cata.caramelo ?? '',
+    cata.cuero ?? '',
   ];
 }
 
 export async function getCatas(): Promise<Cata[]> {
+  const sheets = await getSheets();
   const response = await sheets.spreadsheets.values.get({
     spreadsheetId: SPREADSHEET_ID,
     range: 'Catas!A2:AD',
@@ -293,6 +324,7 @@ export async function getCatas(): Promise<Cata[]> {
 }
 
 export async function createCata(cata: Omit<Cata, 'id' | 'createdAt'>): Promise<Cata> {
+  const sheets = await getSheets();
   const id = crypto.randomUUID();
   const now = new Date().toISOString();
   const full: Cata = { ...cata, id, createdAt: now };
@@ -309,6 +341,7 @@ export async function createCata(cata: Omit<Cata, 'id' | 'createdAt'>): Promise<
 }
 
 export async function updateCata(id: string, data: Partial<Omit<Cata, 'id' | 'createdAt'>>): Promise<Cata> {
+  const sheets = await getSheets();
   const catas = await getCatas();
   const index = catas.findIndex((c) => c.id === id);
   if (index === -1) throw new Error('Cata no encontrada');
@@ -326,6 +359,7 @@ export async function updateCata(id: string, data: Partial<Omit<Cata, 'id' | 'cr
 }
 
 export async function deleteCata(id: string): Promise<void> {
+  const sheets = await getSheets();
   const catas = await getCatas();
   const index = catas.findIndex((c) => c.id === id);
   if (index === -1) throw new Error('Cata no encontrada');
@@ -351,6 +385,7 @@ export async function deleteCata(id: string): Promise<void> {
 export async function actualizarStockMultiple(
   updates: { id: string; cantidad: number }[]
 ): Promise<void> {
+  const sheets = await getSheets();
   const puros = await getPuros();
 
   await Promise.all(
