@@ -5,7 +5,9 @@ import { NextResponse } from 'next/server';
 const SPREADSHEET_ID = process.env.GOOGLE_SHEETS_ID!;
 
 async function getAccessToken(): Promise<string> {
-  const rawKey = (process.env.GOOGLE_PRIVATE_KEY ?? '').replace(/\\n/g, '\n');
+  const rawKey = (process.env.GOOGLE_PRIVATE_KEY ?? '')
+    .replace(/^["']|["']$/g, '')
+    .replace(/\\n/g, '\n');
   const privateKey = await importPKCS8(rawKey, 'RS256');
   const iat = Math.floor(Date.now() / 1000);
 

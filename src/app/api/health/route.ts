@@ -17,7 +17,7 @@ export async function GET() {
   let joseResult = 'not tested';
   if (privateKeyRaw) {
     try {
-      const key = privateKeyRaw.replace(/\\n/g, '\n');
+      const key = privateKeyRaw.replace(/^["']|["']$/g, '').replace(/\\n/g, '\n');
       await importPKCS8(key, 'RS256');
       joseResult = 'OK';
     } catch (e) {
@@ -30,7 +30,7 @@ export async function GET() {
   if (joseResult === 'OK') {
     try {
       const { SignJWT } = await import('jose');
-      const key = privateKeyRaw.replace(/\\n/g, '\n');
+      const key = privateKeyRaw.replace(/^["']|["']$/g, '').replace(/\\n/g, '\n');
       const privateKey = await importPKCS8(key, 'RS256');
       const iat = Math.floor(Date.now() / 1000);
       const jwt = await new SignJWT({ scope: 'https://www.googleapis.com/auth/spreadsheets' })
