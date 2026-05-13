@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { notFound } from 'next/navigation';
 import { getCatas } from '@/lib/sheets';
 import CataDetailView from '@/components/admin/CataDetailView';

@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import Link from 'next/link';
 import { getPuros } from '@/lib/sheets';
 import CataForm from '@/components/admin/CataForm';

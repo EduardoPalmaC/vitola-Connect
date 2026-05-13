@@ -1,4 +1,3 @@
 {
-  "buildCommand": "NODE_OPTIONS='--openssl-legacy-provider' next build",
   "framework": "nextjs"
 }
