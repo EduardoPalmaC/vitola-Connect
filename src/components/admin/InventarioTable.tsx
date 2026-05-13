@@ -209,7 +209,7 @@ function PurosTable({
                   onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.backgroundColor = idx % 2 === 1 ? '#FAFAFA' : '#FFFFFF'; }}
                 >
                   {row.getVisibleCells().map((cell) => (
-                    <td key={cell.id} className="px-4 py-2 whitespace-nowrap" style={cellStyle}>
+                    <td key={cell.id} className="px-4 py-3 whitespace-nowrap" style={cellStyle}>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
                     </td>
                   ))}
