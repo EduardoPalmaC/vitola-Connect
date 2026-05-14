@@ -13,7 +13,7 @@ import {
 } from '@tanstack/react-table';
 import Link from 'next/link';
 import type { Puro } from '@/types';
-import { calcularCostoTotal, calcularMargen } from '@/lib/calculations';
+import { calcularCostoTotal, calcularMargen, calcularGananciaProyectada } from '@/lib/calculations';
 
 // ─── Brand tokens ────────────────────────────────────────────────────────────
 const OXBLOOD = '#6B1E2A';
@@ -279,6 +279,23 @@ function buildNegocioColumns(allData: Puro[]): ColumnDef<Puro, unknown>[] {
       ),
     }) as ColumnDef<Puro, unknown>,
     col.display({
+      id: 'gananciaPieza',
+      header: 'Ganancia / pza',
+      cell: (info) => {
+        const ganancia = calcularGananciaProyectada(info.row.original);
+        const isPositive = ganancia > 0;
+        return (
+          <span style={{
+            fontFamily: 'var(--font-code)', fontSize: '13px',
+            fontWeight: 600,
+            color: isPositive ? EMERALD : '#C0202E',
+          }}>
+            {isPositive ? '+' : ''}${ganancia.toLocaleString('es-MX')}
+          </span>
+        );
+      },
+    }) as ColumnDef<Puro, unknown>,
+    col.display({
       id: 'margen',
       header: 'Margen',
       cell: (info) => <MargenBadge puro={info.row.original} />,
@@ -317,8 +334,9 @@ function buildNegocioColumns(allData: Puro[]): ColumnDef<Puro, unknown>[] {
 
 // ─── Alert bar ────────────────────────────────────────────────────────────────
 function AlertBar({ puros }: { puros: Puro[] }) {
-  const lowStock = puros.filter((p) => p.stock > 0 && p.stock <= 2);
-  const outOfStock = puros.filter((p) => p.stock === 0);
+  const negocio = puros.filter((p) => p.estado === 'negocio');
+  const lowStock = negocio.filter((p) => p.stock > 0 && p.stock <= 2);
+  const outOfStock = negocio.filter((p) => p.stock === 0);
   if (lowStock.length === 0 && outOfStock.length === 0) return null;
 
   return (
