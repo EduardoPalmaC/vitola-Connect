@@ -4,72 +4,192 @@ import { useState, useMemo, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Puro } from '@/types';
 
-interface CartItem {
-  puro: Puro;
-  cantidad: number;
-}
+const OXBLOOD    = '#6B1E2A';
+const SURFACE    = '#FFFFFF';
+const SURFACE_BG = '#F9F6F0';
+const BORDER     = '#EDE8E0';
+const TEXT       = '#1C1008';
+const TEXT_SEC   = '#6B5C4A';
+const TEXT_MUTED = '#A8967E';
 
-interface VentaModalProps {
-  puros: Puro[];
-  open: boolean;
-  onClose: () => void;
-}
+interface CartItem { puro: Puro; cantidad: number }
+interface VentaModalProps { puros: Puro[]; open: boolean; onClose: () => void }
 
 function todayISO() {
   return new Date().toISOString().split('T')[0]!;
 }
 
+// ─── Sub-components ───────────────────────────────────────────────────────────
+
+function Label({ children }: { children: string }) {
+  return (
+    <p style={{
+      fontFamily: 'var(--font-code)', fontSize: '10px',
+      letterSpacing: '0.22em', textTransform: 'uppercase',
+      color: TEXT_MUTED, margin: '0 0 10px',
+    }}>
+      {children}
+    </p>
+  );
+}
+
+function ProductRow({ puro, disabled, onClick }: { puro: Puro; disabled: boolean; onClick: () => void }) {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        width: '100%', padding: '8px 10px', borderRadius: '6px',
+        background: hovered && !disabled ? '#F5EFE8' : 'transparent',
+        border: 'none', cursor: disabled ? 'not-allowed' : 'pointer',
+        opacity: disabled ? 0.4 : 1, textAlign: 'left',
+        transition: 'background 120ms',
+      }}
+    >
+      <div>
+        <span style={{ fontFamily: 'var(--font-serif)', fontSize: '14px', fontWeight: 700, color: TEXT }}>
+          {puro.marca}
+        </span>
+        <span style={{ fontFamily: 'var(--font-serif)', fontSize: '14px', color: TEXT_SEC, marginLeft: '6px' }}>
+          {puro.vitola}
+        </span>
+        <span style={{ fontFamily: 'var(--font-code)', fontSize: '11px', color: TEXT_MUTED, marginLeft: '8px' }}>
+          {puro.nombre}
+        </span>
+      </div>
+      <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexShrink: 0 }}>
+        <span style={{ fontFamily: 'var(--font-code)', fontSize: '10px', color: TEXT_MUTED }}>
+          Stock: {puro.stock}
+        </span>
+        <span style={{ fontFamily: 'var(--font-code)', fontSize: '12px', fontWeight: 600, color: TEXT_SEC }}>
+          ${puro.precioVenta.toLocaleString('es-MX')}
+        </span>
+      </div>
+    </button>
+  );
+}
+
+function QtyButton({ onClick, disabled, children }: { onClick: () => void; disabled?: boolean; children: string }) {
+  const [hovered, setHovered] = useState(false);
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      style={{
+        width: '24px', height: '24px', borderRadius: '50%',
+        border: `1px solid ${hovered && !disabled ? TEXT_MUTED : BORDER}`,
+        background: 'transparent', cursor: disabled ? 'not-allowed' : 'pointer',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        fontFamily: 'var(--font-code)', fontSize: '14px',
+        color: disabled ? TEXT_MUTED : TEXT_SEC,
+        opacity: disabled ? 0.35 : 1,
+        transition: 'border-color 120ms, color 120ms',
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+
+function CartRow({ puro, cantidad, isLast, onUpdate }: { puro: Puro; cantidad: number; isLast: boolean; onUpdate: (n: number) => void }) {
+  const [hovX, setHovX] = useState(false);
+  return (
+    <div style={{
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+      padding: '10px 0',
+      borderBottom: isLast ? 'none' : `1px solid ${BORDER}`,
+    }}>
+      <div style={{ minWidth: 0, marginRight: '16px' }}>
+        <p style={{ fontFamily: 'var(--font-serif)', fontSize: '14px', fontWeight: 700, color: TEXT, margin: 0 }}>
+          {puro.marca} <span style={{ fontWeight: 400, color: TEXT_SEC }}>{puro.vitola}</span>
+        </p>
+        <p style={{ fontFamily: 'var(--font-code)', fontSize: '11px', color: TEXT_MUTED, margin: '2px 0 0' }}>
+          ${puro.precioVenta.toLocaleString('es-MX')} c/u
+        </p>
+      </div>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <QtyButton onClick={() => onUpdate(cantidad - 1)}>−</QtyButton>
+          <span style={{ fontFamily: 'var(--font-code)', fontSize: '13px', fontWeight: 600, color: TEXT, minWidth: '20px', textAlign: 'center' }}>
+            {cantidad}
+          </span>
+          <QtyButton onClick={() => onUpdate(cantidad + 1)} disabled={cantidad >= puro.stock}>+</QtyButton>
+        </div>
+        <span style={{ fontFamily: 'var(--font-code)', fontSize: '13px', fontWeight: 600, color: TEXT_SEC, minWidth: '72px', textAlign: 'right' }}>
+          ${(puro.precioVenta * cantidad).toLocaleString('es-MX')}
+        </span>
+        <button
+          type="button"
+          onClick={() => onUpdate(0)}
+          onMouseEnter={() => setHovX(true)}
+          onMouseLeave={() => setHovX(false)}
+          style={{
+            background: 'none', border: 'none', cursor: 'pointer',
+            fontFamily: 'var(--font-code)', fontSize: '11px',
+            color: hovX ? '#C0202E' : TEXT_MUTED,
+            transition: 'color 120ms', padding: '0 2px',
+          }}
+        >
+          ✕
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Main modal ───────────────────────────────────────────────────────────────
+
 export default function VentaModal({ puros, open, onClose }: VentaModalProps) {
   const router = useRouter();
-  const [search, setSearch] = useState('');
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [fecha, setFecha] = useState(todayISO());
+  const [search, setSearch]         = useState('');
+  const [cart, setCart]             = useState<CartItem[]>([]);
+  const [fecha, setFecha]           = useState(todayISO());
   const [isPending, startTransition] = useTransition();
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError]           = useState<string | null>(null);
+  const [searchFocus, setSearchFocus] = useState(false);
+  const [dateFocus, setDateFocus]   = useState(false);
 
   const disponibles = useMemo(
-    () =>
-      puros.filter(
-        (p) =>
-          p.stock > 0 &&
-          (p.nombre.toLowerCase().includes(search.toLowerCase()) ||
-            p.marca.toLowerCase().includes(search.toLowerCase()) ||
-            p.vitola.toLowerCase().includes(search.toLowerCase())),
-      ),
+    () => puros.filter(
+      (p) => p.stock > 0 && (
+        p.nombre.toLowerCase().includes(search.toLowerCase()) ||
+        p.marca.toLowerCase().includes(search.toLowerCase()) ||
+        p.vitola.toLowerCase().includes(search.toLowerCase())
+      )
+    ),
     [puros, search],
   );
 
   function addToCart(puro: Puro) {
     setCart((prev) => {
-      const existing = prev.find((item) => item.puro.id === puro.id);
+      const existing = prev.find((i) => i.puro.id === puro.id);
       if (existing) {
         if (existing.cantidad >= puro.stock) return prev;
-        return prev.map((item) =>
-          item.puro.id === puro.id ? { ...item, cantidad: item.cantidad + 1 } : item,
-        );
+        return prev.map((i) => i.puro.id === puro.id ? { ...i, cantidad: i.cantidad + 1 } : i);
       }
       return [...prev, { puro, cantidad: 1 }];
     });
   }
 
   function updateCantidad(puroId: string, cantidad: number) {
-    if (cantidad <= 0) {
-      setCart((prev) => prev.filter((i) => i.puro.id !== puroId));
-      return;
-    }
+    if (cantidad <= 0) { setCart((prev) => prev.filter((i) => i.puro.id !== puroId)); return; }
     const item = cart.find((i) => i.puro.id === puroId);
     if (!item || cantidad > item.puro.stock) return;
-    setCart((prev) => prev.map((i) => (i.puro.id === puroId ? { ...i, cantidad } : i)));
+    setCart((prev) => prev.map((i) => i.puro.id === puroId ? { ...i, cantidad } : i));
   }
 
   const total = cart.reduce((sum, { puro, cantidad }) => sum + puro.precioVenta * cantidad, 0);
 
   function handleClose() {
-    setCart([]);
-    setSearch('');
-    setFecha(todayISO());
-    setError(null);
-    onClose();
+    setCart([]); setSearch(''); setFecha(todayISO()); setError(null); onClose();
   }
 
   function handleConfirm() {
@@ -94,189 +214,205 @@ export default function VentaModal({ puros, open, onClose }: VentaModalProps) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
-      <div className="w-full max-w-2xl bg-white rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
+    <div
+      onClick={(e) => { if (e.target === e.currentTarget) handleClose(); }}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 50,
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        backgroundColor: 'rgba(28,16,8,0.5)',
+      }}
+    >
+      <div style={{
+        width: '100%', maxWidth: '580px',
+        backgroundColor: SURFACE_BG,
+        border: `1px solid ${BORDER}`,
+        borderRadius: '12px',
+        boxShadow: '0 24px 64px rgba(28,16,8,0.22)',
+        display: 'flex', flexDirection: 'column',
+        maxHeight: '90vh', overflow: 'hidden',
+      }}>
 
-        {/* Header */}
-        <div className="flex items-start justify-between px-8 pt-7 pb-5 border-b border-stone-100 shrink-0">
+        {/* ── Header ── */}
+        <div style={{
+          display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between',
+          padding: '24px 28px 18px',
+          backgroundColor: SURFACE, borderBottom: `1px solid ${BORDER}`,
+          flexShrink: 0,
+        }}>
           <div>
-            <p className="text-[10px] uppercase tracking-[0.25em] text-stone-400 mb-1">Vitola</p>
-            <h2
-              style={{ fontFamily: "'Cormorant Garamond', serif" }}
-              className="text-2xl font-light text-stone-800 italic"
-            >
-              Registrar Nueva Venta
+            <p style={{ fontFamily: 'var(--font-code)', fontSize: '10px', letterSpacing: '0.3em', textTransform: 'uppercase', color: TEXT_MUTED, margin: '0 0 6px' }}>
+              Vitola · Registro
+            </p>
+            <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '22px', fontWeight: 400, fontStyle: 'italic', color: TEXT, margin: 0, lineHeight: 1.2 }}>
+              Nueva Venta
             </h2>
           </div>
-          <div className="flex items-center gap-5">
-            <div className="flex flex-col items-end gap-1">
-              <label className="text-[10px] uppercase tracking-[0.2em] text-stone-400">Fecha</label>
+          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '20px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '4px' }}>
+              <label style={{ fontFamily: 'var(--font-code)', fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase', color: TEXT_MUTED }}>
+                Fecha
+              </label>
               <input
                 type="date"
                 value={fecha}
                 max={todayISO()}
                 onChange={(e) => setFecha(e.target.value)}
-                className="text-xs text-stone-600 border-b border-stone-200 bg-transparent pb-0.5 focus:outline-none focus:border-stone-500 transition-colors cursor-pointer"
+                onFocus={() => setDateFocus(true)}
+                onBlur={() => setDateFocus(false)}
+                style={{
+                  fontFamily: 'var(--font-code)', fontSize: '12px', color: TEXT_SEC,
+                  border: 'none', borderBottom: `1px solid ${dateFocus ? OXBLOOD : BORDER}`,
+                  background: 'transparent', outline: 'none',
+                  padding: '2px 0', cursor: 'pointer', transition: 'border-color 150ms',
+                }}
               />
             </div>
             <button
-              type="button"
-              onClick={handleClose}
-              className="text-stone-300 hover:text-stone-600 transition-colors text-lg leading-none mt-1"
+              type="button" onClick={handleClose}
+              onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.color = TEXT; }}
+              onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.color = TEXT_MUTED; }}
+              style={{ color: TEXT_MUTED, background: 'none', border: 'none', fontSize: '15px', cursor: 'pointer', marginTop: '4px', lineHeight: 1, transition: 'color 120ms' }}
             >
               ✕
             </button>
           </div>
         </div>
 
-        <div className="flex flex-col overflow-hidden flex-1">
-          {/* Buscador */}
-          <div className="px-8 pt-5 pb-4 border-b border-stone-100 shrink-0">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-stone-400 mb-3">
-              Agregar Productos
-            </p>
+        {/* ── Body ── */}
+        <div style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden', flex: 1 }}>
+
+          {/* Search */}
+          <div style={{ padding: '18px 28px 16px', backgroundColor: SURFACE, borderBottom: `1px solid ${BORDER}`, flexShrink: 0 }}>
+            <Label>Agregar Productos</Label>
             <input
               type="text"
               placeholder="Buscar por nombre, marca o vitola…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full text-sm text-stone-700 placeholder:text-stone-300 border-b border-stone-200 bg-transparent pb-2 focus:outline-none focus:border-stone-500 transition-colors"
+              onFocus={() => setSearchFocus(true)}
+              onBlur={() => setSearchFocus(false)}
+              style={{
+                width: '100%', boxSizing: 'border-box',
+                fontFamily: 'var(--font-code)', fontSize: '13px', color: TEXT,
+                border: 'none', borderBottom: `1px solid ${searchFocus ? OXBLOOD : BORDER}`,
+                background: 'transparent', outline: 'none',
+                padding: '6px 0', transition: 'border-color 150ms',
+              }}
             />
-            <div className="mt-3 max-h-44 overflow-y-auto flex flex-col pr-1">
+            <div style={{ marginTop: '6px', maxHeight: '172px', overflowY: 'auto' }}>
               {disponibles.length === 0 ? (
-                <p className="text-xs text-stone-400 py-3 text-center italic">Sin resultados</p>
+                <p style={{ fontFamily: 'var(--font-code)', fontSize: '11px', color: TEXT_MUTED, textAlign: 'center', padding: '14px 0' }}>
+                  Sin resultados
+                </p>
               ) : (
                 disponibles.map((puro) => {
                   const inCart = cart.find((i) => i.puro.id === puro.id);
-                  const agotadoEnCarrito = !!inCart && inCart.cantidad >= puro.stock;
                   return (
-                    <button
+                    <ProductRow
                       key={puro.id}
-                      type="button"
+                      puro={puro}
+                      disabled={!!inCart && inCart.cantidad >= puro.stock}
                       onClick={() => addToCart(puro)}
-                      disabled={agotadoEnCarrito}
-                      className="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-stone-50 text-left transition-colors disabled:opacity-40 disabled:cursor-not-allowed group"
-                    >
-                      <div className="min-w-0">
-                        <span className="text-sm text-stone-600 group-hover:text-stone-900 transition-colors">
-                          {puro.marca}{' '}
-                          <span className="font-medium text-stone-800">{puro.vitola}</span>
-                        </span>
-                        <span className="text-xs text-stone-400 ml-2 truncate">{puro.nombre}</span>
-                      </div>
-                      <div className="flex items-center gap-4 shrink-0">
-                        <span className="text-xs text-stone-400">Stock: {puro.stock}</span>
-                        <span className="text-sm text-stone-600 tabular-nums">
-                          ${puro.precioVenta.toLocaleString('es-MX')}
-                        </span>
-                      </div>
-                    </button>
+                    />
                   );
                 })
               )}
             </div>
           </div>
 
-          {/* Carrito */}
-          <div className="px-8 pt-5 pb-4 flex flex-col overflow-y-auto flex-1">
-            <p className="text-[10px] uppercase tracking-[0.2em] text-stone-400 mb-3 shrink-0">
-              Carrito{cart.length > 0 ? ` · ${cart.length}` : ''}
-            </p>
+          {/* Cart */}
+          <div style={{ padding: '18px 28px', flex: 1, overflowY: 'auto', backgroundColor: SURFACE_BG }}>
+            <Label>{`Carrito${cart.length > 0 ? ` · ${cart.length}` : ''}`}</Label>
             {cart.length === 0 ? (
-              <p className="text-sm text-stone-400 text-center py-8 italic">
+              <p style={{ fontFamily: 'var(--font-serif)', fontSize: '14px', fontStyle: 'italic', color: TEXT_MUTED, textAlign: 'center', padding: '28px 0' }}>
                 Agrega productos para comenzar
               </p>
             ) : (
-              <div className="flex flex-col divide-y divide-stone-100">
-                {cart.map(({ puro, cantidad }) => (
-                  <div key={puro.id} className="flex items-center justify-between py-3">
-                    <div className="min-w-0 mr-4">
-                      <p className="text-sm text-stone-700">
-                        {puro.marca}{' '}
-                        <span className="font-medium">{puro.vitola}</span>
-                      </p>
-                      <p className="text-xs text-stone-400">
-                        ${puro.precioVenta.toLocaleString('es-MX')} c/u
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-4 shrink-0">
-                      <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => updateCantidad(puro.id, cantidad - 1)}
-                          className="w-6 h-6 rounded-full border border-stone-200 flex items-center justify-center text-stone-500 hover:border-stone-400 hover:text-stone-800 transition-colors"
-                        >
-                          −
-                        </button>
-                        <span className="w-6 text-center text-sm text-stone-700 tabular-nums">
-                          {cantidad}
-                        </span>
-                        <button
-                          type="button"
-                          onClick={() => updateCantidad(puro.id, cantidad + 1)}
-                          disabled={cantidad >= puro.stock}
-                          className="w-6 h-6 rounded-full border border-stone-200 flex items-center justify-center text-stone-500 hover:border-stone-400 hover:text-stone-800 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
-                        >
-                          +
-                        </button>
-                      </div>
-                      <span className="text-sm text-stone-700 w-20 text-right tabular-nums">
-                        ${(puro.precioVenta * cantidad).toLocaleString('es-MX')}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => updateCantidad(puro.id, 0)}
-                        className="text-stone-300 hover:text-red-400 transition-colors text-xs w-4"
-                      >
-                        ✕
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
+              cart.map(({ puro, cantidad }, i) => (
+                <CartRow
+                  key={puro.id}
+                  puro={puro}
+                  cantidad={cantidad}
+                  isLast={i === cart.length - 1}
+                  onUpdate={(n) => updateCantidad(puro.id, n)}
+                />
+              ))
             )}
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="px-8 py-5 border-t border-stone-100 bg-stone-50 shrink-0">
-          {error && <p className="text-xs text-red-500 mb-3">{error}</p>}
-          <div className="flex items-center justify-between">
+        {/* ── Footer ── */}
+        <div style={{ padding: '18px 28px', backgroundColor: SURFACE, borderTop: `1px solid ${BORDER}`, flexShrink: 0 }}>
+          {error && (
+            <p style={{ fontFamily: 'var(--font-code)', fontSize: '11px', color: '#C0202E', marginBottom: '10px' }}>
+              {error}
+            </p>
+          )}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <div>
-              <p className="text-[10px] uppercase tracking-[0.2em] text-stone-400 mb-1">
-                Total de Venta
+              <p style={{ fontFamily: 'var(--font-code)', fontSize: '10px', letterSpacing: '0.2em', textTransform: 'uppercase', color: TEXT_MUTED, margin: '0 0 4px' }}>
+                Total
               </p>
-              <p
-                style={{ color: '#722F37', fontFamily: "'Cormorant Garamond', serif" }}
-                className="text-3xl font-light tabular-nums"
-              >
+              <p style={{ fontFamily: 'var(--font-serif)', fontSize: '30px', fontWeight: 500, color: OXBLOOD, margin: 0, fontVariantNumeric: 'tabular-nums' }}>
                 ${total.toLocaleString('es-MX')}
               </p>
             </div>
-            <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={handleClose}
-                className="px-5 py-2.5 text-stone-500 text-sm hover:text-stone-700 transition-colors"
-              >
-                Cancelar
-              </button>
-              <button
-                type="button"
-                disabled={cart.length === 0 || isPending}
-                onClick={handleConfirm}
-                className="px-6 py-2.5 rounded-lg text-sm font-medium text-white transition-opacity disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
-                style={{ backgroundColor: '#722F37' }}
-              >
-                {isPending && (
-                  <span className="w-3 h-3 rounded-full border-2 border-current border-t-transparent animate-spin" />
-                )}
-                Confirmar Venta
-              </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <CancelBtn onClick={handleClose} />
+              <ConfirmBtn disabled={cart.length === 0 || isPending} isPending={isPending} onClick={handleConfirm} />
             </div>
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+function CancelBtn({ onClick }: { onClick: () => void }) {
+  const [hov, setHov] = useState(false);
+  return (
+    <button
+      type="button" onClick={onClick}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        fontFamily: 'var(--font-code)', fontSize: '10px', letterSpacing: '0.16em',
+        textTransform: 'uppercase', color: hov ? TEXT : TEXT_MUTED,
+        background: 'none', border: 'none', cursor: 'pointer',
+        padding: '12px 16px', transition: 'color 120ms',
+      }}
+    >
+      Cancelar
+    </button>
+  );
+}
+
+function ConfirmBtn({ disabled, isPending, onClick }: { disabled: boolean; isPending: boolean; onClick: () => void }) {
+  const [hov, setHov] = useState(false);
+  return (
+    <button
+      type="button" onClick={onClick} disabled={disabled}
+      onMouseEnter={() => setHov(true)}
+      onMouseLeave={() => setHov(false)}
+      style={{
+        fontFamily: 'var(--font-code)', fontSize: '10px', letterSpacing: '0.16em',
+        textTransform: 'uppercase', color: '#F9F6F0',
+        background: OXBLOOD,
+        border: 'none', cursor: disabled ? 'not-allowed' : 'pointer',
+        padding: '12px 20px', borderRadius: '6px',
+        opacity: disabled ? 0.45 : hov ? 0.82 : 1,
+        transition: 'opacity 150ms',
+        display: 'flex', alignItems: 'center', gap: '8px',
+      }}
+    >
+      {isPending && (
+        <span style={{
+          display: 'inline-block', width: '10px', height: '10px',
+          borderRadius: '50%', border: '2px solid rgba(249,246,240,0.4)',
+          borderTopColor: '#F9F6F0', animation: 'spin 0.6s linear infinite',
+        }} />
+      )}
+      Confirmar Venta
+    </button>
   );
 }
