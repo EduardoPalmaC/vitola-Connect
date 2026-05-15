@@ -3,7 +3,6 @@
 import { useState, useMemo, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import type { Puro } from '@/types';
-import Input from '@/components/ui/Input';
 
 interface CartItem {
   puro: Puro;
@@ -16,10 +15,15 @@ interface VentaModalProps {
   onClose: () => void;
 }
 
+function todayISO() {
+  return new Date().toISOString().split('T')[0]!;
+}
+
 export default function VentaModal({ puros, open, onClose }: VentaModalProps) {
   const router = useRouter();
   const [search, setSearch] = useState('');
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [fecha, setFecha] = useState(todayISO());
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
@@ -63,6 +67,7 @@ export default function VentaModal({ puros, open, onClose }: VentaModalProps) {
   function handleClose() {
     setCart([]);
     setSearch('');
+    setFecha(todayISO());
     setError(null);
     onClose();
   }
@@ -75,7 +80,7 @@ export default function VentaModal({ puros, open, onClose }: VentaModalProps) {
         const res = await fetch('/api/ventas/batch', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ items: cart }),
+          body: JSON.stringify({ items: cart, fecha }),
         });
         if (!res.ok) throw new Error('Error al registrar la venta');
         handleClose();
@@ -89,34 +94,57 @@ export default function VentaModal({ puros, open, onClose }: VentaModalProps) {
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-      <div className="w-full max-w-2xl bg-background border border-border rounded-2xl shadow-2xl flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+      <div className="w-full max-w-2xl bg-white rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden">
+
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border shrink-0">
-          <h2 className="text-lg font-bold text-text">Registrar Nueva Venta</h2>
-          <button
-            type="button"
-            onClick={handleClose}
-            className="text-text-muted hover:text-text transition-colors text-xl leading-none"
-          >
-            ✕
-          </button>
+        <div className="flex items-start justify-between px-8 pt-7 pb-5 border-b border-stone-100 shrink-0">
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.25em] text-stone-400 mb-1">Vitola</p>
+            <h2
+              style={{ fontFamily: "'Cormorant Garamond', serif" }}
+              className="text-2xl font-light text-stone-800 italic"
+            >
+              Registrar Nueva Venta
+            </h2>
+          </div>
+          <div className="flex items-center gap-5">
+            <div className="flex flex-col items-end gap-1">
+              <label className="text-[10px] uppercase tracking-[0.2em] text-stone-400">Fecha</label>
+              <input
+                type="date"
+                value={fecha}
+                max={todayISO()}
+                onChange={(e) => setFecha(e.target.value)}
+                className="text-xs text-stone-600 border-b border-stone-200 bg-transparent pb-0.5 focus:outline-none focus:border-stone-500 transition-colors cursor-pointer"
+              />
+            </div>
+            <button
+              type="button"
+              onClick={handleClose}
+              className="text-stone-300 hover:text-stone-600 transition-colors text-lg leading-none mt-1"
+            >
+              ✕
+            </button>
+          </div>
         </div>
 
         <div className="flex flex-col overflow-hidden flex-1">
           {/* Buscador */}
-          <div className="px-6 py-4 flex flex-col gap-3 border-b border-border shrink-0">
-            <p className="text-xs font-semibold text-text-muted uppercase tracking-wider">
-              Agregar productos
+          <div className="px-8 pt-5 pb-4 border-b border-stone-100 shrink-0">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-stone-400 mb-3">
+              Agregar Productos
             </p>
-            <Input
-              placeholder="Buscar por nombre, marca o vitola..."
+            <input
+              type="text"
+              placeholder="Buscar por nombre, marca o vitola…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              className="w-full text-sm text-stone-700 placeholder:text-stone-300 border-b border-stone-200 bg-transparent pb-2 focus:outline-none focus:border-stone-500 transition-colors"
             />
-            <div className="max-h-44 overflow-y-auto flex flex-col gap-1 pr-1">
+            <div className="mt-3 max-h-44 overflow-y-auto flex flex-col pr-1">
               {disponibles.length === 0 ? (
-                <p className="text-xs text-text-muted py-2 text-center">Sin resultados</p>
+                <p className="text-xs text-stone-400 py-3 text-center italic">Sin resultados</p>
               ) : (
                 disponibles.map((puro) => {
                   const inCart = cart.find((i) => i.puro.id === puro.id);
@@ -127,17 +155,18 @@ export default function VentaModal({ puros, open, onClose }: VentaModalProps) {
                       type="button"
                       onClick={() => addToCart(puro)}
                       disabled={agotadoEnCarrito}
-                      className="flex items-center justify-between px-3 py-2 rounded-lg border border-border bg-surface hover:border-secondary/60 text-left transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex items-center justify-between px-3 py-2.5 rounded-lg hover:bg-stone-50 text-left transition-colors disabled:opacity-40 disabled:cursor-not-allowed group"
                     >
                       <div className="min-w-0">
-                        <span className="text-sm font-medium text-text">
-                          {puro.marca} {puro.vitola}
+                        <span className="text-sm text-stone-600 group-hover:text-stone-900 transition-colors">
+                          {puro.marca}{' '}
+                          <span className="font-medium text-stone-800">{puro.vitola}</span>
                         </span>
-                        <span className="text-xs text-text-muted ml-2 truncate">{puro.nombre}</span>
+                        <span className="text-xs text-stone-400 ml-2 truncate">{puro.nombre}</span>
                       </div>
-                      <div className="flex items-center gap-3 shrink-0">
-                        <span className="text-xs text-text-muted">Stock: {puro.stock}</span>
-                        <span className="text-sm font-semibold text-secondary">
+                      <div className="flex items-center gap-4 shrink-0">
+                        <span className="text-xs text-stone-400">Stock: {puro.stock}</span>
+                        <span className="text-sm text-stone-600 tabular-nums">
                           ${puro.precioVenta.toLocaleString('es-MX')}
                         </span>
                       </div>
@@ -149,73 +178,78 @@ export default function VentaModal({ puros, open, onClose }: VentaModalProps) {
           </div>
 
           {/* Carrito */}
-          <div className="px-6 py-4 flex flex-col gap-3 overflow-y-auto flex-1">
-            <p className="text-xs font-semibold text-text-muted uppercase tracking-wider">
-              Carrito ({cart.length})
+          <div className="px-8 pt-5 pb-4 flex flex-col overflow-y-auto flex-1">
+            <p className="text-[10px] uppercase tracking-[0.2em] text-stone-400 mb-3 shrink-0">
+              Carrito{cart.length > 0 ? ` · ${cart.length}` : ''}
             </p>
             {cart.length === 0 ? (
-              <p className="text-sm text-text-muted text-center py-6">
+              <p className="text-sm text-stone-400 text-center py-8 italic">
                 Agrega productos para comenzar
               </p>
             ) : (
-              cart.map(({ puro, cantidad }) => (
-                <div
-                  key={puro.id}
-                  className="flex items-center justify-between rounded-lg border border-border bg-surface px-4 py-3"
-                >
-                  <div className="min-w-0 mr-4">
-                    <p className="text-sm font-medium text-text">
-                      {puro.marca} {puro.vitola}
-                    </p>
-                    <p className="text-xs text-text-muted">
-                      ${puro.precioVenta.toLocaleString('es-MX')} c/u
-                    </p>
-                  </div>
-                  <div className="flex items-center gap-3 shrink-0">
-                    <div className="flex items-center gap-1">
-                      <button
-                        type="button"
-                        onClick={() => updateCantidad(puro.id, cantidad - 1)}
-                        className="w-7 h-7 rounded-md border border-border bg-background flex items-center justify-center text-text hover:border-secondary/60 transition-colors"
-                      >
-                        −
-                      </button>
-                      <span className="w-8 text-center text-sm font-semibold text-text tabular-nums">
-                        {cantidad}
+              <div className="flex flex-col divide-y divide-stone-100">
+                {cart.map(({ puro, cantidad }) => (
+                  <div key={puro.id} className="flex items-center justify-between py-3">
+                    <div className="min-w-0 mr-4">
+                      <p className="text-sm text-stone-700">
+                        {puro.marca}{' '}
+                        <span className="font-medium">{puro.vitola}</span>
+                      </p>
+                      <p className="text-xs text-stone-400">
+                        ${puro.precioVenta.toLocaleString('es-MX')} c/u
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-4 shrink-0">
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => updateCantidad(puro.id, cantidad - 1)}
+                          className="w-6 h-6 rounded-full border border-stone-200 flex items-center justify-center text-stone-500 hover:border-stone-400 hover:text-stone-800 transition-colors"
+                        >
+                          −
+                        </button>
+                        <span className="w-6 text-center text-sm text-stone-700 tabular-nums">
+                          {cantidad}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => updateCantidad(puro.id, cantidad + 1)}
+                          disabled={cantidad >= puro.stock}
+                          className="w-6 h-6 rounded-full border border-stone-200 flex items-center justify-center text-stone-500 hover:border-stone-400 hover:text-stone-800 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                        >
+                          +
+                        </button>
+                      </div>
+                      <span className="text-sm text-stone-700 w-20 text-right tabular-nums">
+                        ${(puro.precioVenta * cantidad).toLocaleString('es-MX')}
                       </span>
                       <button
                         type="button"
-                        onClick={() => updateCantidad(puro.id, cantidad + 1)}
-                        disabled={cantidad >= puro.stock}
-                        className="w-7 h-7 rounded-md border border-border bg-background flex items-center justify-center text-text hover:border-secondary/60 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                        onClick={() => updateCantidad(puro.id, 0)}
+                        className="text-stone-300 hover:text-red-400 transition-colors text-xs w-4"
                       >
-                        +
+                        ✕
                       </button>
                     </div>
-                    <span className="text-sm font-semibold text-text w-20 text-right tabular-nums">
-                      ${(puro.precioVenta * cantidad).toLocaleString('es-MX')}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => updateCantidad(puro.id, 0)}
-                      className="text-text-muted hover:text-red-400 transition-colors text-xs w-4"
-                    >
-                      ✕
-                    </button>
                   </div>
-                </div>
-              ))
+                ))}
+              </div>
             )}
           </div>
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-border flex flex-col gap-3 shrink-0">
-          {error && <p className="text-xs text-red-400">{error}</p>}
+        <div className="px-8 py-5 border-t border-stone-100 bg-stone-50 shrink-0">
+          {error && <p className="text-xs text-red-500 mb-3">{error}</p>}
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-xs text-text-muted">Total venta</p>
-              <p className="text-2xl font-bold text-secondary">
+              <p className="text-[10px] uppercase tracking-[0.2em] text-stone-400 mb-1">
+                Total de Venta
+              </p>
+              <p
+                style={{ color: '#722F37', fontFamily: "'Cormorant Garamond', serif" }}
+                className="text-3xl font-light tabular-nums"
+              >
                 ${total.toLocaleString('es-MX')}
               </p>
             </div>
@@ -223,7 +257,7 @@ export default function VentaModal({ puros, open, onClose }: VentaModalProps) {
               <button
                 type="button"
                 onClick={handleClose}
-                className="px-4 py-2 rounded-lg border border-border text-text text-sm font-medium hover:border-secondary/60 transition-colors"
+                className="px-5 py-2.5 text-stone-500 text-sm hover:text-stone-700 transition-colors"
               >
                 Cancelar
               </button>
@@ -231,12 +265,13 @@ export default function VentaModal({ puros, open, onClose }: VentaModalProps) {
                 type="button"
                 disabled={cart.length === 0 || isPending}
                 onClick={handleConfirm}
-                className="px-4 py-2 rounded-lg bg-secondary text-background text-sm font-medium hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                className="px-6 py-2.5 rounded-lg text-sm font-medium text-white transition-opacity disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
+                style={{ backgroundColor: '#722F37' }}
               >
                 {isPending && (
                   <span className="w-3 h-3 rounded-full border-2 border-current border-t-transparent animate-spin" />
                 )}
-                Confirmar y Descontar Inventario
+                Confirmar Venta
               </button>
             </div>
           </div>

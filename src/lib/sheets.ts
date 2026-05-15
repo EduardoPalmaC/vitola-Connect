@@ -206,10 +206,13 @@ export async function getVentas(): Promise<Venta[]> {
 }
 
 export async function registrarVentaItems(
-  items: { puro: Puro; cantidad: number }[]
+  items: { puro: Puro; cantidad: number }[],
+  fechaOverride?: string
 ): Promise<void> {
   const sheets = await getSheets();
-  const fecha = new Date().toLocaleDateString('es-MX');
+  const fecha = fechaOverride
+    ? new Date(`${fechaOverride}T12:00:00`).toLocaleDateString('es-MX')
+    : new Date().toLocaleDateString('es-MX');
   const rows = items.map(({ puro, cantidad }) => {
     const costoUnitario = puro.precioBruto + puro.costoTransporte + puro.costoAlmacenamiento;
     const totalVenta = puro.precioVenta * cantidad;
