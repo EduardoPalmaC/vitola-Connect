@@ -12,7 +12,7 @@ const TEXT       = '#1C1008';
 const TEXT_SEC   = '#6B5C4A';
 const TEXT_MUTED = '#A8967E';
 
-interface CartItem { puro: Puro; cantidad: number }
+interface CartItem { puro: Puro; cantidad: number; precioOverride?: number }
 interface VentaModalProps { puros: Puro[]; open: boolean; onClose: () => void }
 
 function todayISO() {
@@ -99,8 +99,15 @@ function QtyButton({ onClick, disabled, children }: { onClick: () => void; disab
   );
 }
 
-function CartRow({ puro, cantidad, isLast, onUpdate }: { puro: Puro; cantidad: number; isLast: boolean; onUpdate: (n: number) => void }) {
+function CartRow({ puro, cantidad, precioOverride, isLast, onUpdate, onPrecioChange }: {
+  puro: Puro; cantidad: number; precioOverride?: number; isLast: boolean;
+  onUpdate: (n: number) => void; onPrecioChange: (p: number) => void;
+}) {
   const [hovX, setHovX] = useState(false);
+  const [priceFocus, setPriceFocus] = useState(false);
+  const precio = precioOverride ?? puro.precioVenta;
+  const isModified = precioOverride !== undefined && precioOverride !== puro.precioVenta;
+
   return (
     <div style={{
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
@@ -111,9 +118,30 @@ function CartRow({ puro, cantidad, isLast, onUpdate }: { puro: Puro; cantidad: n
         <p style={{ fontFamily: 'var(--font-serif)', fontSize: '14px', fontWeight: 700, color: TEXT, margin: 0 }}>
           {puro.marca} <span style={{ fontWeight: 400, color: TEXT_SEC }}>{puro.vitola}</span>
         </p>
-        <p style={{ fontFamily: 'var(--font-code)', fontSize: '11px', color: TEXT_MUTED, margin: '2px 0 0' }}>
-          ${puro.precioVenta.toLocaleString('es-MX')} c/u
-        </p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px' }}>
+          <span style={{ fontFamily: 'var(--font-code)', fontSize: '10px', color: TEXT_MUTED }}>$</span>
+          <input
+            type="number"
+            value={precio}
+            min={0}
+            onChange={(e) => { const v = parseFloat(e.target.value); if (!isNaN(v) && v >= 0) onPrecioChange(v); }}
+            onFocus={() => setPriceFocus(true)}
+            onBlur={() => setPriceFocus(false)}
+            style={{
+              fontFamily: 'var(--font-code)', fontSize: '12px',
+              color: isModified ? OXBLOOD : TEXT_MUTED,
+              border: 'none', borderBottom: `1px solid ${priceFocus ? OXBLOOD : (isModified ? OXBLOOD + '60' : BORDER)}`,
+              background: 'transparent', outline: 'none',
+              width: '72px', padding: '0 0 1px', transition: 'border-color 150ms',
+            }}
+          />
+          <span style={{ fontFamily: 'var(--font-code)', fontSize: '10px', color: TEXT_MUTED }}>c/u</span>
+          {isModified && (
+            <span style={{ fontFamily: 'var(--font-code)', fontSize: '10px', color: TEXT_MUTED, textDecoration: 'line-through' }}>
+              ${puro.precioVenta.toLocaleString('es-MX')}
+            </span>
+          )}
+        </div>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexShrink: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -123,8 +151,8 @@ function CartRow({ puro, cantidad, isLast, onUpdate }: { puro: Puro; cantidad: n
           </span>
           <QtyButton onClick={() => onUpdate(cantidad + 1)} disabled={cantidad >= puro.stock}>+</QtyButton>
         </div>
-        <span style={{ fontFamily: 'var(--font-code)', fontSize: '13px', fontWeight: 600, color: TEXT_SEC, minWidth: '72px', textAlign: 'right' }}>
-          ${(puro.precioVenta * cantidad).toLocaleString('es-MX')}
+        <span style={{ fontFamily: 'var(--font-code)', fontSize: '13px', fontWeight: 600, color: isModified ? OXBLOOD : TEXT_SEC, minWidth: '72px', textAlign: 'right' }}>
+          ${(precio * cantidad).toLocaleString('es-MX')}
         </span>
         <button
           type="button"
@@ -186,7 +214,11 @@ export default function VentaModal({ puros, open, onClose }: VentaModalProps) {
     setCart((prev) => prev.map((i) => i.puro.id === puroId ? { ...i, cantidad } : i));
   }
 
-  const total = cart.reduce((sum, { puro, cantidad }) => sum + puro.precioVenta * cantidad, 0);
+  function updatePrecio(puroId: string, precio: number) {
+    setCart((prev) => prev.map((i) => i.puro.id === puroId ? { ...i, precioOverride: precio } : i));
+  }
+
+  const total = cart.reduce((sum, { puro, cantidad, precioOverride }) => sum + (precioOverride ?? puro.precioVenta) * cantidad, 0);
 
   function handleClose() {
     setCart([]); setSearch(''); setFecha(todayISO()); setError(null); onClose();
@@ -200,7 +232,13 @@ export default function VentaModal({ puros, open, onClose }: VentaModalProps) {
         const res = await fetch('/api/ventas/batch', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ items: cart, fecha }),
+          body: JSON.stringify({
+            items: cart.map(({ puro, cantidad, precioOverride }) => ({
+              puro: precioOverride !== undefined ? { ...puro, precioVenta: precioOverride } : puro,
+              cantidad,
+            })),
+            fecha,
+          }),
         });
         if (!res.ok) throw new Error('Error al registrar la venta');
         handleClose();
@@ -328,13 +366,15 @@ export default function VentaModal({ puros, open, onClose }: VentaModalProps) {
                 Agrega productos para comenzar
               </p>
             ) : (
-              cart.map(({ puro, cantidad }, i) => (
+              cart.map(({ puro, cantidad, precioOverride }, i) => (
                 <CartRow
                   key={puro.id}
                   puro={puro}
                   cantidad={cantidad}
+                  precioOverride={precioOverride}
                   isLast={i === cart.length - 1}
                   onUpdate={(n) => updateCantidad(puro.id, n)}
+                  onPrecioChange={(p) => updatePrecio(puro.id, p)}
                 />
               ))
             )}
