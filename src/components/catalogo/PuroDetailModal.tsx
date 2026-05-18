@@ -268,15 +268,34 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <div
-          className="flex flex-col md:grid md:grid-cols-[280px_1fr] overflow-y-auto max-h-[85vh] md:max-h-none md:overflow-visible"
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '280px 1fr',
+          }}
+          className="max-sm:grid-cols-1"
         >
           {/* Left: image */}
           <div
-            className="bg-[#F2EDE4] border-b border-[#EDE8DE] md:border-b-0 md:border-r flex items-center justify-center p-6 md:p-[48px_24px] min-h-[250px] md:min-h-[460px]"
+            style={{
+              background: '#F2EDE4',
+              borderRight: '1px solid #EDE8DE',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '48px 24px',
+              minHeight: '460px',
+            }}
+            className="max-sm:min-h-[260px] max-sm:border-r-0 max-sm:border-b max-sm:border-[#EDE8DE]"
           >
             {puro.fotoUrl ? (
               <div
-                className="w-full h-[250px] md:w-[300px] md:h-[700px] relative md:rotate-90"
+                style={{
+                  width: '300px',
+                  height: '700px',
+                  position: 'relative',
+                  flexShrink: 0,
+                }}
+                className="rotate-90"
               >
                 <Image
                   src={puro.fotoUrl}
@@ -295,11 +314,17 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
           </div>
 
           {/* Right: details */}
-          <div className="p-6 md:p-[36px_44px_40px_40px] relative">
+          <div style={{ padding: '36px 44px 40px 40px', position: 'relative' }}>
             {/* Logo — absolute, no afecta el flujo */}
             {puro.logoMarcaUrl && (
               <div
-                className="absolute top-4 right-4 w-16 h-16 md:top-9 md:right-11 md:w-[160px] md:h-[160px]"
+                style={{
+                  position: 'absolute',
+                  top: '36px',
+                  right: '44px',
+                  width: '160px',
+                  height: '160px',
+                }}
               >
                 <Image
                   src={puro.logoMarcaUrl}
@@ -312,7 +337,7 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
             )}
 
             {/* Header */}
-            <div className={`mb-7 ${puro.logoMarcaUrl ? 'pr-4 md:pr-[180px]' : ''}`}>
+            <div style={{ marginBottom: '28px', paddingRight: puro.logoMarcaUrl ? '180px' : '0' }}>
               <h2
                 style={{
                   fontFamily: 'var(--font-serif)',
