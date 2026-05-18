@@ -49,10 +49,11 @@ export default function PuroCard({ puro, idx, onOpenDetail }: PuroCardProps) {
     <button
       type="button"
       onClick={onOpenDetail}
-      className="group block relative text-left w-full px-4 pt-8 pb-5 sm:px-9 sm:pt-11 sm:pb-8"
+      className="group block relative text-left w-full"
       style={{
         borderRight: '1px solid #EDE8DE',
         borderBottom: '1px solid #EDE8DE',
+        padding: '44px 36px 32px',
         background: '#FFFFFF',
         opacity: soldOut ? 0.5 : 1,
         transition: 'background 0.2s ease',
@@ -64,8 +65,10 @@ export default function PuroCard({ puro, idx, onOpenDetail }: PuroCardProps) {
       `}</style>
 
       <div
-        className="absolute top-4 left-4 sm:top-5 sm:left-9"
         style={{
+          position: 'absolute',
+          top: '20px',
+          left: '36px',
           fontFamily: 'var(--font-code)',
           fontSize: '10px',
           letterSpacing: '0.2em',
@@ -77,8 +80,10 @@ export default function PuroCard({ puro, idx, onOpenDetail }: PuroCardProps) {
 
       {puro.paisOrigen && (
         <div
-          className="absolute top-4 right-4 sm:top-5 sm:right-9"
           style={{
+            position: 'absolute',
+            top: '20px',
+            right: '36px',
             fontFamily: 'var(--font-code)',
             fontSize: '10px',
             letterSpacing: '0.2em',
@@ -92,7 +97,7 @@ export default function PuroCard({ puro, idx, onOpenDetail }: PuroCardProps) {
 
       <div
         style={{
-          height: '260px',
+          height: '320px',
           margin: '8px 0 14px',
           position: 'relative',
           display: 'flex',
@@ -102,35 +107,32 @@ export default function PuroCard({ puro, idx, onOpenDetail }: PuroCardProps) {
           background: '#F7F3EC',
           borderRadius: '4px',
         }}
-        className="sm:h-[320px]"
       >
         {puro.fotoUrl ? (
           <div
             style={{
               width: '200px',
-              height: '240px',
+              height: '300px',
               position: 'relative',
               overflow: 'hidden',
               flexShrink: 0,
             }}
-            className="sm:h-[300px]"
           >
             <div
               style={{
                 position: 'absolute',
-                width: '240px',
+                width: '300px',
                 height: '200px',
                 top: '50%',
                 left: '50%',
                 transform: 'translate(-50%, -50%) rotate(90deg)',
               }}
-              className="sm:!w-[300px]"
             >
               <Image
                 src={puro.fotoUrl}
                 alt={puro.nombre}
                 fill
-                sizes="(max-width: 640px) 240px, 300px"
+                sizes="300px"
                 style={{ objectFit: 'contain', objectPosition: 'center' }}
               />
             </div>
@@ -157,15 +159,12 @@ export default function PuroCard({ puro, idx, onOpenDetail }: PuroCardProps) {
         style={{
           fontFamily: 'var(--font-serif)',
           fontWeight: 400,
-          fontSize: '22px',
+          fontSize: '26px',
           lineHeight: 1.15,
           letterSpacing: '-0.01em',
           color: '#2C1E1A',
           margin: '0',
-          overflowWrap: 'break-word',
-          wordBreak: 'break-word',
         }}
-        className="sm:!text-[26px]"
       >
         {puro.nombre}
       </h3>
@@ -174,7 +173,7 @@ export default function PuroCard({ puro, idx, onOpenDetail }: PuroCardProps) {
         style={{
           display: 'grid',
           gridTemplateColumns: '1fr 1fr 1fr',
-          gap: '8px',
+          gap: '10px',
           marginTop: '12px',
           paddingTop: '12px',
           borderTop: '1px solid #EDE8DE',
@@ -185,7 +184,7 @@ export default function PuroCard({ puro, idx, onOpenDetail }: PuroCardProps) {
           <div
             style={{
               fontFamily: 'var(--font-code)',
-              fontSize: '10px',
+              fontSize: '11px',
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
               color: '#B0A090',
@@ -194,8 +193,7 @@ export default function PuroCard({ puro, idx, onOpenDetail }: PuroCardProps) {
           >
             Vitola
           </div>
-          <div style={{ fontFamily: 'var(--font-serif)', fontSize: '15px', color: '#2C1E1A' }}
-            className="sm:!text-[17px] truncate">
+          <div style={{ fontFamily: 'var(--font-serif)', fontSize: '17px', color: '#2C1E1A' }}>
             {puro.vitola}
           </div>
         </div>
@@ -203,7 +201,7 @@ export default function PuroCard({ puro, idx, onOpenDetail }: PuroCardProps) {
           <div
             style={{
               fontFamily: 'var(--font-code)',
-              fontSize: '10px',
+              fontSize: '11px',
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
               color: '#B0A090',
@@ -212,8 +210,7 @@ export default function PuroCard({ puro, idx, onOpenDetail }: PuroCardProps) {
           >
             Cepo
           </div>
-          <div style={{ fontFamily: 'var(--font-serif)', fontSize: '15px', color: '#2C1E1A' }}
-            className="sm:!text-[17px]">
+          <div style={{ fontFamily: 'var(--font-serif)', fontSize: '17px', color: '#2C1E1A' }}>
             {puro.ringGauge ?? '—'}
           </div>
         </div>
@@ -221,7 +218,7 @@ export default function PuroCard({ puro, idx, onOpenDetail }: PuroCardProps) {
           <div
             style={{
               fontFamily: 'var(--font-code)',
-              fontSize: '10px',
+              fontSize: '11px',
               letterSpacing: '0.14em',
               textTransform: 'uppercase',
               color: '#B0A090',
@@ -230,8 +227,7 @@ export default function PuroCard({ puro, idx, onOpenDetail }: PuroCardProps) {
           >
             Stock
           </div>
-          <div style={{ fontFamily: 'var(--font-serif)', fontSize: '15px', color: '#2C1E1A' }}
-            className="sm:!text-[17px]">
+          <div style={{ fontFamily: 'var(--font-serif)', fontSize: '17px', color: '#2C1E1A' }}>
             {puro.stock || '—'}
           </div>
         </div>
@@ -241,15 +237,14 @@ export default function PuroCard({ puro, idx, onOpenDetail }: PuroCardProps) {
         <div
           style={{
             fontFamily: 'Inter, sans-serif',
-            fontSize: '22px',
+            fontSize: '24px',
             fontWeight: 700,
             color: '#B28F69',
             letterSpacing: '-0.02em',
           }}
-          className="sm:!text-[24px]"
         >
           ${intero}
-          <span style={{ fontSize: '13px' }}>.{deci}</span>
+          <span style={{ fontSize: '14px' }}>.{deci}</span>
         </div>
         <div
           style={{

@@ -12,7 +12,7 @@ export default async function InventarioPage() {
     <div className="min-h-screen" style={{ backgroundColor: '#F9F6F0' }}>
       <MobileNav />
       <header
-        className="px-4 sm:px-6 py-4 sm:py-5 flex flex-wrap items-center justify-between gap-2"
+        className="px-6 py-5 flex items-center justify-between"
         style={{ borderBottom: '1px solid #E2D9C8', backgroundColor: '#F9F6F0' }}
       >
         <div>
@@ -34,31 +34,31 @@ export default async function InventarioPage() {
             {puros.length} puros en total
           </p>
         </div>
-        <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto whitespace-nowrap scrollbar-hide">
+        <div className="flex items-center gap-3">
           <Link
             href="/admin/dashboard"
-            className="transition-colors hover:opacity-70 shrink-0"
+            className="hidden sm:inline transition-colors hover:opacity-70"
             style={{ fontSize: '13px', color: '#9A8572', fontFamily: 'var(--font-code)' }}
           >
             Dashboard
           </Link>
           <Link
             href="/admin/ventas"
-            className="transition-colors shrink-0"
+            className="hidden sm:inline transition-colors"
             style={{ fontSize: '13px', color: '#9A8572', fontFamily: 'var(--font-code)' }}
           >
             Ventas
           </Link>
           <Link
             href="/admin/diario"
-            className="transition-colors shrink-0"
+            className="hidden sm:inline transition-colors"
             style={{ fontSize: '13px', color: '#9A8572', fontFamily: 'var(--font-code)' }}
           >
             Mi Diario
           </Link>
           <Link
             href="/admin/inventario/nuevo"
-            className="inline-flex items-center transition-opacity hover:opacity-85 shrink-0"
+            className="inline-flex items-center transition-opacity hover:opacity-85"
             style={{
               padding: '8px 16px',
               borderRadius: '6px',
@@ -75,7 +75,7 @@ export default async function InventarioPage() {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 pb-24 sm:pb-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 pb-8 max-sm:pb-20">
         <InventarioTable puros={puros} />
       </div>
     </div>

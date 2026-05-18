@@ -18,6 +18,7 @@ export default async function DashboardPage() {
       <MobileNav />
       <header
         style={{
+          padding: '20px 64px 16px',
           borderBottom: '1px solid #E2D9C8',
           display: 'grid',
           gridTemplateColumns: '1fr auto',
@@ -25,7 +26,7 @@ export default async function DashboardPage() {
           gap: '20px',
           background: '#F9F6F0',
         }}
-        className="grid-cols-1 md:grid-cols-[1fr_auto] px-4 md:px-16 pt-4 md:pt-5 pb-3 md:pb-4"
+        className="max-sm:grid-cols-1 max-sm:px-6 max-sm:pt-4 max-sm:pb-3"
       >
         <div>
           <p
@@ -35,6 +36,7 @@ export default async function DashboardPage() {
               letterSpacing: '0.32em',
               textTransform: 'uppercase',
               color: '#B0A090',
+              marginBottom: '10px',
               margin: '0 0 10px',
             }}
           >
@@ -53,7 +55,14 @@ export default async function DashboardPage() {
             Dashboard
           </h1>
         </div>
-        <nav className="flex items-center gap-4 md:gap-7 overflow-x-auto whitespace-nowrap scrollbar-hide pb-1 md:pb-0">
+        <nav
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '28px',
+          }}
+          className="max-sm:hidden"
+        >
           {[
             { href: '/admin/inventario', label: 'Inventario' },
             { href: '/admin/ventas', label: 'Ventas' },
@@ -74,7 +83,7 @@ export default async function DashboardPage() {
                 textDecoration: 'none',
                 transition: 'color 0.15s',
               }}
-              className="hover:!text-[#5C3D1E] shrink-0"
+              className="hover:!text-[#5C3D1E]"
             >
               {label}
             </Link>
@@ -93,7 +102,6 @@ export default async function DashboardPage() {
                 cursor: 'pointer',
                 padding: 0,
                 transition: 'color 0.15s',
-                whiteSpace: 'nowrap',
               }}
               className="hover:!text-[#5C3D1E]"
             >
@@ -104,8 +112,8 @@ export default async function DashboardPage() {
       </header>
 
       <div
-        style={{ maxWidth: '1100px', margin: '0 auto' }}
-        className="px-4 md:px-16 pt-8 md:pt-14 pb-24 md:pb-20"
+        style={{ maxWidth: '1100px', margin: '0 auto', padding: '56px 64px 80px' }}
+        className="max-sm:px-6 max-sm:py-8 max-sm:pb-20"
       >
         {/* KPI grid */}
         <div
@@ -198,12 +206,11 @@ function KPICard({ label, value, sub }: { label: string; value: string; sub: str
     <div
       style={{
         background: '#FFFFFF',
-        padding: '20px 16px 18px',
+        padding: '32px 28px 28px',
         display: 'flex',
         flexDirection: 'column',
         gap: '8px',
       }}
-      className="md:!p-[32px_28px_28px]"
     >
       <p
         style={{
@@ -220,13 +227,12 @@ function KPICard({ label, value, sub }: { label: string; value: string; sub: str
       <p
         style={{
           fontFamily: 'var(--font-serif)',
-          fontSize: '28px',
+          fontSize: '34px',
           fontWeight: 700,
           color: '#2C1E1A',
           margin: 0,
           lineHeight: 1,
         }}
-        className="md:!text-[34px]"
       >
         {value}
       </p>
@@ -263,25 +269,21 @@ function AlertRow({
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        padding: '14px 16px',
+        padding: '18px 24px',
         borderBottom: '1px solid #EDE8DE',
         background: '#FFFFFF',
         textDecoration: 'none',
         transition: 'background 0.15s',
-        gap: '12px',
       }}
-      className="md:!p-[18px_24px] hover:!bg-[#FDFAF5]"
+      className="hover:!bg-[#FDFAF5]"
     >
-      <div style={{ minWidth: 0 }}>
+      <div>
         <p
           style={{
             fontFamily: 'var(--font-serif)',
             fontSize: '15px',
             color: '#2C1E1A',
             margin: '0 0 3px',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-            whiteSpace: 'nowrap',
           }}
         >
           {nombre}
@@ -310,7 +312,6 @@ function AlertRow({
           padding: '5px 10px',
           background: '#F5EDD8',
           whiteSpace: 'nowrap',
-          flexShrink: 0,
         }}
       >
         {label}
