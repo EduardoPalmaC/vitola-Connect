@@ -16,7 +16,6 @@ export default async function ClientesPage() {
       <MobileNav />
       <header
         style={{
-          padding: '20px 64px 16px',
           borderBottom: '1px solid #E2D9C8',
           display: 'grid',
           gridTemplateColumns: '1fr auto',
@@ -24,7 +23,7 @@ export default async function ClientesPage() {
           gap: '20px',
           background: '#F9F6F0',
         }}
-        className="max-sm:grid-cols-1 max-sm:px-6 max-sm:pt-4 max-sm:pb-3"
+        className="grid-cols-1 md:grid-cols-[1fr_auto] px-4 md:px-16 pt-4 md:pt-5 pb-3 md:pb-4"
       >
         <div>
           <p style={{
@@ -41,7 +40,7 @@ export default async function ClientesPage() {
             Clientes
           </h1>
         </div>
-        <nav style={{ display: 'flex', alignItems: 'center', gap: '28px' }} className="max-sm:hidden">
+        <nav className="flex items-center gap-4 md:gap-7 overflow-x-auto whitespace-nowrap scrollbar-hide pb-1 md:pb-0">
           {[
             { href: '/admin/dashboard', label: 'Dashboard' },
             { href: '/admin/inventario', label: 'Inventario' },
@@ -58,7 +57,7 @@ export default async function ClientesPage() {
                 letterSpacing: '0.2em', textTransform: 'uppercase',
                 color: '#9A8572', textDecoration: 'none', transition: 'color 0.15s',
               }}
-              className="hover:!text-[#5C3D1E]"
+              className="hover:!text-[#5C3D1E] shrink-0"
             >
               {label}
             </Link>
@@ -70,7 +69,8 @@ export default async function ClientesPage() {
                 fontFamily: 'var(--font-code)', fontSize: '10px',
                 letterSpacing: '0.2em', textTransform: 'uppercase',
                 color: '#9A8572', background: 'transparent',
-                border: 'none', cursor: 'pointer', padding: 0, transition: 'color 0.15s',
+                border: 'none', cursor: 'pointer', padding: 0,
+                transition: 'color 0.15s', whiteSpace: 'nowrap',
               }}
               className="hover:!text-[#5C3D1E]"
             >
@@ -81,8 +81,8 @@ export default async function ClientesPage() {
       </header>
 
       <div
-        style={{ maxWidth: '1100px', margin: '0 auto', padding: '56px 64px 80px' }}
-        className="max-sm:px-6 max-sm:py-8 max-sm:pb-20"
+        style={{ maxWidth: '1100px', margin: '0 auto' }}
+        className="px-4 md:px-16 pt-8 md:pt-14 pb-24 md:pb-20"
       >
         {/* KPI strip */}
         <div
@@ -114,9 +114,11 @@ export default async function ClientesPage() {
 function KPICard({ label, value }: { label: string; value: string }) {
   return (
     <div style={{
-      background: '#FFFFFF', padding: '28px 28px 24px',
+      background: '#FFFFFF', padding: '20px 16px 18px',
       display: 'flex', flexDirection: 'column', gap: '8px',
-    }}>
+    }}
+      className="md:!p-[28px_28px_24px]"
+    >
       <p style={{
         fontFamily: 'var(--font-code)', fontSize: '9px',
         letterSpacing: '0.28em', textTransform: 'uppercase',
@@ -125,9 +127,11 @@ function KPICard({ label, value }: { label: string; value: string }) {
         {label}
       </p>
       <p style={{
-        fontFamily: 'var(--font-serif)', fontSize: '30px',
+        fontFamily: 'var(--font-serif)', fontSize: '26px',
         fontWeight: 700, color: '#2C1E1A', margin: 0, lineHeight: 1,
-      }}>
+      }}
+        className="md:!text-[30px]"
+      >
         {value}
       </p>
     </div>

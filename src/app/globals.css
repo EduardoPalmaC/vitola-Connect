@@ -52,6 +52,9 @@ html {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
 body {
   font-family: 'Inter', sans-serif;
   font-size: 16px;
