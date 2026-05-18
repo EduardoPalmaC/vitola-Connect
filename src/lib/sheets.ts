@@ -1,7 +1,7 @@
 import { google } from 'googleapis';
 import { OAuth2Client } from 'google-auth-library';
 import { SignJWT, importPKCS8 } from 'jose';
-import type { Puro, Venta, Cata } from '@/types';
+import type { Puro, Venta, Cata, Cliente } from '@/types';
 
 const SPREADSHEET_ID = process.env.GOOGLE_SHEETS_ID!;
 
@@ -189,7 +189,7 @@ export async function getVentas(): Promise<Venta[]> {
   const sheets = await getSheets();
   const response = await sheets.spreadsheets.values.get({
     spreadsheetId: SPREADSHEET_ID,
-    range: 'Ventas!A2:F',
+    range: 'Ventas!A2:H',
   });
 
   const rows = (response.data.values ?? []) as string[][];
@@ -202,12 +202,41 @@ export async function getVentas(): Promise<Venta[]> {
       precioUnitario: parseFloat(row[3]!),
       totalVenta: parseFloat(row[4]!),
       gananciaEstimada: parseFloat(row[5]!),
+      clienteNombre: row[6] || undefined,
+      clienteContacto: row[7] || undefined,
     }));
+}
+
+export async function getClientes(): Promise<Cliente[]> {
+  const ventas = await getVentas();
+  const map = new Map<string, Cliente>();
+
+  for (const v of ventas) {
+    if (!v.clienteNombre) continue;
+    const key = v.clienteNombre.toLowerCase().trim();
+    if (!map.has(key)) {
+      map.set(key, {
+        nombre: v.clienteNombre,
+        contacto: v.clienteContacto ?? '',
+        totalPuros: 0,
+        totalGastado: 0,
+        ventas: [],
+      });
+    }
+    const c = map.get(key)!;
+    c.totalPuros += v.cantidad;
+    c.totalGastado += v.totalVenta;
+    c.ventas.push({ fecha: v.fecha, producto: v.producto, cantidad: v.cantidad, totalVenta: v.totalVenta });
+  }
+
+  return Array.from(map.values()).sort((a, b) => b.totalGastado - a.totalGastado);
 }
 
 export async function registrarVentaItems(
   items: { puro: Puro; cantidad: number }[],
-  fechaOverride?: string
+  fechaOverride?: string,
+  clienteNombre?: string,
+  clienteContacto?: string,
 ): Promise<void> {
   const sheets = await getSheets();
   const fecha = fechaOverride
@@ -217,12 +246,12 @@ export async function registrarVentaItems(
     const costoUnitario = puro.precioBruto + puro.costoTransporte + puro.costoAlmacenamiento;
     const totalVenta = puro.precioVenta * cantidad;
     const gananciaEstimada = (puro.precioVenta - costoUnitario) * cantidad;
-    return [fecha, `${puro.marca} ${puro.vitola}`, cantidad, puro.precioVenta, totalVenta, gananciaEstimada];
+    return [fecha, `${puro.marca} ${puro.vitola}`, cantidad, puro.precioVenta, totalVenta, gananciaEstimada, clienteNombre ?? '', clienteContacto ?? ''];
   });
 
   await sheets.spreadsheets.values.append({
     spreadsheetId: SPREADSHEET_ID,
-    range: 'Ventas!A:F',
+    range: 'Ventas!A:H',
     valueInputOption: 'USER_ENTERED',
     requestBody: { values: rows },
   });

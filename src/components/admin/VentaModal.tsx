@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useMemo, useTransition } from 'react';
+import { useState, useMemo, useTransition, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import type { Puro } from '@/types';
+import type { Puro, Cliente } from '@/types';
 
 const OXBLOOD    = '#6B1E2A';
 const SURFACE    = '#FFFFFF';
@@ -185,6 +185,28 @@ export default function VentaModal({ puros, open, onClose }: VentaModalProps) {
   const [searchFocus, setSearchFocus] = useState(false);
   const [dateFocus, setDateFocus]   = useState(false);
 
+  const [clientes, setClientes]           = useState<Cliente[]>([]);
+  const [clienteNombre, setClienteNombre] = useState('');
+  const [clienteContacto, setClienteContacto] = useState('');
+  const [clienteSearch, setClienteSearch] = useState('');
+  const [showClienteDrop, setShowClienteDrop] = useState(false);
+  const clienteRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    fetch('/api/clientes').then((r) => r.json()).then((data: Cliente[]) => setClientes(data)).catch(() => {});
+  }, [open]);
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (clienteRef.current && !clienteRef.current.contains(e.target as Node)) {
+        setShowClienteDrop(false);
+      }
+    }
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
+
   const disponibles = useMemo(
     () => puros.filter(
       (p) => p.stock > 0 && (
@@ -220,8 +242,22 @@ export default function VentaModal({ puros, open, onClose }: VentaModalProps) {
 
   const total = cart.reduce((sum, { puro, cantidad, precioOverride }) => sum + (precioOverride ?? puro.precioVenta) * cantidad, 0);
 
+  const clientesFiltrados = useMemo(
+    () => clientes.filter((c) => c.nombre.toLowerCase().includes(clienteSearch.toLowerCase())),
+    [clientes, clienteSearch],
+  );
+
+  function selectCliente(c: Cliente) {
+    setClienteNombre(c.nombre);
+    setClienteContacto(c.contacto);
+    setClienteSearch(c.nombre);
+    setShowClienteDrop(false);
+  }
+
   function handleClose() {
-    setCart([]); setSearch(''); setFecha(todayISO()); setError(null); onClose();
+    setCart([]); setSearch(''); setFecha(todayISO()); setError(null);
+    setClienteNombre(''); setClienteContacto(''); setClienteSearch('');
+    onClose();
   }
 
   function handleConfirm() {
@@ -238,6 +274,8 @@ export default function VentaModal({ puros, open, onClose }: VentaModalProps) {
               cantidad,
             })),
             fecha,
+            clienteNombre: clienteNombre.trim() || undefined,
+            clienteContacto: clienteContacto.trim() || undefined,
           }),
         });
         if (!res.ok) throw new Error('Error al registrar la venta');
@@ -356,6 +394,82 @@ export default function VentaModal({ puros, open, onClose }: VentaModalProps) {
                 })
               )}
             </div>
+          </div>
+
+          {/* Cliente */}
+          <div style={{ padding: '16px 28px', backgroundColor: SURFACE, borderBottom: `1px solid ${BORDER}`, flexShrink: 0 }}>
+            <Label>Cliente</Label>
+            <div ref={clienteRef} style={{ position: 'relative' }}>
+              <input
+                type="text"
+                placeholder="Buscar cliente existente o escribir nombre nuevo…"
+                value={clienteSearch}
+                onChange={(e) => {
+                  setClienteSearch(e.target.value);
+                  setClienteNombre(e.target.value);
+                  setShowClienteDrop(true);
+                }}
+                onFocus={() => setShowClienteDrop(true)}
+                style={{
+                  width: '100%', boxSizing: 'border-box',
+                  fontFamily: 'var(--font-code)', fontSize: '13px', color: TEXT,
+                  border: 'none', borderBottom: `1px solid ${showClienteDrop ? OXBLOOD : BORDER}`,
+                  background: 'transparent', outline: 'none',
+                  padding: '6px 0', transition: 'border-color 150ms',
+                }}
+              />
+              {showClienteDrop && clientesFiltrados.length > 0 && (
+                <div style={{
+                  position: 'absolute', top: '100%', left: 0, right: 0, zIndex: 10,
+                  background: SURFACE, border: `1px solid ${BORDER}`, borderTop: 'none',
+                  borderRadius: '0 0 6px 6px', maxHeight: '140px', overflowY: 'auto',
+                  boxShadow: '0 8px 20px rgba(28,16,8,0.1)',
+                }}>
+                  {clientesFiltrados.map((c) => (
+                    <button
+                      key={c.nombre}
+                      type="button"
+                      onMouseDown={() => selectCliente(c)}
+                      style={{
+                        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                        width: '100%', padding: '9px 14px', border: 'none',
+                        background: 'transparent', cursor: 'pointer', textAlign: 'left',
+                        borderBottom: `1px solid ${BORDER}`,
+                      }}
+                      onMouseEnter={(e) => { (e.currentTarget as HTMLButtonElement).style.background = '#F5EFE8'; }}
+                      onMouseLeave={(e) => { (e.currentTarget as HTMLButtonElement).style.background = 'transparent'; }}
+                    >
+                      <div>
+                        <span style={{ fontFamily: 'var(--font-serif)', fontSize: '13px', color: TEXT }}>{c.nombre}</span>
+                        {c.contacto && <span style={{ fontFamily: 'var(--font-code)', fontSize: '10px', color: TEXT_MUTED, marginLeft: '8px' }}>{c.contacto}</span>}
+                      </div>
+                      <span style={{ fontFamily: 'var(--font-code)', fontSize: '10px', color: TEXT_MUTED }}>
+                        {c.totalPuros} puros
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            {clienteNombre.trim() && (
+              <div style={{ marginTop: '10px' }}>
+                <input
+                  type="text"
+                  placeholder="Teléfono / contacto (opcional)…"
+                  value={clienteContacto}
+                  onChange={(e) => setClienteContacto(e.target.value)}
+                  style={{
+                    width: '100%', boxSizing: 'border-box',
+                    fontFamily: 'var(--font-code)', fontSize: '12px', color: TEXT_SEC,
+                    border: 'none', borderBottom: `1px solid ${BORDER}`,
+                    background: 'transparent', outline: 'none',
+                    padding: '4px 0', transition: 'border-color 150ms',
+                  }}
+                  onFocus={(e) => { (e.currentTarget as HTMLInputElement).style.borderBottomColor = OXBLOOD; }}
+                  onBlur={(e) => { (e.currentTarget as HTMLInputElement).style.borderBottomColor = BORDER; }}
+                />
+              </div>
+            )}
           </div>
 
           {/* Cart */}

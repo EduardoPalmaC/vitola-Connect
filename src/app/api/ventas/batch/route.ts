@@ -3,11 +3,11 @@ import { registrarVentaItems, actualizarStockMultiple } from '@/lib/sheets';
 import type { Puro } from '@/types';
 
 export async function POST(req: Request) {
-  const body: { items: { puro: Puro; cantidad: number }[]; fecha?: string } = await req.json();
+  const body: { items: { puro: Puro; cantidad: number }[]; fecha?: string; clienteNombre?: string; clienteContacto?: string } = await req.json();
 
   await Promise.all([
     actualizarStockMultiple(body.items.map(({ puro, cantidad }) => ({ id: puro.id, cantidad }))),
-    registrarVentaItems(body.items, body.fecha),
+    registrarVentaItems(body.items, body.fecha, body.clienteNombre, body.clienteContacto),
   ]);
 
   return NextResponse.json({ ok: true }, { status: 201 });

@@ -36,6 +36,23 @@ export interface Venta {
   precioUnitario: number;
   totalVenta: number;
   gananciaEstimada: number;
+  clienteNombre?: string;
+  clienteContacto?: string;
+}
+
+export interface VentaHistorial {
+  fecha: string;
+  producto: string;
+  cantidad: number;
+  totalVenta: number;
+}
+
+export interface Cliente {
+  nombre: string;
+  contacto: string;
+  totalPuros: number;
+  totalGastado: number;
+  ventas: VentaHistorial[];
 }
 
 export interface FilterParams {
