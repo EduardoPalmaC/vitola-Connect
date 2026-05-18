@@ -268,8 +268,11 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <div
-          style={{ display: 'grid' }}
-          className="grid-cols-[280px_1fr] max-sm:grid-cols-1"
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '280px 1fr',
+          }}
+          className="max-sm:grid-cols-1"
         >
           {/* Left: image */}
           <div
@@ -280,19 +283,25 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
               alignItems: 'center',
               justifyContent: 'center',
               padding: '48px 24px',
+              minHeight: '460px',
             }}
-            className="min-h-[460px] max-sm:min-h-[220px] max-sm:border-r-0 max-sm:border-b max-sm:border-[#EDE8DE]"
+            className="max-sm:min-h-[260px] max-sm:border-r-0 max-sm:border-b max-sm:border-[#EDE8DE]"
           >
             {puro.fotoUrl ? (
               <div
-                style={{ position: 'relative', flexShrink: 0 }}
-                className="rotate-90 max-sm:rotate-0 w-[300px] h-[700px] max-sm:w-full max-sm:h-[220px]"
+                style={{
+                  width: '300px',
+                  height: '700px',
+                  position: 'relative',
+                  flexShrink: 0,
+                }}
+                className="rotate-90"
               >
                 <Image
                   src={puro.fotoUrl}
                   alt={puro.nombre}
                   fill
-                  sizes="(max-width: 640px) 100vw, 300px"
+                  sizes="300px"
                   className="h-full scale-200"
                   style={{ objectFit: 'contain', objectPosition: 'center' }}
                 />
@@ -305,28 +314,30 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
           </div>
 
           {/* Right: details */}
-          <div style={{ position: 'relative' }} className="p-5 sm:pl-10 sm:pr-11 sm:pt-9 sm:pb-10">
+          <div style={{ padding: '36px 44px 40px 40px', position: 'relative' }}>
             {/* Logo — absolute, no afecta el flujo */}
             {puro.logoMarcaUrl && (
               <div
-                style={{ position: 'absolute' }}
-                className="top-9 right-11 w-[160px] h-[160px] max-sm:top-5 max-sm:right-5 max-sm:w-20 max-sm:h-20"
+                style={{
+                  position: 'absolute',
+                  top: '36px',
+                  right: '44px',
+                  width: '160px',
+                  height: '160px',
+                }}
               >
                 <Image
                   src={puro.logoMarcaUrl}
                   alt={`Logo ${puro.marca}`}
                   fill
-                  sizes="(max-width: 640px) 80px, 160px"
+                  sizes="160px"
                   style={{ objectFit: 'contain', objectPosition: 'center' }}
                 />
               </div>
             )}
 
             {/* Header */}
-            <div
-              style={{ marginBottom: '28px' }}
-              className={puro.logoMarcaUrl ? 'pr-[180px] max-sm:pr-[100px]' : ''}
-            >
+            <div style={{ marginBottom: '28px', paddingRight: puro.logoMarcaUrl ? '180px' : '0' }}>
               <h2
                 style={{
                   fontFamily: 'var(--font-serif)',
