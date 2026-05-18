@@ -3,12 +3,14 @@ export const dynamic = 'force-dynamic';
 import Link from 'next/link';
 import { getPuros } from '@/lib/sheets';
 import InventarioTable from '@/components/admin/InventarioTable';
+import MobileNav from '@/components/admin/MobileNav';
 
 export default async function InventarioPage() {
   const puros = await getPuros();
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#F9F6F0' }}>
+      <MobileNav />
       <header
         className="px-6 py-5 flex items-center justify-between"
         style={{ borderBottom: '1px solid #E2D9C8', backgroundColor: '#F9F6F0' }}
@@ -35,21 +37,21 @@ export default async function InventarioPage() {
         <div className="flex items-center gap-3">
           <Link
             href="/admin/dashboard"
-            className="transition-colors hover:opacity-70"
+            className="hidden sm:inline transition-colors hover:opacity-70"
             style={{ fontSize: '13px', color: '#9A8572', fontFamily: 'var(--font-code)' }}
           >
             Dashboard
           </Link>
           <Link
             href="/admin/ventas"
-            className="transition-colors"
+            className="hidden sm:inline transition-colors"
             style={{ fontSize: '13px', color: '#9A8572', fontFamily: 'var(--font-code)' }}
           >
             Ventas
           </Link>
           <Link
             href="/admin/diario"
-            className="transition-colors"
+            className="hidden sm:inline transition-colors"
             style={{ fontSize: '13px', color: '#9A8572', fontFamily: 'var(--font-code)' }}
           >
             Mi Diario
@@ -73,7 +75,7 @@ export default async function InventarioPage() {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 pb-8 max-sm:pb-20">
         <InventarioTable puros={puros} />
       </div>
     </div>

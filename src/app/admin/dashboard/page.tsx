@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { getPuros, getVentas } from '@/lib/sheets';
 import { calcularKPIs } from '@/lib/calculations';
 import DashboardActions from '@/components/admin/DashboardActions';
+import MobileNav from '@/components/admin/MobileNav';
 
 export default async function DashboardPage() {
   const [puros, ventas] = await Promise.all([getPuros(), getVentas()]);
@@ -14,6 +15,7 @@ export default async function DashboardPage() {
 
   return (
     <div style={{ background: '#F9F6F0', color: '#2C1E1A', minHeight: '100vh' }}>
+      <MobileNav />
       <header
         style={{
           padding: '20px 64px 16px',
@@ -111,7 +113,7 @@ export default async function DashboardPage() {
 
       <div
         style={{ maxWidth: '1100px', margin: '0 auto', padding: '56px 64px 80px' }}
-        className="max-sm:px-6 max-sm:py-8"
+        className="max-sm:px-6 max-sm:py-8 max-sm:pb-20"
       >
         {/* KPI grid */}
         <div

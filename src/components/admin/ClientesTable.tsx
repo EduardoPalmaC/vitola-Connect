@@ -42,7 +42,8 @@ export default function ClientesTable({ clientes }: { clientes: Cliente[] }) {
   }
 
   return (
-    <div style={{ background: SURFACE, border: `1px solid ${BORDER}` }}>
+    <div style={{ overflowX: 'auto' }}>
+    <div style={{ background: SURFACE, border: `1px solid ${BORDER}`, minWidth: '560px' }}>
       {/* Header row */}
       <div style={{
         display: 'grid',
@@ -64,6 +65,7 @@ export default function ClientesTable({ clientes }: { clientes: Cliente[] }) {
       {clientes.map((c, i) => {
         const isOpen = expanded === c.nombre;
         const isLast = i === clientes.length - 1;
+
         return (
           <div key={c.nombre} style={{ borderBottom: isLast ? 'none' : `1px solid ${BORDER}` }}>
             {/* Main row */}
@@ -175,6 +177,7 @@ export default function ClientesTable({ clientes }: { clientes: Cliente[] }) {
           </div>
         );
       })}
+    </div>
     </div>
   );
 }

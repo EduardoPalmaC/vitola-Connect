@@ -226,7 +226,7 @@ export default function VentasHistorialClient({ ventas, puros }: Props) {
           />
         </div>
 
-        <div style={{ display: 'flex', gap: '4px' }}>
+        <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
           {(Object.keys(DATE_FILTER_LABELS) as DateFilter[]).map((f) => (
             <button
               key={f}
@@ -375,7 +375,7 @@ export default function VentasHistorialClient({ ventas, puros }: Props) {
 
             {/* Modal body */}
             <div style={{ padding: '28px 32px' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+              <div className="grid grid-cols-1 sm:grid-cols-2" style={{ gap: '20px' }}>
                 <FieldGroup label="Fecha">
                   <input
                     type="date"

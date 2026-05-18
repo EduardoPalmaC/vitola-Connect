@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import Link from 'next/link';
 import { getVentasConIndice, getPuros } from '@/lib/sheets';
 import VentasHistorialClient from '@/components/admin/VentasHistorialClient';
+import MobileNav from '@/components/admin/MobileNav';
 
 export default async function VentasPage() {
   const [ventas, puros] = await Promise.all([getVentasConIndice(), getPuros()]);
@@ -13,6 +14,7 @@ export default async function VentasPage() {
 
   return (
     <div style={{ background: '#F9F6F0', color: '#2C1E1A', minHeight: '100vh' }}>
+      <MobileNav />
       <header
         style={{
           padding: '20px 64px 16px',
@@ -81,10 +83,10 @@ export default async function VentasPage() {
 
       <div
         style={{ maxWidth: '1200px', margin: '0 auto', padding: '56px 64px 80px' }}
-        className="max-sm:px-6 max-sm:py-8"
+        className="max-sm:px-6 max-sm:py-8 max-sm:pb-20"
       >
         <div
-          className="grid grid-cols-3"
+          className="grid grid-cols-1 sm:grid-cols-3"
           style={{ background: '#E2D9C8', gap: '1px', marginBottom: '48px' }}
         >
           <KPICard label="Transacciones" value={String(ventas.length)} />

@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic';
 import Link from 'next/link';
 import { getClientes } from '@/lib/sheets';
 import ClientesTable from '@/components/admin/ClientesTable';
+import MobileNav from '@/components/admin/MobileNav';
 
 export default async function ClientesPage() {
   const clientes = await getClientes();
@@ -12,6 +13,7 @@ export default async function ClientesPage() {
 
   return (
     <div style={{ background: '#F9F6F0', color: '#2C1E1A', minHeight: '100vh' }}>
+      <MobileNav />
       <header
         style={{
           padding: '20px 64px 16px',
@@ -80,11 +82,11 @@ export default async function ClientesPage() {
 
       <div
         style={{ maxWidth: '1100px', margin: '0 auto', padding: '56px 64px 80px' }}
-        className="max-sm:px-6 max-sm:py-8"
+        className="max-sm:px-6 max-sm:py-8 max-sm:pb-20"
       >
         {/* KPI strip */}
         <div
-          className="grid grid-cols-3"
+          className="grid grid-cols-1 sm:grid-cols-3"
           style={{ background: '#E2D9C8', gap: '1px', marginBottom: '48px' }}
         >
           <KPICard label="Clientes registrados" value={String(clientes.length)} />
