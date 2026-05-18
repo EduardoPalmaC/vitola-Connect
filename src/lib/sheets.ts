@@ -1,7 +1,7 @@
 import { google } from 'googleapis';
 import { OAuth2Client } from 'google-auth-library';
 import { SignJWT, importPKCS8 } from 'jose';
-import type { Puro, Venta, Cata, Cliente } from '@/types';
+import type { Puro, Venta, VentaConIndice, Cata, Cliente } from '@/types';
 
 const SPREADSHEET_ID = process.env.GOOGLE_SHEETS_ID!;
 
@@ -205,6 +205,55 @@ export async function getVentas(): Promise<Venta[]> {
       clienteNombre: row[6] || undefined,
       clienteContacto: row[7] || undefined,
     }));
+}
+
+export async function getVentasConIndice(): Promise<VentaConIndice[]> {
+  const sheets = await getSheets();
+  const response = await sheets.spreadsheets.values.get({
+    spreadsheetId: SPREADSHEET_ID,
+    range: 'Ventas!A2:H',
+  });
+  const rows = (response.data.values ?? []) as string[][];
+  return rows
+    .map((row, i) => ({ row, sheetRow: i + 2 }))
+    .filter(({ row }) => row.length >= 6)
+    .map(({ row, sheetRow }) => ({
+      rowIndex: sheetRow,
+      fecha: row[0]!,
+      producto: row[1]!,
+      cantidad: parseInt(row[2]!),
+      precioUnitario: parseFloat(row[3]!),
+      totalVenta: parseFloat(row[4]!),
+      gananciaEstimada: parseFloat(row[5]!),
+      clienteNombre: row[6] || undefined,
+      clienteContacto: row[7] || undefined,
+    }));
+}
+
+export async function updateVenta(rowIndex: number, data: Partial<Venta>): Promise<void> {
+  const sheets = await getSheets();
+  const ventas = await getVentasConIndice();
+  const venta = ventas.find(v => v.rowIndex === rowIndex);
+  if (!venta) throw new Error('Venta no encontrada');
+
+  const updated = { ...venta, ...data };
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: SPREADSHEET_ID,
+    range: `Ventas!A${rowIndex}:H${rowIndex}`,
+    valueInputOption: 'USER_ENTERED',
+    requestBody: {
+      values: [[
+        updated.fecha,
+        updated.producto,
+        updated.cantidad,
+        updated.precioUnitario,
+        updated.totalVenta,
+        updated.gananciaEstimada,
+        updated.clienteNombre ?? '',
+        updated.clienteContacto ?? '',
+      ]],
+    },
+  });
 }
 
 export async function getClientes(): Promise<Cliente[]> {

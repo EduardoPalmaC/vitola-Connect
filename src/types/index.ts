@@ -119,6 +119,10 @@ export interface Cata {
   maridaje?: string;
 }
 
+export interface VentaConIndice extends Venta {
+  rowIndex: number;
+}
+
 export interface DashboardKPIs {
   valorColeccionPersonal: number;
   gananciasProyectadas: number;
