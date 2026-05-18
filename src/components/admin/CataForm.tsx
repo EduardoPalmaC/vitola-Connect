@@ -107,6 +107,7 @@ export default function CataForm({ puros }: Props) {
     setValues((prev) => ({
       ...prev,
       puroId,
+      nombre: puro.nombre,
       marca: puro.marca,
       vitola: puro.vitola,
       cepo: puro.ringGauge,
@@ -251,7 +252,7 @@ export default function CataForm({ puros }: Props) {
               <option value="">Selecciona un puro...</option>
               {puros.map((p) => (
                 <option key={p.id} value={p.id}>
-                  {p.marca} — {p.vitola} (Cepo {p.ringGauge})
+                  {p.nombre} — {p.marca}
                 </option>
               ))}
             </select>
