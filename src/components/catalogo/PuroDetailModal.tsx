@@ -267,200 +267,363 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '280px 1fr',
-          }}
-          className="max-sm:grid-cols-1"
-        >
-          {/* Left: image */}
+        {/* ── DESKTOP ── */}
+        <div className="hidden md:block">
           <div
             style={{
-              background: '#F2EDE4',
-              borderRight: '1px solid #EDE8DE',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '48px 24px',
-              minHeight: '460px',
+              display: 'grid',
+              gridTemplateColumns: '280px 1fr',
             }}
-            className="max-sm:min-h-[260px] max-sm:border-r-0 max-sm:border-b max-sm:border-[#EDE8DE]"
           >
-            {puro.fotoUrl ? (
-              <div
-                style={{
-                  width: '300px',
-                  height: '700px',
-                  position: 'relative',
-                  flexShrink: 0,
-                }}
-                className="rotate-90"
-              >
-                <Image
-                  src={puro.fotoUrl}
-                  alt={puro.nombre}
-                  fill
-                  sizes="300px"
-                  className="h-full scale-200"
-                  style={{ objectFit: 'contain', objectPosition: 'center' }}
-                />
-              </div>
-            ) : (
-              <div style={{ height: '340px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <CigarSVG shade={shade} id={puro.id} />
-              </div>
-            )}
-          </div>
-
-          {/* Right: details */}
-          <div style={{ padding: '36px 44px 40px 40px', position: 'relative' }}>
-            {/* Logo — absolute, no afecta el flujo */}
-            {puro.logoMarcaUrl && (
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '36px',
-                  right: '44px',
-                  width: '160px',
-                  height: '160px',
-                }}
-              >
-                <Image
-                  src={puro.logoMarcaUrl}
-                  alt={`Logo ${puro.marca}`}
-                  fill
-                  sizes="160px"
-                  style={{ objectFit: 'contain', objectPosition: 'center' }}
-                />
-              </div>
-            )}
-
-            {/* Header */}
-            <div style={{ marginBottom: '28px', paddingRight: puro.logoMarcaUrl ? '180px' : '0' }}>
-              <h2
-                style={{
-                  fontFamily: 'var(--font-serif)',
-                  fontWeight: 400,
-                  fontSize: '30px',
-                  lineHeight: 1.1,
-                  letterSpacing: '-0.01em',
-                  color: '#2C1E1A',
-                  margin: '0 0 8px 0',
-                }}
-              >
-                {puro.nombre}
-              </h2>
-              <div
-                style={{
-                  fontFamily: 'var(--font-code)',
-                  fontSize: '9px',
-                  letterSpacing: '0.36em',
-                  textTransform: 'uppercase',
-                  color: '#9B7840',
-                }}
-              >
-                {puro.marca}
-              </div>
-            </div>
-
-            {/* Price + stock */}
+            {/* Left: image */}
             <div
               style={{
-                display: 'flex',
-                alignItems: 'baseline',
-                gap: '14px',
-                marginBottom: '20px',
-                paddingBottom: '20px',
-                borderBottom: '1px solid #EDE8DE',
-              }}
-            >
-              <span
-                style={{
-                  fontFamily: 'Inter, sans-serif',
-                  fontSize: '28px',
-                  fontWeight: 700,
-                  color: '#B28F69',
-                  letterSpacing: '-0.02em',
-                }}
-              >
-                ${intero}
-                <span style={{ fontSize: '16px' }}>.{deci}</span>
-              </span>
-              <span
-                style={{
-                  fontFamily: 'var(--font-code)',
-                  fontSize: '9px',
-                  letterSpacing: '0.2em',
-                  textTransform: 'uppercase',
-                  color: soldOut ? '#C05040' : low ? '#C47A3D' : '#9A8572',
-                }}
-              >
-                {soldOut ? 'Agotado' : low ? `Quedan ${puro.stock}` : 'Disponible'}
-              </span>
-            </div>
-
-            {/* Technical indicators */}
-            <div
-              style={{
+                background: '#F2EDE4',
+                borderRight: '1px solid #EDE8DE',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '20px',
-                marginBottom: '20px',
-                paddingBottom: '20px',
-                borderBottom: '1px solid #EDE8DE',
+                justifyContent: 'center',
+                padding: '48px 24px',
+                minHeight: '460px',
               }}
             >
-              {puro.ringGauge && <GaugeIndicator value={puro.ringGauge} />}
-              {(puro.largo || puro.fortaleza) && (
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  {puro.largo && <LengthIndicator value={puro.largo} />}
-                  {puro.fortaleza && <StrengthIndicator value={puro.fortaleza} />}
+              {puro.fotoUrl ? (
+                <div
+                  style={{
+                    width: '300px',
+                    height: '700px',
+                    position: 'relative',
+                    flexShrink: 0,
+                  }}
+                  className="rotate-90"
+                >
+                  <Image
+                    src={puro.fotoUrl}
+                    alt={puro.nombre}
+                    fill
+                    sizes="300px"
+                    className="h-full scale-200"
+                    style={{ objectFit: 'contain', objectPosition: 'center' }}
+                  />
+                </div>
+              ) : (
+                <div style={{ height: '340px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                  <CigarSVG shade={shade} id={puro.id} />
                 </div>
               )}
             </div>
 
-            {/* Spec list */}
-            <div>
-              <SpecRow label="Vitola" value={puro.vitola} />
-              {puro.ringGauge && <SpecRow label="Cepo" value={String(puro.ringGauge)} />}
-              {puro.paisOrigen && <SpecRow label="País de Origen" value={puro.paisOrigen} />}
-              {puro.largo && <SpecRow label="Largo" value={`${puro.largo} mm`} />}
-              {puro.tiempoAnejamiento != null && (
-                <SpecRow label="Añejamiento" value={`${puro.tiempoAnejamiento} meses`} />
+            {/* Right: details */}
+            <div style={{ padding: '36px 44px 40px 40px', position: 'relative' }}>
+              {puro.logoMarcaUrl && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: '36px',
+                    right: '44px',
+                    width: '160px',
+                    height: '160px',
+                  }}
+                >
+                  <Image
+                    src={puro.logoMarcaUrl}
+                    alt={`Logo ${puro.marca}`}
+                    fill
+                    sizes="160px"
+                    style={{ objectFit: 'contain', objectPosition: 'center' }}
+                  />
+                </div>
               )}
-              <SpecRow label="Stock" value={String(puro.stock)} />
-            </div>
 
-            {/* Notas de cata */}
-            {puro.notasCata && (
-              <div style={{ marginTop: '24px' }}>
+              <div style={{ marginBottom: '28px', paddingRight: puro.logoMarcaUrl ? '180px' : '0' }}>
+                <h2
+                  style={{
+                    fontFamily: 'var(--font-serif)',
+                    fontWeight: 400,
+                    fontSize: '30px',
+                    lineHeight: 1.1,
+                    letterSpacing: '-0.01em',
+                    color: '#2C1E1A',
+                    margin: '0 0 8px 0',
+                  }}
+                >
+                  {puro.nombre}
+                </h2>
                 <div
                   style={{
                     fontFamily: 'var(--font-code)',
                     fontSize: '9px',
-                    letterSpacing: '0.28em',
+                    letterSpacing: '0.36em',
                     textTransform: 'uppercase',
-                    color: '#B0A090',
-                    marginBottom: '10px',
+                    color: '#9B7840',
                   }}
                 >
-                  Notas de Cata
+                  {puro.marca}
                 </div>
-                <p
+              </div>
+
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'baseline',
+                  gap: '14px',
+                  marginBottom: '20px',
+                  paddingBottom: '20px',
+                  borderBottom: '1px solid #EDE8DE',
+                }}
+              >
+                <span
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '28px',
+                    fontWeight: 700,
+                    color: '#B28F69',
+                    letterSpacing: '-0.02em',
+                  }}
+                >
+                  ${intero}
+                  <span style={{ fontSize: '16px' }}>.{deci}</span>
+                </span>
+                <span
+                  style={{
+                    fontFamily: 'var(--font-code)',
+                    fontSize: '9px',
+                    letterSpacing: '0.2em',
+                    textTransform: 'uppercase',
+                    color: soldOut ? '#C05040' : low ? '#C47A3D' : '#9A8572',
+                  }}
+                >
+                  {soldOut ? 'Agotado' : low ? `Quedan ${puro.stock}` : 'Disponible'}
+                </span>
+              </div>
+
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '20px',
+                  marginBottom: '20px',
+                  paddingBottom: '20px',
+                  borderBottom: '1px solid #EDE8DE',
+                }}
+              >
+                {puro.ringGauge && <GaugeIndicator value={puro.ringGauge} />}
+                {(puro.largo || puro.fortaleza) && (
+                  <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    {puro.largo && <LengthIndicator value={puro.largo} />}
+                    {puro.fortaleza && <StrengthIndicator value={puro.fortaleza} />}
+                  </div>
+                )}
+              </div>
+
+              <div>
+                <SpecRow label="Vitola" value={puro.vitola} />
+                {puro.ringGauge && <SpecRow label="Cepo" value={String(puro.ringGauge)} />}
+                {puro.paisOrigen && <SpecRow label="País de Origen" value={puro.paisOrigen} />}
+                {puro.largo && <SpecRow label="Largo" value={`${puro.largo} mm`} />}
+                {puro.tiempoAnejamiento != null && (
+                  <SpecRow label="Añejamiento" value={`${puro.tiempoAnejamiento} meses`} />
+                )}
+                <SpecRow label="Stock" value={String(puro.stock)} />
+              </div>
+
+              {puro.notasCata && (
+                <div style={{ marginTop: '24px' }}>
+                  <div
+                    style={{
+                      fontFamily: 'var(--font-code)',
+                      fontSize: '9px',
+                      letterSpacing: '0.28em',
+                      textTransform: 'uppercase',
+                      color: '#B0A090',
+                      marginBottom: '10px',
+                    }}
+                  >
+                    Notas de Cata
+                  </div>
+                  <p
+                    style={{
+                      fontFamily: 'var(--font-serif)',
+                      fontSize: '15px',
+                      fontStyle: 'italic',
+                      color: '#5C3D1E',
+                      lineHeight: 1.65,
+                      margin: 0,
+                    }}
+                  >
+                    {puro.notasCata}
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* ── MÓVIL ── */}
+        <div className="block md:hidden max-h-[85vh] overflow-y-auto bg-white">
+          <div className="flex flex-col gap-4">
+
+            {/* Imagen */}
+            <div className="w-full flex justify-center overflow-hidden bg-[#F2EDE4] py-6">
+              {puro.fotoUrl ? (
+                <div className="relative w-full max-w-[240px]" style={{ aspectRatio: '1 / 2.5' }}>
+                  <Image
+                    src={puro.fotoUrl}
+                    alt={puro.nombre}
+                    fill
+                    sizes="240px"
+                    style={{ objectFit: 'contain', objectPosition: 'center' }}
+                  />
+                </div>
+              ) : (
+                <div className="w-[100px]">
+                  <CigarSVG shade={shade} id={`${puro.id}-mobile`} />
+                </div>
+              )}
+            </div>
+
+            {/* Contenido */}
+            <div className="flex flex-col gap-3 w-full px-4 pb-6 break-words">
+
+              {/* Logo */}
+              {puro.logoMarcaUrl && (
+                <div className="relative w-[80px] h-[80px]">
+                  <Image
+                    src={puro.logoMarcaUrl}
+                    alt={`Logo ${puro.marca}`}
+                    fill
+                    sizes="80px"
+                    style={{ objectFit: 'contain', objectPosition: 'left' }}
+                  />
+                </div>
+              )}
+
+              {/* Nombre + marca */}
+              <div>
+                <h2
                   style={{
                     fontFamily: 'var(--font-serif)',
-                    fontSize: '15px',
-                    fontStyle: 'italic',
-                    color: '#5C3D1E',
-                    lineHeight: 1.65,
-                    margin: 0,
+                    fontWeight: 400,
+                    fontSize: '22px',
+                    lineHeight: 1.2,
+                    letterSpacing: '-0.01em',
+                    color: '#2C1E1A',
+                    margin: '0 0 6px 0',
                   }}
                 >
-                  {puro.notasCata}
-                </p>
+                  {puro.nombre}
+                </h2>
+                <div
+                  style={{
+                    fontFamily: 'var(--font-code)',
+                    fontSize: '9px',
+                    letterSpacing: '0.36em',
+                    textTransform: 'uppercase',
+                    color: '#9B7840',
+                  }}
+                >
+                  {puro.marca}
+                </div>
               </div>
-            )}
+
+              {/* Precio + stock */}
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'baseline',
+                  gap: '12px',
+                  paddingBottom: '16px',
+                  borderBottom: '1px solid #EDE8DE',
+                }}
+              >
+                <span
+                  style={{
+                    fontFamily: 'Inter, sans-serif',
+                    fontSize: '24px',
+                    fontWeight: 700,
+                    color: '#B28F69',
+                    letterSpacing: '-0.02em',
+                  }}
+                >
+                  ${intero}
+                  <span style={{ fontSize: '14px' }}>.{deci}</span>
+                </span>
+                <span
+                  style={{
+                    fontFamily: 'var(--font-code)',
+                    fontSize: '9px',
+                    letterSpacing: '0.2em',
+                    textTransform: 'uppercase',
+                    color: soldOut ? '#C05040' : low ? '#C47A3D' : '#9A8572',
+                  }}
+                >
+                  {soldOut ? 'Agotado' : low ? `Quedan ${puro.stock}` : 'Disponible'}
+                </span>
+              </div>
+
+              {/* Indicadores técnicos */}
+              {(puro.ringGauge || puro.largo || puro.fortaleza) && (
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '16px',
+                    paddingBottom: '16px',
+                    borderBottom: '1px solid #EDE8DE',
+                  }}
+                >
+                  {puro.ringGauge && <GaugeIndicator value={puro.ringGauge} />}
+                  {(puro.largo || puro.fortaleza) && (
+                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                      {puro.largo && <LengthIndicator value={puro.largo} />}
+                      {puro.fortaleza && <StrengthIndicator value={puro.fortaleza} />}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Specs */}
+              <div>
+                <SpecRow label="Vitola" value={puro.vitola} />
+                {puro.ringGauge && <SpecRow label="Cepo" value={String(puro.ringGauge)} />}
+                {puro.paisOrigen && <SpecRow label="País de Origen" value={puro.paisOrigen} />}
+                {puro.largo && <SpecRow label="Largo" value={`${puro.largo} mm`} />}
+                {puro.tiempoAnejamiento != null && (
+                  <SpecRow label="Añejamiento" value={`${puro.tiempoAnejamiento} meses`} />
+                )}
+                <SpecRow label="Stock" value={String(puro.stock)} />
+              </div>
+
+              {/* Notas de cata */}
+              {puro.notasCata && (
+                <div>
+                  <div
+                    style={{
+                      fontFamily: 'var(--font-code)',
+                      fontSize: '9px',
+                      letterSpacing: '0.28em',
+                      textTransform: 'uppercase',
+                      color: '#B0A090',
+                      marginBottom: '8px',
+                    }}
+                  >
+                    Notas de Cata
+                  </div>
+                  <p
+                    style={{
+                      fontFamily: 'var(--font-serif)',
+                      fontSize: '14px',
+                      fontStyle: 'italic',
+                      color: '#5C3D1E',
+                      lineHeight: 1.65,
+                      margin: 0,
+                    }}
+                  >
+                    {puro.notasCata}
+                  </p>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </DialogContent>
