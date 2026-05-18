@@ -99,6 +99,26 @@ function QtyButton({ onClick, disabled, children }: { onClick: () => void; disab
   );
 }
 
+function SourceTag({ estado }: { estado: Puro['estado'] }) {
+  return (
+    <span style={{
+      display: 'inline-block',
+      fontFamily: 'var(--font-code)',
+      fontSize: '9px',
+      letterSpacing: '0.16em',
+      textTransform: 'uppercase',
+      color: TEXT_MUTED,
+      background: '#F0EBE3',
+      borderRadius: '3px',
+      padding: '1px 5px',
+      marginLeft: '7px',
+      verticalAlign: 'middle',
+    }}>
+      {estado === 'negocio' ? 'Negocio' : 'Colección'}
+    </span>
+  );
+}
+
 function CartRow({ puro, cantidad, precioOverride, isLast, isPast, onUpdate, onPrecioChange }: {
   puro: Puro; cantidad: number; precioOverride?: number; isLast: boolean; isPast: boolean;
   onUpdate: (n: number) => void; onPrecioChange: (p: number) => void;
@@ -117,6 +137,7 @@ function CartRow({ puro, cantidad, precioOverride, isLast, isPast, onUpdate, onP
       <div style={{ minWidth: 0, marginRight: '16px' }}>
         <p style={{ fontFamily: 'var(--font-serif)', fontSize: '14px', fontWeight: 700, color: TEXT, margin: 0 }}>
           {puro.marca} <span style={{ fontWeight: 400, color: TEXT_SEC }}>{puro.vitola}</span>
+          <SourceTag estado={puro.estado} />
         </p>
         <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px' }}>
           <span style={{ fontFamily: 'var(--font-code)', fontSize: '10px', color: TEXT_MUTED }}>$</span>
@@ -175,9 +196,12 @@ function CartRow({ puro, cantidad, precioOverride, isLast, isPast, onUpdate, onP
 
 // ─── Main modal ───────────────────────────────────────────────────────────────
 
+type InventoryTab = 'negocio' | 'coleccion_personal';
+
 export default function VentaModal({ puros, open, onClose }: VentaModalProps) {
   const router = useRouter();
   const [search, setSearch]         = useState('');
+  const [activeTab, setActiveTab]   = useState<InventoryTab>('negocio');
   const [cart, setCart]             = useState<CartItem[]>([]);
   const [fecha, setFecha]           = useState(todayISO());
   const [isPending, startTransition] = useTransition();
@@ -211,13 +235,14 @@ export default function VentaModal({ puros, open, onClose }: VentaModalProps) {
 
   const disponibles = useMemo(
     () => puros.filter(
-      (p) => (isPast || p.stock > 0) && (
-        p.nombre.toLowerCase().includes(search.toLowerCase()) ||
-        p.marca.toLowerCase().includes(search.toLowerCase()) ||
-        p.vitola.toLowerCase().includes(search.toLowerCase())
-      )
+      (p) => p.estado === activeTab &&
+        (isPast || p.stock > 0) && (
+          p.nombre.toLowerCase().includes(search.toLowerCase()) ||
+          p.marca.toLowerCase().includes(search.toLowerCase()) ||
+          p.vitola.toLowerCase().includes(search.toLowerCase())
+        )
     ),
-    [puros, search, isPast],
+    [puros, search, isPast, activeTab],
   );
 
   function addToCart(puro: Puro) {
@@ -362,6 +387,35 @@ export default function VentaModal({ puros, open, onClose }: VentaModalProps) {
           {/* Search */}
           <div style={{ padding: '18px 28px 16px', backgroundColor: SURFACE, borderBottom: `1px solid ${BORDER}`, flexShrink: 0 }}>
             <Label>Agregar Productos</Label>
+
+            {/* Inventory tabs */}
+            <div style={{ display: 'flex', gap: '24px', marginBottom: '14px', borderBottom: `1px solid ${BORDER}` }}>
+              {([
+                { key: 'negocio' as const, label: 'Negocio' },
+                { key: 'coleccion_personal' as const, label: 'Colección' },
+              ] as const).map(({ key, label }) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => { setActiveTab(key); setSearch(''); }}
+                  style={{
+                    background: 'none', border: 'none', cursor: 'pointer',
+                    padding: '0 0 10px',
+                    fontFamily: 'var(--font-code)',
+                    fontSize: '10px',
+                    letterSpacing: '0.2em',
+                    textTransform: 'uppercase' as const,
+                    color: activeTab === key ? TEXT : TEXT_MUTED,
+                    borderBottom: activeTab === key ? `1.5px solid ${TEXT}` : '1.5px solid transparent',
+                    marginBottom: '-1px',
+                    transition: 'color 150ms, border-color 150ms',
+                  }}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
             <input
               type="text"
               placeholder="Buscar por nombre, marca o vitola…"
