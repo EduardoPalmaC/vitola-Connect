@@ -202,8 +202,8 @@ export async function getVentas(): Promise<Venta[]> {
       precioUnitario: parseFloat(row[3]!),
       totalVenta: parseFloat(row[4]!),
       gananciaEstimada: parseFloat(row[5]!),
-      clienteNombre: row[6] || undefined,
-      clienteContacto: row[7] || undefined,
+      clienteNombre: row[6] && row[6] !== '#ERROR!' ? row[6] : undefined,
+      clienteContacto: row[7] && row[7] !== '#ERROR!' ? row[7] : undefined,
     }));
 }
 
@@ -225,8 +225,8 @@ export async function getVentasConIndice(): Promise<VentaConIndice[]> {
       precioUnitario: parseFloat(row[3]!),
       totalVenta: parseFloat(row[4]!),
       gananciaEstimada: parseFloat(row[5]!),
-      clienteNombre: row[6] || undefined,
-      clienteContacto: row[7] || undefined,
+      clienteNombre: row[6] && row[6] !== '#ERROR!' ? row[6] : undefined,
+      clienteContacto: row[7] && row[7] !== '#ERROR!' ? row[7] : undefined,
     }));
 }
 
@@ -301,7 +301,7 @@ export async function registrarVentaItems(
   await sheets.spreadsheets.values.append({
     spreadsheetId: SPREADSHEET_ID,
     range: 'Ventas!A:H',
-    valueInputOption: 'USER_ENTERED',
+    valueInputOption: 'RAW',
     requestBody: { values: rows },
   });
 }
