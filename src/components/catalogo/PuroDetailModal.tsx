@@ -466,7 +466,7 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
             {/* Imagen */}
             <div className="w-full flex justify-center overflow-hidden bg-[#F2EDE4] py-6">
               {puro.fotoUrl ? (
-                <div className="w-[120px] h-[200px] relative mx-auto">
+                <div className="w-full h-[300px] relative flex justify-center items-center mx-auto">
                   <Image
                     src={puro.fotoUrl}
                     alt={puro.nombre}
