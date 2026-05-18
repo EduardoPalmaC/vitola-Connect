@@ -392,7 +392,7 @@ function PurosTable({
         overflowX: 'auto',
         boxShadow: '0 1px 4px rgba(28,16,8,0.06)',
       }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+        <table className="min-w-[700px] md:w-full" style={{ borderCollapse: 'collapse' }}>
           <thead>
             {table.getHeaderGroups().map((hg) => (
               <tr key={hg.id} style={{ borderBottom: `2px solid ${BORDER}` }}>

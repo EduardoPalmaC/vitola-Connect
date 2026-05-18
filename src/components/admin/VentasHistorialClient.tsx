@@ -269,8 +269,8 @@ export default function VentasHistorialClient({ ventas, puros }: Props) {
       </div>
 
       {/* Table */}
-      <div style={{ border: `1px solid ${BORDER}`, background: '#FFFFFF', overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+      <div className="w-full overflow-x-auto" style={{ border: `1px solid ${BORDER}`, background: '#FFFFFF' }}>
+        <table className="min-w-[580px] md:w-full" style={{ borderCollapse: 'collapse' }}>
           <thead>
             <tr style={{ borderBottom: `1px solid ${BORDER}` }}>
               {['Fecha', 'Cliente', 'Producto', 'Cantidad', 'P. Unitario', 'Total', ''].map((h) => (

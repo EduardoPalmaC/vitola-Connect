@@ -66,7 +66,7 @@ export default async function PuroDetailPage({ params }: PageProps) {
                 {puro.marca}
               </p>
               <h1
-                className="leading-tight"
+                className="leading-tight break-words"
                 style={{
                   fontFamily: 'var(--font-serif)',
                   fontWeight: 600,
@@ -126,6 +126,7 @@ export default async function PuroDetailPage({ params }: PageProps) {
                     Notas de cata
                   </p>
                   <p
+                    className="break-words"
                     style={{
                       fontFamily: 'var(--font-serif)',
                       fontSize: '1.05rem',

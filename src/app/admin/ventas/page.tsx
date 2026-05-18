@@ -17,7 +17,6 @@ export default async function VentasPage() {
       <MobileNav />
       <header
         style={{
-          padding: '20px 64px 16px',
           borderBottom: '1px solid #E2D9C8',
           display: 'grid',
           gridTemplateColumns: '1fr auto',
@@ -25,7 +24,7 @@ export default async function VentasPage() {
           gap: '20px',
           background: '#F9F6F0',
         }}
-        className="max-sm:grid-cols-1 max-sm:px-6 max-sm:pt-4 max-sm:pb-3"
+        className="px-6 pt-4 pb-3 sm:px-16 sm:pt-5 sm:pb-4 max-sm:grid-cols-1"
       >
         <div>
           <p style={{
@@ -82,8 +81,8 @@ export default async function VentasPage() {
       </header>
 
       <div
-        style={{ maxWidth: '1200px', margin: '0 auto', padding: '56px 64px 80px' }}
-        className="max-sm:px-6 max-sm:py-8 max-sm:pb-20"
+        style={{ maxWidth: '1200px', margin: '0 auto' }}
+        className="px-4 py-8 pb-24 sm:px-16 sm:pt-14 sm:pb-20"
       >
         <div
           className="grid grid-cols-1 sm:grid-cols-3"
