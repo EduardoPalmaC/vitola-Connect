@@ -63,6 +63,7 @@ export default async function DashboardPage() {
         >
           {[
             { href: '/admin/inventario', label: 'Inventario' },
+            { href: '/admin/ventas', label: 'Ventas' },
             { href: '/admin/coleccion', label: 'Mi Colección' },
             { href: '/admin/diario', label: 'Mi Diario' },
             { href: '/admin/clientes', label: 'Clientes' },

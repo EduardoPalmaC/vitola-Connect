@@ -41,6 +41,13 @@ export default async function InventarioPage() {
             Dashboard
           </Link>
           <Link
+            href="/admin/ventas"
+            className="transition-colors"
+            style={{ fontSize: '13px', color: '#9A8572', fontFamily: 'var(--font-code)' }}
+          >
+            Ventas
+          </Link>
+          <Link
             href="/admin/diario"
             className="transition-colors"
             style={{ fontSize: '13px', color: '#9A8572', fontFamily: 'var(--font-code)' }}

@@ -43,6 +43,7 @@ export default async function ClientesPage() {
           {[
             { href: '/admin/dashboard', label: 'Dashboard' },
             { href: '/admin/inventario', label: 'Inventario' },
+            { href: '/admin/ventas', label: 'Ventas' },
             { href: '/admin/coleccion', label: 'Mi Colección' },
             { href: '/admin/diario', label: 'Mi Diario' },
             { href: '/admin/settings', label: 'Configuración' },
