@@ -33,7 +33,7 @@ function Label({ children }: { children: string }) {
   );
 }
 
-function ProductRow({ puro, disabled, onClick }: { puro: Puro; disabled: boolean; onClick: () => void }) {
+function ProductRow({ puro, disabled, isPast, onClick }: { puro: Puro; disabled: boolean; isPast: boolean; onClick: () => void }) {
   const [hovered, setHovered] = useState(false);
   return (
     <button
@@ -64,7 +64,7 @@ function ProductRow({ puro, disabled, onClick }: { puro: Puro; disabled: boolean
       </div>
       <div style={{ display: 'flex', gap: '16px', alignItems: 'center', flexShrink: 0 }}>
         <span style={{ fontFamily: 'var(--font-code)', fontSize: '10px', color: TEXT_MUTED }}>
-          Stock: {puro.stock}
+          {isPast ? `Stock actual: ${puro.stock}` : `Stock: ${puro.stock}`}
         </span>
         <span style={{ fontFamily: 'var(--font-code)', fontSize: '12px', fontWeight: 600, color: TEXT_SEC }}>
           ${puro.precioVenta.toLocaleString('es-MX')}
@@ -99,8 +99,8 @@ function QtyButton({ onClick, disabled, children }: { onClick: () => void; disab
   );
 }
 
-function CartRow({ puro, cantidad, precioOverride, isLast, onUpdate, onPrecioChange }: {
-  puro: Puro; cantidad: number; precioOverride?: number; isLast: boolean;
+function CartRow({ puro, cantidad, precioOverride, isLast, isPast, onUpdate, onPrecioChange }: {
+  puro: Puro; cantidad: number; precioOverride?: number; isLast: boolean; isPast: boolean;
   onUpdate: (n: number) => void; onPrecioChange: (p: number) => void;
 }) {
   const [hovX, setHovX] = useState(false);
@@ -149,7 +149,7 @@ function CartRow({ puro, cantidad, precioOverride, isLast, onUpdate, onPrecioCha
           <span style={{ fontFamily: 'var(--font-code)', fontSize: '13px', fontWeight: 600, color: TEXT, minWidth: '20px', textAlign: 'center' }}>
             {cantidad}
           </span>
-          <QtyButton onClick={() => onUpdate(cantidad + 1)} disabled={cantidad >= puro.stock}>+</QtyButton>
+          <QtyButton onClick={() => onUpdate(cantidad + 1)} disabled={!isPast && cantidad >= puro.stock}>+</QtyButton>
         </div>
         <span style={{ fontFamily: 'var(--font-code)', fontSize: '13px', fontWeight: 600, color: isModified ? OXBLOOD : TEXT_SEC, minWidth: '72px', textAlign: 'right' }}>
           ${(precio * cantidad).toLocaleString('es-MX')}
@@ -185,6 +185,8 @@ export default function VentaModal({ puros, open, onClose }: VentaModalProps) {
   const [searchFocus, setSearchFocus] = useState(false);
   const [dateFocus, setDateFocus]   = useState(false);
 
+  const isPast = fecha < todayISO();
+
   const [clientes, setClientes]           = useState<Cliente[]>([]);
   const [clienteNombre, setClienteNombre] = useState('');
   const [clienteContacto, setClienteContacto] = useState('');
@@ -209,20 +211,20 @@ export default function VentaModal({ puros, open, onClose }: VentaModalProps) {
 
   const disponibles = useMemo(
     () => puros.filter(
-      (p) => p.stock > 0 && (
+      (p) => (isPast || p.stock > 0) && (
         p.nombre.toLowerCase().includes(search.toLowerCase()) ||
         p.marca.toLowerCase().includes(search.toLowerCase()) ||
         p.vitola.toLowerCase().includes(search.toLowerCase())
       )
     ),
-    [puros, search],
+    [puros, search, isPast],
   );
 
   function addToCart(puro: Puro) {
     setCart((prev) => {
       const existing = prev.find((i) => i.puro.id === puro.id);
       if (existing) {
-        if (existing.cantidad >= puro.stock) return prev;
+        if (!isPast && existing.cantidad >= puro.stock) return prev;
         return prev.map((i) => i.puro.id === puro.id ? { ...i, cantidad: i.cantidad + 1 } : i);
       }
       return [...prev, { puro, cantidad: 1 }];
@@ -232,7 +234,7 @@ export default function VentaModal({ puros, open, onClose }: VentaModalProps) {
   function updateCantidad(puroId: string, cantidad: number) {
     if (cantidad <= 0) { setCart((prev) => prev.filter((i) => i.puro.id !== puroId)); return; }
     const item = cart.find((i) => i.puro.id === puroId);
-    if (!item || cantidad > item.puro.stock) return;
+    if (!item || (!isPast && cantidad > item.puro.stock)) return;
     setCart((prev) => prev.map((i) => i.puro.id === puroId ? { ...i, cantidad } : i));
   }
 
@@ -387,7 +389,8 @@ export default function VentaModal({ puros, open, onClose }: VentaModalProps) {
                     <ProductRow
                       key={puro.id}
                       puro={puro}
-                      disabled={!!inCart && inCart.cantidad >= puro.stock}
+                      disabled={!isPast && !!inCart && inCart.cantidad >= puro.stock}
+                      isPast={isPast}
                       onClick={() => addToCart(puro)}
                     />
                   );
@@ -487,6 +490,7 @@ export default function VentaModal({ puros, open, onClose }: VentaModalProps) {
                   cantidad={cantidad}
                   precioOverride={precioOverride}
                   isLast={i === cart.length - 1}
+                  isPast={isPast}
                   onUpdate={(n) => updateCantidad(puro.id, n)}
                   onPrecioChange={(p) => updatePrecio(puro.id, p)}
                 />
