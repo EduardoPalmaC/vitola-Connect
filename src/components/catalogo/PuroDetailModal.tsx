@@ -483,44 +483,43 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
             </div>
 
             {/* Contenido */}
-            <div className="flex flex-col gap-5 w-full px-8 pb-6 pt-2 break-words">
+            <div className="w-full px-6 pb-8 box-border overflow-hidden">
 
-              {/* Logo */}
-              {puro.logoMarcaUrl && (
-                <div className="relative w-[80px] h-[80px]">
-                  <Image
-                    src={puro.logoMarcaUrl}
-                    alt={`Logo ${puro.marca}`}
-                    fill
-                    sizes="80px"
-                    style={{ objectFit: 'contain', objectPosition: 'left' }}
-                  />
+              {/* Cabecera: Nombre+Marca / Logo */}
+              <div className="flex justify-between items-start w-full gap-4 mb-4">
+                <div className="flex flex-col">
+                  <h2 className="text-2xl font-serif text-stone-900 leading-tight m-0">
+                    {puro.nombre}
+                  </h2>
+                  <span className="text-xs uppercase tracking-[0.2em] text-stone-500 mt-1">
+                    {puro.marca}
+                  </span>
                 </div>
-              )}
-
-              {/* Nombre + marca */}
-              <div>
-                <h2 className="text-xl font-serif text-stone-800 tracking-wide leading-tight m-0">
-                  {puro.nombre}
-                </h2>
-                <p className="text-xs uppercase tracking-[0.15em] text-stone-500 mt-1 m-0">
-                  {puro.marca}
-                </p>
+                {puro.logoMarcaUrl && (
+                  <div className="shrink-0 relative w-12 h-12">
+                    <Image
+                      src={puro.logoMarcaUrl}
+                      alt={`Logo ${puro.marca}`}
+                      fill
+                      sizes="48px"
+                      style={{ objectFit: 'contain', objectPosition: 'right' }}
+                    />
+                  </div>
+                )}
               </div>
 
-              {/* Precio + stock */}
-              <div className="flex justify-between items-center border-b border-stone-100 pb-3 mb-2">
+              {/* Separador Precio + Stock */}
+              <div className="flex justify-between items-center w-full py-3 border-y border-stone-200 mb-5">
                 <span
                   style={{
                     fontFamily: 'Inter, sans-serif',
-                    fontSize: '24px',
-                    fontWeight: 700,
+                    fontSize: '22px',
+                    fontWeight: 600,
                     color: '#B28F69',
                     letterSpacing: '-0.02em',
                   }}
                 >
-                  ${intero}
-                  <span style={{ fontSize: '14px' }}>.{deci}</span>
+                  ${intero}<span style={{ fontSize: '13px' }}>.{deci}</span>
                 </span>
                 <span
                   style={{
@@ -537,18 +536,10 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
 
               {/* Indicadores técnicos */}
               {(puro.ringGauge || puro.largo || puro.fortaleza) && (
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '16px',
-                    paddingBottom: '16px',
-                    borderBottom: '1px solid #EDE8DE',
-                  }}
-                >
+                <div className="flex items-center gap-4 pb-4 border-b border-stone-100 mb-4">
                   {puro.ringGauge && <GaugeIndicator value={puro.ringGauge} />}
                   {(puro.largo || puro.fortaleza) && (
-                    <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                    <div className="flex-1 flex flex-col gap-3">
                       {puro.largo && <LengthIndicator value={puro.largo} />}
                       {puro.fortaleza && <StrengthIndicator value={puro.fortaleza} />}
                     </div>
@@ -557,7 +548,7 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
               )}
 
               {/* Specs */}
-              <div>
+              <div className="mb-4">
                 <SpecRow label="Vitola" value={puro.vitola} />
                 {puro.ringGauge && <SpecRow label="Cepo" value={String(puro.ringGauge)} />}
                 {puro.paisOrigen && <SpecRow label="País de Origen" value={puro.paisOrigen} />}
@@ -570,7 +561,7 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
 
               {/* Notas de cata */}
               {puro.notasCata && (
-                <div>
+                <div className="mb-4">
                   <div
                     style={{
                       fontFamily: 'var(--font-code)',
