@@ -483,7 +483,7 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
             </div>
 
             {/* Contenido */}
-            <div className="flex flex-col gap-3 w-full px-4 pb-6 break-words">
+            <div className="flex flex-col gap-5 w-full px-6 pb-6 pt-2 break-words">
 
               {/* Logo */}
               {puro.logoMarcaUrl && (
@@ -500,42 +500,16 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
 
               {/* Nombre + marca */}
               <div>
-                <h2
-                  style={{
-                    fontFamily: 'var(--font-serif)',
-                    fontWeight: 400,
-                    fontSize: '22px',
-                    lineHeight: 1.2,
-                    letterSpacing: '-0.01em',
-                    color: '#2C1E1A',
-                    margin: '0 0 6px 0',
-                  }}
-                >
+                <h2 className="text-xl font-serif text-stone-800 tracking-wide leading-tight m-0">
                   {puro.nombre}
                 </h2>
-                <div
-                  style={{
-                    fontFamily: 'var(--font-code)',
-                    fontSize: '9px',
-                    letterSpacing: '0.36em',
-                    textTransform: 'uppercase',
-                    color: '#9B7840',
-                  }}
-                >
+                <p className="text-xs uppercase tracking-[0.15em] text-stone-500 mt-1 m-0">
                   {puro.marca}
-                </div>
+                </p>
               </div>
 
               {/* Precio + stock */}
-              <div
-                style={{
-                  display: 'flex',
-                  alignItems: 'baseline',
-                  gap: '12px',
-                  paddingBottom: '16px',
-                  borderBottom: '1px solid #EDE8DE',
-                }}
-              >
+              <div className="flex justify-between items-center border-b border-stone-100 pb-3 mb-2">
                 <span
                   style={{
                     fontFamily: 'Inter, sans-serif',
