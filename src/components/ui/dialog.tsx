@@ -24,27 +24,15 @@ export function DialogOverlay() {
 interface DialogContentProps {
   children: React.ReactNode;
   onClose?: () => void;
+  className?: string;
 }
 
-export function DialogContent({ children, onClose }: DialogContentProps) {
+export function DialogContent({ children, onClose, className }: DialogContentProps) {
   return (
     <DialogPrimitive.Portal>
       <DialogOverlay />
       <DialogPrimitive.Content
-        style={{
-          position: 'fixed',
-          top: '50%',
-          left: '50%',
-          transform: 'translate(-50%, -50%)',
-          width: 'min(90vw, 920px)',
-          maxHeight: '90vh',
-          overflowY: 'hidden',
-          background: '#F9F6F0',
-          zIndex: 51,
-          outline: 'none',
-          border: '1px solid #DDD5C5',
-          boxShadow: '0 24px 60px rgba(20,12,8,0.25)',
-        }}
+        className={`fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[min(90vw,920px)] max-h-[90vh] overflow-y-hidden bg-[#F9F6F0] z-[51] outline-none border border-[#DDD5C5] shadow-[0_24px_60px_rgba(20,12,8,0.25)]${className ? ` ${className}` : ''}`}
       >
         {children}
         <DialogPrimitive.Close
