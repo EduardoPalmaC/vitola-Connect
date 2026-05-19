@@ -266,7 +266,7 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent>
+      <DialogContent className="max-sm:max-w-[calc(100%-2rem)] max-sm:mx-auto max-sm:rounded-2xl">
         {/* ── DESKTOP ── */}
         <div className="hidden md:block">
           <div
@@ -483,7 +483,7 @@ export default function PuroDetailModal({ puro, idx, open, onOpenChange }: Props
             </div>
 
             {/* Contenido */}
-            <div className="flex flex-col gap-5 w-full px-6 pb-6 pt-2 break-words">
+            <div className="flex flex-col gap-5 w-full px-8 pb-6 pt-2 break-words">
 
               {/* Logo */}
               {puro.logoMarcaUrl && (
