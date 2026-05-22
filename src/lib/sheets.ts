@@ -281,6 +281,30 @@ export async function getClientes(): Promise<Cliente[]> {
   return Array.from(map.values()).sort((a, b) => b.totalGastado - a.totalGastado);
 }
 
+export async function updateCliente(
+  oldNombre: string,
+  newNombre: string,
+  newContacto: string,
+): Promise<void> {
+  const sheets = await getSheets();
+  const ventas = await getVentasConIndice();
+  const matching = ventas.filter(
+    (v) => v.clienteNombre?.toLowerCase().trim() === oldNombre.toLowerCase().trim(),
+  );
+  if (matching.length === 0) return;
+
+  await sheets.spreadsheets.values.batchUpdate({
+    spreadsheetId: SPREADSHEET_ID,
+    requestBody: {
+      valueInputOption: 'RAW',
+      data: matching.map((v) => ({
+        range: `Ventas!G${v.rowIndex}:H${v.rowIndex}`,
+        values: [[newNombre, newContacto]],
+      })),
+    },
+  });
+}
+
 export async function registrarVentaItems(
   items: { puro: Puro; cantidad: number }[],
   fechaOverride?: string,

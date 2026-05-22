@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import type { Cliente } from '@/types';
 
 const SURFACE    = '#FFFFFF';
@@ -23,7 +24,48 @@ function formatDate(raw: string): string {
 }
 
 export default function ClientesTable({ clientes }: { clientes: Cliente[] }) {
+  const router = useRouter();
   const [expanded, setExpanded] = useState<string | null>(null);
+  const [editing, setEditing] = useState<string | null>(null);
+  const [editNombre, setEditNombre] = useState('');
+  const [editContacto, setEditContacto] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  function startEdit(c: Cliente) {
+    setEditing(c.nombre);
+    setEditNombre(c.nombre);
+    setEditContacto(c.contacto);
+    setError(null);
+  }
+
+  function cancelEdit() {
+    setEditing(null);
+    setError(null);
+  }
+
+  async function saveEdit(oldNombre: string) {
+    setSaving(true);
+    setError(null);
+    try {
+      const res = await fetch('/api/clientes', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ oldNombre, newNombre: editNombre.trim(), newContacto: editContacto.trim() }),
+      });
+      if (!res.ok) {
+        const data = await res.json();
+        setError(data.error ?? 'Error al guardar');
+        return;
+      }
+      setEditing(null);
+      router.refresh();
+    } catch {
+      setError('Error de red');
+    } finally {
+      setSaving(false);
+    }
+  }
 
   if (clientes.length === 0) {
     return (
@@ -64,6 +106,7 @@ export default function ClientesTable({ clientes }: { clientes: Cliente[] }) {
 
       {clientes.map((c, i) => {
         const isOpen = expanded === c.nombre;
+        const isEditing = editing === c.nombre;
         const isLast = i === clientes.length - 1;
 
         return (
@@ -117,13 +160,115 @@ export default function ClientesTable({ clientes }: { clientes: Cliente[] }) {
               </span>
             </button>
 
-            {/* Expanded history */}
+            {/* Expanded section */}
             {isOpen && (
               <div style={{
                 background: SURFACE_BG,
                 borderTop: `1px solid ${BORDER}`,
                 padding: '16px 32px 20px',
               }}>
+                {/* Edit form */}
+                {isEditing ? (
+                  <div style={{ marginBottom: '20px', paddingBottom: '20px', borderBottom: `1px solid ${BORDER}` }}>
+                    <p style={{
+                      fontFamily: 'var(--font-code)', fontSize: '9px',
+                      letterSpacing: '0.22em', textTransform: 'uppercase',
+                      color: TEXT_MUTED, margin: '0 0 12px',
+                    }}>
+                      Editar cliente
+                    </p>
+                    <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'flex-end' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        <label style={{ fontFamily: 'var(--font-code)', fontSize: '9px', letterSpacing: '0.18em', textTransform: 'uppercase', color: TEXT_MUTED }}>
+                          Nombre
+                        </label>
+                        <input
+                          value={editNombre}
+                          onChange={(e) => setEditNombre(e.target.value)}
+                          style={{
+                            fontFamily: 'var(--font-code)', fontSize: '12px', color: TEXT,
+                            background: SURFACE, border: `1px solid ${BORDER}`,
+                            padding: '7px 10px', outline: 'none', width: '200px',
+                          }}
+                        />
+                      </div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                        <label style={{ fontFamily: 'var(--font-code)', fontSize: '9px', letterSpacing: '0.18em', textTransform: 'uppercase', color: TEXT_MUTED }}>
+                          Contacto
+                        </label>
+                        <input
+                          value={editContacto}
+                          onChange={(e) => setEditContacto(e.target.value)}
+                          style={{
+                            fontFamily: 'var(--font-code)', fontSize: '12px', color: TEXT,
+                            background: SURFACE, border: `1px solid ${BORDER}`,
+                            padding: '7px 10px', outline: 'none', width: '200px',
+                          }}
+                        />
+                      </div>
+                      <div style={{ display: 'flex', gap: '8px' }}>
+                        <button
+                          type="button"
+                          disabled={saving || !editNombre.trim()}
+                          onClick={() => saveEdit(c.nombre)}
+                          style={{
+                            fontFamily: 'var(--font-code)', fontSize: '9px',
+                            letterSpacing: '0.18em', textTransform: 'uppercase',
+                            background: OXBLOOD, color: '#F0E6D2',
+                            border: 'none', padding: '8px 16px', cursor: saving ? 'wait' : 'pointer',
+                            opacity: saving || !editNombre.trim() ? 0.5 : 1,
+                          }}
+                        >
+                          {saving ? 'Guardando…' : 'Guardar'}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={cancelEdit}
+                          disabled={saving}
+                          style={{
+                            fontFamily: 'var(--font-code)', fontSize: '9px',
+                            letterSpacing: '0.18em', textTransform: 'uppercase',
+                            background: 'transparent', color: TEXT_MUTED,
+                            border: `1px solid ${BORDER}`, padding: '8px 16px', cursor: 'pointer',
+                          }}
+                        >
+                          Cancelar
+                        </button>
+                      </div>
+                    </div>
+                    {error && (
+                      <p style={{ fontFamily: 'var(--font-code)', fontSize: '10px', color: '#EF4444', margin: '8px 0 0' }}>
+                        {error}
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <div style={{ marginBottom: '16px' }}>
+                    <button
+                      type="button"
+                      onClick={() => startEdit(c)}
+                      style={{
+                        fontFamily: 'var(--font-code)', fontSize: '9px',
+                        letterSpacing: '0.18em', textTransform: 'uppercase',
+                        background: 'transparent', color: TEXT_MUTED,
+                        border: `1px solid ${BORDER}`, padding: '6px 14px',
+                        cursor: 'pointer', transition: 'color 120ms, border-color 120ms',
+                      }}
+                      onMouseEnter={(e) => {
+                        (e.currentTarget as HTMLButtonElement).style.color = TEXT;
+                        (e.currentTarget as HTMLButtonElement).style.borderColor = TEXT_SEC;
+                      }}
+                      onMouseLeave={(e) => {
+                        (e.currentTarget as HTMLButtonElement).style.color = TEXT_MUTED;
+                        (e.currentTarget as HTMLButtonElement).style.borderColor = BORDER;
+                      }}
+                    >
+                      Editar información
+                    </button>
+                  </div>
+                )}
+
+                {/* Purchase history */}
                 <p style={{
                   fontFamily: 'var(--font-code)', fontSize: '9px',
                   letterSpacing: '0.22em', textTransform: 'uppercase',
