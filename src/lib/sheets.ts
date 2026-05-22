@@ -546,7 +546,7 @@ export async function createEntradaInventario(
   await sheets.spreadsheets.values.update({
     spreadsheetId: SPREADSHEET_ID,
     range: `Inventario!A${index + 2}:AB${index + 2}`,
-    valueInputOption: 'RAW',
+    valueInputOption: 'USER_ENTERED',
     requestBody: { values: [puroToRow(updated)] },
   });
 
