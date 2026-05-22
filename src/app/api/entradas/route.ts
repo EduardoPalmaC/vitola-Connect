@@ -1,3 +1,4 @@
+import { revalidatePath } from 'next/cache';
 import { NextResponse } from 'next/server';
 import { createEntradaInventario, getEntradasByPuro } from '@/lib/sheets';
 
@@ -17,6 +18,8 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Campos requeridos: puroId, fecha, cantidad, costoUnitario' }, { status: 400 });
     }
     const entrada = await createEntradaInventario({ puroId, fecha, cantidad: Number(cantidad), costoUnitario: Number(costoUnitario), notas });
+    revalidatePath('/admin');
+    revalidatePath('/catalogo');
     return NextResponse.json(entrada, { status: 201 });
   } catch (err) {
     const msg = err instanceof Error ? err.message : 'Error interno';
