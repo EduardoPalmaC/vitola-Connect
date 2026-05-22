@@ -476,10 +476,31 @@ export async function getEntradasByPuro(puroId: string): Promise<EntradaInventar
   });
   const rows = (response.data.values ?? []) as string[][];
   return rows
-    .filter((row) => row[1] === puroId)
+    .filter((row) => row[1]?.trim() === puroId.trim())
     .map((row) => ({
-      id: row[0]!,
-      puroId: row[1]!,
+      id: row[0]!.trim(),
+      puroId: row[1]!.trim(),
+      fecha: row[2]!,
+      cantidad: parseInt(row[3]!),
+      costoUnitario: parseFloat(row[4]!),
+      notas: row[5] || undefined,
+      createdAt: row[6]!,
+    }));
+}
+
+export async function getAllEntradas(): Promise<(EntradaInventario & { rowIndex: number })[]> {
+  const sheets = await getSheets();
+  const response = await sheets.spreadsheets.values.get({
+    spreadsheetId: SPREADSHEET_ID,
+    range: 'EntradasInventario!A2:G',
+  });
+  const rows = (response.data.values ?? []) as string[][];
+  return rows
+    .filter((row) => row[0])
+    .map((row, i) => ({
+      rowIndex: i + 2,
+      id: row[0]!.trim(),
+      puroId: row[1]!.trim(),
       fecha: row[2]!,
       cantidad: parseInt(row[3]!),
       costoUnitario: parseFloat(row[4]!),
@@ -491,15 +512,15 @@ export async function getEntradasByPuro(puroId: string): Promise<EntradaInventar
 export async function createEntradaInventario(
   data: Omit<EntradaInventario, 'id' | 'createdAt'>
 ): Promise<EntradaInventario> {
-  const sheets = await getSheets();
   const id = crypto.randomUUID();
   const now = new Date().toISOString();
   const entrada: EntradaInventario = { ...data, id, createdAt: now };
 
+  const sheets = await getSheets();
   await sheets.spreadsheets.values.append({
     spreadsheetId: SPREADSHEET_ID,
     range: 'EntradasInventario!A:G',
-    valueInputOption: 'USER_ENTERED',
+    valueInputOption: 'RAW',
     requestBody: {
       values: [[
         entrada.id,
@@ -514,22 +535,80 @@ export async function createEntradaInventario(
   });
 
   const puros = await getPuros();
-  const index = puros.findIndex((p) => p.id === data.puroId);
-  if (index !== -1) {
-    const updated: Puro = {
+  const index = puros.findIndex((p) => p.id.trim() === data.puroId.trim());
+  if (index === -1) throw new Error(`Puro ${data.puroId} no encontrado al actualizar stock`);
+
+  const updated: Puro = {
+    ...puros[index]!,
+    stock: puros[index]!.stock + data.cantidad,
+    updatedAt: now,
+  };
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: SPREADSHEET_ID,
+    range: `Inventario!A${index + 2}:AB${index + 2}`,
+    valueInputOption: 'RAW',
+    requestBody: { values: [puroToRow(updated)] },
+  });
+
+  return entrada;
+}
+
+export async function updateEntradaInventario(
+  entradaId: string,
+  updates: Pick<EntradaInventario, 'fecha' | 'cantidad' | 'costoUnitario' | 'notas'>
+): Promise<EntradaInventario> {
+  const todas = await getAllEntradas();
+  const found = todas.find((e) => e.id === entradaId);
+  if (!found) throw new Error(`Entrada ${entradaId} no encontrada`);
+
+  const cantidadDelta = updates.cantidad - found.cantidad;
+
+  const updated: EntradaInventario = {
+    id: found.id,
+    puroId: found.puroId,
+    fecha: updates.fecha,
+    cantidad: updates.cantidad,
+    costoUnitario: updates.costoUnitario,
+    notas: updates.notas,
+    createdAt: found.createdAt,
+  };
+
+  const sheets = await getSheets();
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: SPREADSHEET_ID,
+    range: `EntradasInventario!A${found.rowIndex}:G${found.rowIndex}`,
+    valueInputOption: 'RAW',
+    requestBody: {
+      values: [[
+        updated.id,
+        updated.puroId,
+        updated.fecha,
+        updated.cantidad,
+        updated.costoUnitario,
+        updated.notas ?? '',
+        updated.createdAt,
+      ]],
+    },
+  });
+
+  if (cantidadDelta !== 0) {
+    const puros = await getPuros();
+    const index = puros.findIndex((p) => p.id.trim() === found.puroId.trim());
+    if (index === -1) throw new Error(`Puro ${found.puroId} no encontrado al ajustar stock`);
+    const puroActualizado: Puro = {
       ...puros[index]!,
-      stock: puros[index]!.stock + data.cantidad,
-      updatedAt: now,
+      stock: Math.max(0, puros[index]!.stock + cantidadDelta),
+      updatedAt: new Date().toISOString(),
     };
     await sheets.spreadsheets.values.update({
       spreadsheetId: SPREADSHEET_ID,
       range: `Inventario!A${index + 2}:AB${index + 2}`,
-      valueInputOption: 'USER_ENTERED',
-      requestBody: { values: [puroToRow(updated)] },
+      valueInputOption: 'RAW',
+      requestBody: { values: [puroToRow(puroActualizado)] },
     });
   }
 
-  return entrada;
+  return updated;
 }
 
 export async function actualizarStockMultiple(

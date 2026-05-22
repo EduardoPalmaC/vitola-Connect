@@ -10,11 +10,16 @@ export async function GET(req: Request) {
 }
 
 export async function POST(req: Request) {
-  const body = await req.json();
-  const { puroId, fecha, cantidad, costoUnitario, notas } = body;
-  if (!puroId || !fecha || !cantidad || costoUnitario === undefined) {
-    return NextResponse.json({ error: 'Campos requeridos: puroId, fecha, cantidad, costoUnitario' }, { status: 400 });
+  try {
+    const body = await req.json();
+    const { puroId, fecha, cantidad, costoUnitario, notas } = body;
+    if (!puroId || !fecha || !cantidad || costoUnitario === undefined) {
+      return NextResponse.json({ error: 'Campos requeridos: puroId, fecha, cantidad, costoUnitario' }, { status: 400 });
+    }
+    const entrada = await createEntradaInventario({ puroId, fecha, cantidad: Number(cantidad), costoUnitario: Number(costoUnitario), notas });
+    return NextResponse.json(entrada, { status: 201 });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : 'Error interno';
+    return NextResponse.json({ error: msg }, { status: 500 });
   }
-  const entrada = await createEntradaInventario({ puroId, fecha, cantidad: Number(cantidad), costoUnitario: Number(costoUnitario), notas });
-  return NextResponse.json(entrada, { status: 201 });
 }
