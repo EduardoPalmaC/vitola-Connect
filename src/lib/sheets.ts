@@ -611,6 +611,46 @@ export async function updateEntradaInventario(
   return updated;
 }
 
+export async function deleteEntradaInventario(entradaId: string): Promise<void> {
+  const todas = await getAllEntradas();
+  const found = todas.find((e) => e.id === entradaId);
+  if (!found) throw new Error(`Entrada ${entradaId} no encontrada`);
+
+  const sheets = await getSheets();
+
+  const spreadsheet = await sheets.spreadsheets.get({ spreadsheetId: SPREADSHEET_ID });
+  const sheet = spreadsheet.data.sheets?.find((s) => s.properties?.title === 'EntradasInventario');
+  const sheetId = sheet?.properties?.sheetId;
+  if (sheetId === undefined) throw new Error('Hoja EntradasInventario no encontrada');
+
+  await sheets.spreadsheets.batchUpdate({
+    spreadsheetId: SPREADSHEET_ID,
+    requestBody: {
+      requests: [{
+        deleteDimension: {
+          range: { sheetId, dimension: 'ROWS', startIndex: found.rowIndex - 1, endIndex: found.rowIndex },
+        },
+      }],
+    },
+  });
+
+  const puros = await getPuros();
+  const index = puros.findIndex((p) => p.id.trim() === found.puroId.trim());
+  if (index === -1) throw new Error(`Puro ${found.puroId} no encontrado al revertir stock`);
+
+  const puroActualizado: Puro = {
+    ...puros[index]!,
+    stock: Math.max(0, puros[index]!.stock - found.cantidad),
+    updatedAt: new Date().toISOString(),
+  };
+  await sheets.spreadsheets.values.update({
+    spreadsheetId: SPREADSHEET_ID,
+    range: `Inventario!A${index + 2}:AB${index + 2}`,
+    valueInputOption: 'RAW',
+    requestBody: { values: [puroToRow(puroActualizado)] },
+  });
+}
+
 export async function actualizarStockMultiple(
   updates: { id: string; cantidad: number }[]
 ): Promise<void> {

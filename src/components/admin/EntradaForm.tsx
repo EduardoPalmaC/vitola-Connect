@@ -110,6 +110,7 @@ export default function EntradaForm({ puroId, puroNombre, stockActual, entradas 
   const [editState, setEditState] = useState<EditState | null>(null);
   const [editLoading, setEditLoading] = useState(false);
   const [editError, setEditError] = useState('');
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   // ── Derived cost ──
   const qty = Number(purosPorMazo) || 1;
@@ -197,6 +198,18 @@ export default function EntradaForm({ puroId, puroNombre, stockActual, entradas 
       setEditState(null);
     } catch (err) { setEditError(err instanceof Error ? err.message : 'Error desconocido'); }
     finally { setEditLoading(false); }
+  }
+
+  async function handleDelete(entradaId: string, cantidadEntrada: number) {
+    if (!confirm('¿Eliminar esta entrada? El stock se reducirá automáticamente.')) return;
+    setDeletingId(entradaId);
+    try {
+      const res = await fetch(`/api/entradas/${entradaId}`, { method: 'DELETE' });
+      if (!res.ok) { const d = await res.json() as { error?: string }; throw new Error(d.error ?? 'Error al eliminar'); }
+      setListaEntradas((prev) => prev.filter((e) => e.id !== entradaId));
+      setStockDisplay((prev) => Math.max(0, prev - cantidadEntrada));
+    } catch (err) { alert(err instanceof Error ? err.message : 'Error al eliminar'); }
+    finally { setDeletingId(null); }
   }
 
   const tabBase: React.CSSProperties = { padding: '6px 16px', fontSize: '13px', fontFamily: 'var(--font-code)', cursor: 'pointer', transition: 'all 150ms', border: 'none' };
@@ -306,10 +319,16 @@ export default function EntradaForm({ puroId, puroNombre, stockActual, entradas 
                         <span style={{ color: '#F0E6D2', fontFamily: 'var(--font-code)', fontSize: '13px' }}>${e.costoUnitario.toFixed(4)}/ud</span>
                         {e.notas && <span style={{ color: '#9A8572', fontFamily: 'var(--font-code)', fontSize: '12px' }}>{e.notas}</span>}
                       </div>
-                      <button type="button" onClick={() => { setEditingId(e.id); setEditState(buildEditState(e)); setEditError(''); }}
-                        style={{ color: '#8B6F47', fontFamily: 'var(--font-code)', fontSize: '12px', background: 'none', border: 'none', cursor: 'pointer', letterSpacing: '0.04em' }}>
-                        Editar
-                      </button>
+                      <div className="flex items-center gap-3">
+                        <button type="button" onClick={() => { setEditingId(e.id); setEditState(buildEditState(e)); setEditError(''); }}
+                          style={{ color: '#8B6F47', fontFamily: 'var(--font-code)', fontSize: '12px', background: 'none', border: 'none', cursor: 'pointer', letterSpacing: '0.04em' }}>
+                          Editar
+                        </button>
+                        <button type="button" disabled={deletingId === e.id} onClick={() => handleDelete(e.id, e.cantidad)}
+                          style={{ color: '#EF4444', fontFamily: 'var(--font-code)', fontSize: '12px', background: 'none', border: 'none', cursor: deletingId === e.id ? 'not-allowed' : 'pointer', opacity: deletingId === e.id ? 0.5 : 1 }}>
+                          {deletingId === e.id ? '…' : 'Eliminar'}
+                        </button>
+                      </div>
                     </div>
                   ) : (
                     <div className="flex flex-col gap-4">
