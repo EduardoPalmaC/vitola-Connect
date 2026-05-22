@@ -538,9 +538,10 @@ export async function createEntradaInventario(
   const index = puros.findIndex((p) => p.id.trim() === data.puroId.trim());
   if (index === -1) throw new Error(`Puro ${data.puroId} no encontrado al actualizar stock`);
 
+  const puro = puros[index]!;
   const updated: Puro = {
-    ...puros[index]!,
-    stock: puros[index]!.stock + data.cantidad,
+    ...puro,
+    stock: puro.stock + data.cantidad,
     updatedAt: now,
   };
   await sheets.spreadsheets.values.update({

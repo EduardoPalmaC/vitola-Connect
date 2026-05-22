@@ -11,7 +11,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const body = await req.json();
+  const { stock: _stock, ...body } = await req.json();
   await updatePuro(id, body);
   return NextResponse.json({ ok: true });
 }
