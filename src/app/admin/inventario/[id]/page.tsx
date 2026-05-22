@@ -2,8 +2,9 @@ export const dynamic = 'force-dynamic';
 
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { getPuros } from '@/lib/sheets';
+import { getPuros, getEntradasByPuro } from '@/lib/sheets';
 import PuroForm from '@/components/admin/PuroForm';
+import EntradaForm from '@/components/admin/EntradaForm';
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -11,7 +12,7 @@ interface PageProps {
 
 export default async function EditarPuroPage({ params }: PageProps) {
   const { id } = await params;
-  const puros = await getPuros();
+  const [puros, entradas] = await Promise.all([getPuros(), getEntradasByPuro(id)]);
   const puro = puros.find((p) => p.id === id);
 
   if (!puro) notFound();
@@ -33,8 +34,23 @@ export default async function EditarPuroPage({ params }: PageProps) {
         </Link>
       </header>
 
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-10">
         <PuroForm mode="edit" id={id} initialData={initialData} />
+
+        <div>
+          <h2
+            className="font-bold mb-4"
+            style={{ fontFamily: 'var(--font-serif)', fontSize: '20px', color: '#F0E6D2' }}
+          >
+            Entradas de inventario
+          </h2>
+          <EntradaForm
+            puroId={id}
+            puroNombre={`${puro.marca} ${puro.vitola}`}
+            stockActual={puro.stock}
+            entradas={entradas.sort((a, b) => b.fecha.localeCompare(a.fecha))}
+          />
+        </div>
       </div>
     </div>
   );

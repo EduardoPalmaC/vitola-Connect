@@ -119,6 +119,16 @@ export interface Cata {
   maridaje?: string;
 }
 
+export interface EntradaInventario {
+  id: string;
+  puroId: string;
+  fecha: string;
+  cantidad: number;
+  costoUnitario: number;
+  notas?: string;
+  createdAt: string;
+}
+
 export interface VentaConIndice extends Venta {
   rowIndex: number;
 }

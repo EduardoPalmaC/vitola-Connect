@@ -1,7 +1,7 @@
 import { google } from 'googleapis';
 import { OAuth2Client } from 'google-auth-library';
 import { SignJWT, importPKCS8 } from 'jose';
-import type { Puro, Venta, VentaConIndice, Cata, Cliente } from '@/types';
+import type { Puro, Venta, VentaConIndice, Cata, Cliente, EntradaInventario } from '@/types';
 
 const SPREADSHEET_ID = process.env.GOOGLE_SHEETS_ID!;
 
@@ -466,6 +466,70 @@ export async function deleteCata(id: string): Promise<void> {
       ],
     },
   });
+}
+
+export async function getEntradasByPuro(puroId: string): Promise<EntradaInventario[]> {
+  const sheets = await getSheets();
+  const response = await sheets.spreadsheets.values.get({
+    spreadsheetId: SPREADSHEET_ID,
+    range: 'EntradasInventario!A2:G',
+  });
+  const rows = (response.data.values ?? []) as string[][];
+  return rows
+    .filter((row) => row[1] === puroId)
+    .map((row) => ({
+      id: row[0]!,
+      puroId: row[1]!,
+      fecha: row[2]!,
+      cantidad: parseInt(row[3]!),
+      costoUnitario: parseFloat(row[4]!),
+      notas: row[5] || undefined,
+      createdAt: row[6]!,
+    }));
+}
+
+export async function createEntradaInventario(
+  data: Omit<EntradaInventario, 'id' | 'createdAt'>
+): Promise<EntradaInventario> {
+  const sheets = await getSheets();
+  const id = crypto.randomUUID();
+  const now = new Date().toISOString();
+  const entrada: EntradaInventario = { ...data, id, createdAt: now };
+
+  await sheets.spreadsheets.values.append({
+    spreadsheetId: SPREADSHEET_ID,
+    range: 'EntradasInventario!A:G',
+    valueInputOption: 'USER_ENTERED',
+    requestBody: {
+      values: [[
+        entrada.id,
+        entrada.puroId,
+        entrada.fecha,
+        entrada.cantidad,
+        entrada.costoUnitario,
+        entrada.notas ?? '',
+        entrada.createdAt,
+      ]],
+    },
+  });
+
+  const puros = await getPuros();
+  const index = puros.findIndex((p) => p.id === data.puroId);
+  if (index !== -1) {
+    const updated: Puro = {
+      ...puros[index]!,
+      stock: puros[index]!.stock + data.cantidad,
+      updatedAt: now,
+    };
+    await sheets.spreadsheets.values.update({
+      spreadsheetId: SPREADSHEET_ID,
+      range: `Inventario!A${index + 2}:AB${index + 2}`,
+      valueInputOption: 'USER_ENTERED',
+      requestBody: { values: [puroToRow(updated)] },
+    });
+  }
+
+  return entrada;
 }
 
 export async function actualizarStockMultiple(
