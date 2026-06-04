@@ -39,7 +39,9 @@ export default async function ColeccionPage({ searchParams }: PageProps) {
   };
 
   const allPuros = await getPuros();
-  const coleccionPuros = allPuros.filter((p) => p.estado === 'coleccion_personal');
+  const coleccionPuros = allPuros
+    .filter((p) => p.estado === 'coleccion_personal')
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
   const filtered = filtrarPuros(coleccionPuros, filterParams);
   const { items, total, pages } = paginar(filtered, filterParams.page);
