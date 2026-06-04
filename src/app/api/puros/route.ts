@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { getPuros, createPuro } from '@/lib/sheets';
 import { filtrarPuros, paginar } from '@/lib/filters';
 import type { FilterParams } from '@/types';
@@ -31,5 +32,7 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   const body = await req.json();
   const puro = await createPuro(body);
+  revalidatePath('/admin/inventario');
+  revalidatePath('/admin/coleccion');
   return NextResponse.json(puro, { status: 201 });
 }
