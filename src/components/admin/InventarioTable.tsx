@@ -569,8 +569,7 @@ function Legend() {
 }
 
 // ─── Root export ──────────────────────────────────────────────────────────────
-export default function InventarioTable({ puros: initialPuros }: { puros: Puro[] }) {
-  const [puros] = useState<Puro[]>(initialPuros);
+export default function InventarioTable({ puros }: { puros: Puro[] }) {
   const [globalFilter, setGlobalFilter] = useState('');
 
   const negocio = useMemo(() => puros.filter((p) => p.estado === 'negocio'), [puros]);
