@@ -23,35 +23,112 @@ export default function PaginationBar({ page, pages, total }: PaginationBarProps
 
   return (
     <div
-      className="flex items-center justify-between pt-8 mt-8"
-      style={{ borderTop: '1px solid rgba(237,224,196,0.07)' }}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '24px 48px',
+        borderTop: '1px solid #E2D9C8',
+        background: '#F9F6F0',
+      }}
+      className="max-sm:px-6"
     >
       <p
-        className="text-[10px] uppercase tracking-widest"
-        style={{ fontFamily: 'var(--font-body)', color: 'rgba(237,224,196,0.2)' }}
+        style={{
+          fontFamily: 'var(--font-code)',
+          fontSize: '11px',
+          letterSpacing: '0.18em',
+          textTransform: 'uppercase',
+          color: '#B0A090',
+        }}
       >
-        {total} puros
+        {total} puros · pág. {page} de {pages}
       </p>
-      <div className="flex items-center gap-4">
+
+      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
         <button
           disabled={page <= 1}
           onClick={() => goTo(page - 1)}
-          className="text-[10px] uppercase tracking-widest cursor-pointer transition-colors duration-200 disabled:opacity-20 disabled:cursor-not-allowed"
-          style={{ fontFamily: 'var(--font-body)', color: 'rgba(237,224,196,0.4)' }}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            padding: '10px 20px',
+            border: '1px solid #C8B99A',
+            borderRadius: '6px',
+            background: page <= 1 ? '#F0EBE3' : '#FFFFFF',
+            color: page <= 1 ? '#C8B99A' : '#2C1E1A',
+            fontFamily: 'var(--font-code)',
+            fontSize: '11px',
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase',
+            cursor: page <= 1 ? 'not-allowed' : 'pointer',
+            transition: 'all 150ms',
+          }}
+          onMouseEnter={(e) => {
+            if (page > 1) (e.currentTarget as HTMLButtonElement).style.background = '#F5F0E8';
+          }}
+          onMouseLeave={(e) => {
+            if (page > 1) (e.currentTarget as HTMLButtonElement).style.background = '#FFFFFF';
+          }}
         >
           ← Anterior
         </button>
-        <span
-          className="text-[10px] tabular-nums"
-          style={{ fontFamily: 'var(--font-body)', color: 'rgba(237,224,196,0.2)' }}
-        >
-          {page} / {pages}
-        </span>
+
+        <div style={{ display: 'flex', gap: '4px' }}>
+          {Array.from({ length: pages }, (_, i) => i + 1).map((p) => (
+            <button
+              key={p}
+              onClick={() => goTo(p)}
+              style={{
+                width: '36px',
+                height: '36px',
+                borderRadius: '6px',
+                border: p === page ? '1px solid #2C1E1A' : '1px solid #E2D9C8',
+                background: p === page ? '#2C1E1A' : '#FFFFFF',
+                color: p === page ? '#F0E6D2' : '#2C1E1A',
+                fontFamily: 'var(--font-code)',
+                fontSize: '12px',
+                cursor: 'pointer',
+                transition: 'all 150ms',
+              }}
+              onMouseEnter={(e) => {
+                if (p !== page) (e.currentTarget as HTMLButtonElement).style.background = '#F5F0E8';
+              }}
+              onMouseLeave={(e) => {
+                if (p !== page) (e.currentTarget as HTMLButtonElement).style.background = '#FFFFFF';
+              }}
+            >
+              {p}
+            </button>
+          ))}
+        </div>
+
         <button
           disabled={page >= pages}
           onClick={() => goTo(page + 1)}
-          className="text-[10px] uppercase tracking-widest cursor-pointer transition-colors duration-200 disabled:opacity-20 disabled:cursor-not-allowed"
-          style={{ fontFamily: 'var(--font-body)', color: 'rgba(237,224,196,0.4)' }}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            padding: '10px 20px',
+            border: '1px solid #C8B99A',
+            borderRadius: '6px',
+            background: page >= pages ? '#F0EBE3' : '#FFFFFF',
+            color: page >= pages ? '#C8B99A' : '#2C1E1A',
+            fontFamily: 'var(--font-code)',
+            fontSize: '11px',
+            letterSpacing: '0.14em',
+            textTransform: 'uppercase',
+            cursor: page >= pages ? 'not-allowed' : 'pointer',
+            transition: 'all 150ms',
+          }}
+          onMouseEnter={(e) => {
+            if (page < pages) (e.currentTarget as HTMLButtonElement).style.background = '#F5F0E8';
+          }}
+          onMouseLeave={(e) => {
+            if (page < pages) (e.currentTarget as HTMLButtonElement).style.background = '#FFFFFF';
+          }}
         >
           Siguiente →
         </button>
