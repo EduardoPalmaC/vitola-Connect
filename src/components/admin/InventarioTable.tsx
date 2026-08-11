@@ -185,6 +185,14 @@ function buildBaseColumns(allData: Puro[]): ColumnDef<Puro, unknown>[] {
       header: 'Stock',
       cell: (info) => <StockBadge stock={info.getValue() as number} />,
     }) as ColumnDef<Puro, unknown>,
+    col.accessor('humidor', {
+      header: 'Humidor',
+      cell: (info) => (
+        <span style={{ fontFamily: 'var(--font-code)', fontSize: '11px', color: TEXT_MUTED }}>
+          {(info.getValue() as string) || '—'}
+        </span>
+      ),
+    }) as ColumnDef<Puro, unknown>,
     col.accessor('fechaLlegada', {
       header: 'Llegada',
       cell: (info) => (
@@ -303,6 +311,14 @@ function buildNegocioColumns(allData: Puro[]): ColumnDef<Puro, unknown>[] {
     col.accessor('stock', {
       header: 'Stock',
       cell: (info) => <StockBadge stock={info.getValue() as number} />,
+    }) as ColumnDef<Puro, unknown>,
+    col.accessor('humidor', {
+      header: 'Humidor',
+      cell: (info) => (
+        <span style={{ fontFamily: 'var(--font-code)', fontSize: '11px', color: TEXT_MUTED }}>
+          {(info.getValue() as string) || '—'}
+        </span>
+      ),
     }) as ColumnDef<Puro, unknown>,
     col.accessor('fechaLlegada', {
       header: 'Llegada',
