@@ -73,6 +73,7 @@ function rowToPuro(row: string[]): Puro {
     transporteMazo: row[25] !== undefined && row[25] !== '' ? parseFloat(row[25]) : undefined,
     almacenamientoMazo: row[26] !== undefined && row[26] !== '' ? parseFloat(row[26]) : undefined,
     modoIngreso: (row[27] === 'mazo' || row[27] === 'pieza') ? row[27] : undefined,
+    humidor: row[28] || undefined,
     createdAt: row[18]!,
     updatedAt: row[19]!,
   };
@@ -108,6 +109,7 @@ function puroToRow(puro: Puro): (string | number)[] {
     puro.transporteMazo ?? '',
     puro.almacenamientoMazo ?? '',
     puro.modoIngreso ?? '',
+    puro.humidor ?? '',
   ];
 }
 
@@ -115,7 +117,7 @@ export async function getPuros(): Promise<Puro[]> {
   const sheets = await getSheets();
   const response = await sheets.spreadsheets.values.get({
     spreadsheetId: SPREADSHEET_ID,
-    range: 'Inventario!A2:AB',
+    range: 'Inventario!A2:AC',
   });
 
   const rows = (response.data.values ?? []) as string[][];
@@ -132,7 +134,7 @@ export async function createPuro(
 
   await sheets.spreadsheets.values.append({
     spreadsheetId: SPREADSHEET_ID,
-    range: 'Inventario!A:AB',
+    range: 'Inventario!A:AC',
     valueInputOption: 'USER_ENTERED',
     requestBody: { values: [puroToRow(full)] },
   });
@@ -154,7 +156,7 @@ export async function updatePuro(id: string, updates: Partial<Puro>): Promise<vo
 
   await sheets.spreadsheets.values.update({
     spreadsheetId: SPREADSHEET_ID,
-    range: `Inventario!A${index + 2}:AB${index + 2}`,
+    range: `Inventario!A${index + 2}:AC${index + 2}`,
     valueInputOption: 'USER_ENTERED',
     requestBody: { values: [puroToRow(updated)] },
   });
@@ -570,7 +572,7 @@ export async function createEntradaInventario(
   };
   await sheets.spreadsheets.values.update({
     spreadsheetId: SPREADSHEET_ID,
-    range: `Inventario!A${index + 2}:AB${index + 2}`,
+    range: `Inventario!A${index + 2}:AC${index + 2}`,
     valueInputOption: 'USER_ENTERED',
     requestBody: { values: [puroToRow(updated)] },
   });
@@ -627,7 +629,7 @@ export async function updateEntradaInventario(
     };
     await sheets.spreadsheets.values.update({
       spreadsheetId: SPREADSHEET_ID,
-      range: `Inventario!A${index + 2}:AB${index + 2}`,
+      range: `Inventario!A${index + 2}:AC${index + 2}`,
       valueInputOption: 'RAW',
       requestBody: { values: [puroToRow(puroActualizado)] },
     });
@@ -670,7 +672,7 @@ export async function deleteEntradaInventario(entradaId: string): Promise<void> 
   };
   await sheets.spreadsheets.values.update({
     spreadsheetId: SPREADSHEET_ID,
-    range: `Inventario!A${index + 2}:AB${index + 2}`,
+    range: `Inventario!A${index + 2}:AC${index + 2}`,
     valueInputOption: 'RAW',
     requestBody: { values: [puroToRow(puroActualizado)] },
   });
@@ -695,7 +697,7 @@ export async function actualizarStockMultiple(
 
       return sheets.spreadsheets.values.update({
         spreadsheetId: SPREADSHEET_ID,
-        range: `Inventario!A${index + 2}:AB${index + 2}`,
+        range: `Inventario!A${index + 2}:AC${index + 2}`,
         valueInputOption: 'USER_ENTERED',
         requestBody: { values: [puroToRow(updated)] },
       });

@@ -31,6 +31,7 @@ const EMPTY: FormValues = {
   notasCata: '',
   stock: 1,
   fortaleza: '',
+  humidor: '',
   costoMazo: 0,
   purosPorMazo: 25,
   transporteMazo: 0,
@@ -97,6 +98,7 @@ export default function PuroForm({ mode, id, initialData }: Props) {
     notasCata: initialData?.notasCata ?? EMPTY.notasCata,
     stock: initialData?.stock ?? EMPTY.stock,
     fortaleza: initialData?.fortaleza ?? EMPTY.fortaleza,
+    humidor: initialData?.humidor ?? EMPTY.humidor,
   });
 
   const isColeccion = values.estado === 'coleccion_personal';
@@ -451,6 +453,12 @@ export default function PuroForm({ mode, id, initialData }: Props) {
             value={values.stock}
             onChange={(e) => set('stock', Number(e.target.value))}
             required
+          />
+          <Input
+            label="Humidor"
+            value={values.humidor ?? ''}
+            onChange={(e) => set('humidor', e.target.value)}
+            placeholder="Número o nombre del humidor"
           />
         </div>
         {costMode === 'mazo' && purosPorMazo > 0 && (

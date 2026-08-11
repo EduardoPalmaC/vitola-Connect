@@ -25,6 +25,7 @@ export interface Puro {
   transporteMazo?: number;
   almacenamientoMazo?: number;
   modoIngreso?: 'pieza' | 'mazo';
+  humidor?: string;
   createdAt: string;
   updatedAt: string;
 }
